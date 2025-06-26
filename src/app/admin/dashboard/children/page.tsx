@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -9,51 +13,35 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-
-const children = [
-  {
-    id: "BP001",
-    name: "Olivia Smith",
-    age: 4,
-    parent: "John Smith",
-    contact: "john@example.com",
-    photo: "/avatars/01.png",
-  },
-  {
-    id: "BP002",
-    name: "Noah Johnson",
-    age: 5,
-    parent: "Emily Johnson",
-    contact: "emily@example.com",
-    photo: "/avatars/02.png",
-  },
-  {
-    id: "BP003",
-    name: "Emma Williams",
-    age: 3,
-    parent: "Michael Williams",
-    contact: "michael@example.com",
-    photo: "",
-  },
-  {
-    id: "BP004",
-    name: "Liam Brown",
-    age: 4,
-    parent: "Sophia Brown",
-    contact: "sophia@example.com",
-    photo: "/avatars/03.png",
-  },
-  {
-    id: "BP005",
-    name: "Ava Jones",
-    age: 5,
-    parent: "David Jones",
-    contact: "david@example.com",
-    photo: "/avatars/04.png",
-  },
-];
+import type { Child } from "@/lib/data";
+import { initialChildren } from "@/lib/data";
 
 export default function ChildrenPage() {
+  const [children, setChildren] = useState<Child[]>([]);
+
+  useEffect(() => {
+    // This effect runs only on the client
+    let storedChildren: Child[];
+    try {
+      const storedChildrenJSON = localStorage.getItem("registeredChildren");
+      if (storedChildrenJSON) {
+        storedChildren = JSON.parse(storedChildrenJSON);
+      } else {
+        // First time load, populate localStorage with initial data
+        storedChildren = initialChildren;
+        localStorage.setItem(
+          "registeredChildren",
+          JSON.stringify(initialChildren)
+        );
+      }
+    } catch (error) {
+      console.error("Failed to load children from local storage", error);
+      // Fallback to initial children if parsing fails
+      storedChildren = initialChildren;
+    }
+    setChildren(storedChildren);
+  }, []);
+
   return (
     <div className="py-6">
       <h2 className="text-3xl font-bold tracking-tight mb-4">
@@ -76,12 +64,7 @@ export default function ChildrenPage() {
               <TableRow key={child.id}>
                 <TableCell>
                   <Avatar>
-                    <AvatarImage
-                      src={`https://placehold.co/40x40.png?text=${child.name
-                        .charAt(0)
-                        .toUpperCase()}`}
-                      alt={child.name}
-                    />
+                    <AvatarImage src={child.photo} alt={child.name} />
                     <AvatarFallback>
                       {child.name.charAt(0).toUpperCase()}
                     </AvatarFallback>

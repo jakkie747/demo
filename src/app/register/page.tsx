@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { initialChildren, type Child } from "@/lib/data";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -54,7 +56,7 @@ export default function RegisterPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       childName: "",
-      childAge: undefined,
+      childAge: "" as any,
       address: "",
       parentName: "",
       parentEmail: "",
@@ -62,14 +64,66 @@ export default function RegisterPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Here you would typically send the data to your backend
-    toast({
-      title: "Registration Submitted!",
-      description: `Thank you for registering ${values.childName}. We will be in touch shortly.`,
-    });
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const file = values.childPhoto?.[0];
+    let photoDataUrl = "";
+
+    if (file) {
+      try {
+        photoDataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      } catch (error) {
+        console.error("Error reading file:", error);
+        toast({
+          variant: "destructive",
+          title: "File Upload Error",
+          description: "Could not read the uploaded photo.",
+        });
+        return;
+      }
+    }
+
+    try {
+      const storedChildrenJSON = localStorage.getItem("registeredChildren");
+      const existingChildren: Child[] = storedChildrenJSON
+        ? JSON.parse(storedChildrenJSON)
+        : initialChildren;
+
+      const nextIdNumber = existingChildren.length + 1;
+      const nextId = `BP${String(nextIdNumber).padStart(3, "0")}`;
+
+      const newChild: Child = {
+        id: nextId,
+        name: values.childName,
+        age: values.childAge,
+        parent: values.parentName,
+        contact: values.parentEmail,
+        photo: photoDataUrl,
+      };
+
+      const updatedChildren = [...existingChildren, newChild];
+      localStorage.setItem(
+        "registeredChildren",
+        JSON.stringify(updatedChildren)
+      );
+
+      toast({
+        title: "Registration Submitted!",
+        description: `Thank you for registering ${values.childName}. We will be in touch shortly.`,
+      });
+      form.reset();
+    } catch (error) {
+      console.error("Failed to save registration:", error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem saving the registration.",
+      });
+    }
   }
 
   return (
@@ -160,7 +214,7 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="childPhoto"
-                render={({ field: { value, ...restField } }) => (
+                render={({ field: { onChange, value, ...rest } }) => (
                   <FormItem>
                     <FormLabel>Child's Photo</FormLabel>
                     <FormControl>
@@ -168,7 +222,10 @@ export default function RegisterPage() {
                         <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                           type="file"
-                          {...restField}
+                          {...rest}
+                          onChange={(event) => {
+                            onChange(event.target.files);
+                          }}
                           className="pl-10"
                         />
                       </div>
