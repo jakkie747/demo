@@ -32,11 +32,25 @@ export default function DashboardLayout({
             href="/admin/dashboard"
             className="flex items-center justify-center group p-2"
           >
-            <img
-              src="/logo.png"
-              alt="Blinkogies Logo"
+            <svg
               className="h-14 w-auto group-data-[collapsible=icon]:h-8"
-            />
+              viewBox="0 0 24 24"
+              fill="hsl(var(--sidebar-foreground))"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-label="Blinkogies Logo"
+            >
+              <circle cx="12" cy="12" r="12" />
+              <text
+                x="12"
+                y="17.5"
+                fontFamily="Lilita One, sans-serif"
+                fontSize="16"
+                fill="hsl(var(--sidebar-background))"
+                textAnchor="middle"
+              >
+                B
+              </text>
+            </svg>
           </Link>
         </SidebarHeader>
         <SidebarContent>
