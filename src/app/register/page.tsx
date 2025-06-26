@@ -123,6 +123,7 @@ export default function RegisterPage() {
                             type="number"
                             placeholder="e.g. 3"
                             {...field}
+                            value={field.value ?? ""}
                           />
                         </FormControl>
                         <FormMessage />
