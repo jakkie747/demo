@@ -34,21 +34,25 @@ export default function DashboardLayout({
           >
             <svg
               className="h-14 w-auto group-data-[collapsible=icon]:h-8"
-              viewBox="0 0 24 24"
-              fill="hsl(var(--sidebar-foreground))"
+              viewBox="0 0 100 100"
               xmlns="http://www.w3.org/2000/svg"
-              aria-label="Blinkogies Logo"
+              aria-label="Logo Placeholder"
             >
-              <circle cx="12" cy="12" r="12" />
+              <circle
+                cx="50"
+                cy="50"
+                r="50"
+                fill="hsl(var(--sidebar-foreground))"
+              />
               <text
-                x="12"
-                y="17.5"
+                x="50"
+                y="60"
                 fontFamily="Lilita One, sans-serif"
-                fontSize="16"
+                fontSize="30"
                 fill="hsl(var(--sidebar-background))"
                 textAnchor="middle"
               >
-                B
+                LOGO
               </text>
             </svg>
           </Link>
