@@ -1,3 +1,4 @@
+
 "use client";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Edit, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long"),
@@ -69,6 +80,7 @@ export default function ManageEventsPage() {
   const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -88,6 +100,22 @@ export default function ManageEventsPage() {
   const handleCancelClick = () => {
     setEditingEvent(null);
     form.reset();
+  };
+  
+  const handleDeleteClick = (event: Event) => {
+    setEventToDelete(event);
+  };
+
+  const confirmDelete = () => {
+    if (eventToDelete) {
+      setEvents(events.filter((event) => event.id !== eventToDelete.id));
+      toast({
+        title: "Event Deleted!",
+        description: `The event "${eventToDelete.title}" has been successfully deleted.`,
+        variant: "destructive",
+      });
+      setEventToDelete(null); 
+    }
   };
 
   function onSubmit(values: z.infer<typeof eventFormSchema>) {
@@ -262,6 +290,7 @@ export default function ManageEventsPage() {
                         variant="ghost"
                         size="icon"
                         className="text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteClick(event)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -272,6 +301,22 @@ export default function ManageEventsPage() {
             </TableBody>
           </Table>
         </Card>
+        <AlertDialog open={!!eventToDelete} onOpenChange={(open) => !open && setEventToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the event "{eventToDelete?.title}".
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
