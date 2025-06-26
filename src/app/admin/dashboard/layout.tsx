@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import Image from "next/image";
 
 import {
   SidebarProvider,
@@ -33,13 +32,10 @@ export default function DashboardLayout({
             href="/admin/dashboard"
             className="flex items-center justify-center group p-2"
           >
-            <Image
-              src="https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png"
+            <img
+              src="https://placehold.co/176x174.png"
               alt="Blinkogies Logo"
-              width={176}
-              height={174}
               className="h-14 w-auto group-data-[collapsible=icon]:h-8"
-              unoptimized
             />
           </Link>
         </SidebarHeader>
