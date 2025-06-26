@@ -35,6 +35,7 @@ export default function DashboardLayout({
                 width={176}
                 height={174}
                 className="h-14 w-auto group-data-[collapsible=icon]:h-8"
+                unoptimized
               />
           </Link>
         </SidebarHeader>
