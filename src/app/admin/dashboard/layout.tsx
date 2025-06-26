@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image, { type ImageLoaderProps } from "next/image";
+import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -19,10 +19,6 @@ import {
 } from "@/components/ui/sidebar";
 import { AdminNav } from "@/components/admin/AdminNav";
 
-const imageLoader = ({ src }: ImageLoaderProps) => {
-  return src;
-};
-
 export default function DashboardLayout({
   children,
 }: {
@@ -38,12 +34,12 @@ export default function DashboardLayout({
             className="flex items-center justify-center group p-2"
           >
             <Image
-                loader={imageLoader}
                 src="https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png"
                 alt="Blinkogies Logo"
                 width={176}
                 height={174}
                 className="h-14 w-auto group-data-[collapsible=icon]:h-8"
+                unoptimized
               />
           </Link>
         </SidebarHeader>
