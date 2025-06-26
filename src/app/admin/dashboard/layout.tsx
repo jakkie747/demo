@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import Image from "next/image";
 
 import {
   SidebarProvider,
@@ -32,25 +33,14 @@ export default function DashboardLayout({
             href="/admin/dashboard"
             className="flex items-center justify-center group p-2"
           >
-            <svg
-              viewBox="0 0 100 100"
+            <Image
+              src="https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png"
+              alt="Blinkogies Logo"
+              width={176}
+              height={174}
               className="h-14 w-auto group-data-[collapsible=icon]:h-8"
-              aria-label="Blinkogies Logo"
-            >
-              <defs>
-                <clipPath id="clip-path-logo-admin">
-                  <circle cx="50" cy="50" r="48" />
-                </clipPath>
-              </defs>
-              <g clipPath="url(#clip-path-logo-admin)">
-                <rect
-                  width="100"
-                  height="100"
-                  fill="hsl(var(--sidebar-foreground))"
-                />
-                <circle cx="78" cy="32" r="30" fill="hsl(var(--sidebar-ring))" />
-              </g>
-            </svg>
+              unoptimized
+            />
           </Link>
         </SidebarHeader>
         <SidebarContent>
