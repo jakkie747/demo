@@ -16,8 +16,6 @@ import {
 } from "@/components/ui/sidebar";
 import { AdminNav } from "@/components/admin/AdminNav";
 
-const LOGO_URL = "https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png";
-
 export default function DashboardLayout({
   children,
 }: {
@@ -32,7 +30,7 @@ export default function DashboardLayout({
             className="flex items-center justify-center group p-2"
           >
             <Image
-                src={LOGO_URL}
+                src="https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png"
                 alt="Blinkogies Logo"
                 width={176}
                 height={174}
