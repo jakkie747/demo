@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -19,15 +19,13 @@ import { initialChildren } from "@/lib/data";
 export default function ChildrenPage() {
   const [children, setChildren] = useState<Child[]>([]);
 
-  useEffect(() => {
-    // This effect runs only on the client
+  const loadChildren = useCallback(() => {
     let storedChildren: Child[];
     try {
       const storedChildrenJSON = localStorage.getItem("registeredChildren");
       if (storedChildrenJSON) {
         storedChildren = JSON.parse(storedChildrenJSON);
       } else {
-        // First time load, populate localStorage with initial data
         storedChildren = initialChildren;
         localStorage.setItem(
           "registeredChildren",
@@ -36,11 +34,23 @@ export default function ChildrenPage() {
       }
     } catch (error) {
       console.error("Failed to load children from local storage", error);
-      // Fallback to initial children if parsing fails
       storedChildren = initialChildren;
     }
     setChildren(storedChildren);
   }, []);
+
+  useEffect(() => {
+    loadChildren();
+
+    // Add event listener to reload data when the window (or tab) gets focus.
+    // This ensures the list is fresh when navigating back to this page.
+    window.addEventListener('focus', loadChildren);
+
+    // Cleanup listener on component unmount
+    return () => {
+      window.removeEventListener('focus', loadChildren);
+    };
+  }, [loadChildren]);
 
   return (
     <div className="py-6">
