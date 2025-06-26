@@ -160,13 +160,17 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="childPhoto"
-                render={({ field }) => (
+                render={({ field: { value, ...restField } }) => (
                   <FormItem>
                     <FormLabel>Child's Photo</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input type="file" {...field} className="pl-10" />
+                        <Input
+                          type="file"
+                          {...restField}
+                          className="pl-10"
+                        />
                       </div>
                     </FormControl>
                     <FormDescription>
