@@ -34,7 +34,7 @@ export default function DashboardLayout({
             className="flex items-center justify-center group p-2"
           >
             <Image
-                src="https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png"
+                src="https://storage.googleapis.com/source-www-uploads-prod/images/18314358.png"
                 alt="Blinkogies Logo"
                 width={176}
                 height={174}
