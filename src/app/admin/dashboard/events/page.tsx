@@ -1,4 +1,6 @@
+
 "use client";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -41,14 +43,33 @@ const eventFormSchema = z.object({
   image: z.any().optional(),
 });
 
-const existingEvents = [
-  { id: "EVT001", title: "Annual Sports Day", date: "2024-10-26" },
-  { id: "EVT002", title: "Pajama & Movie Day", date: "2024-11-15" },
-  { id: "EVT003", title: "End-of-Year Concert", date: "2024-12-05" },
+type Event = z.infer<typeof eventFormSchema> & { id: string };
+
+const initialEvents: Event[] = [
+  {
+    id: "EVT001",
+    title: "Annual Sports Day",
+    date: "2024-10-26",
+    description: "A day of fun and friendly competition for everyone.",
+  },
+  {
+    id: "EVT002",
+    title: "Pajama & Movie Day",
+    date: "2024-11-15",
+    description: "Wear your PJs and enjoy a cozy movie day with popcorn.",
+  },
+  {
+    id: "EVT003",
+    title: "End-of-Year Concert",
+    date: "2024-12-05",
+    description: "A spectacular performance by our talented little stars.",
+  },
 ];
 
 export default function ManageEventsPage() {
   const { toast } = useToast();
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -56,15 +77,47 @@ export default function ManageEventsPage() {
       title: "",
       date: "",
       description: "",
+      image: undefined,
     },
   });
 
+  const handleEditClick = (event: Event) => {
+    setEditingEvent(event);
+    form.reset(event);
+  };
+
+  const handleCancelClick = () => {
+    setEditingEvent(null);
+    form.reset();
+  };
+
   function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    console.log(values);
-    toast({
-      title: "Event Created!",
-      description: `The event "${values.title}" has been successfully created.`,
-    });
+    if (editingEvent) {
+      setEvents(
+        events.map((event) =>
+          event.id === editingEvent.id ? { ...event, ...values } : event
+        )
+      );
+      toast({
+        title: "Event Updated!",
+        description: `The event "${values.title}" has been successfully updated.`,
+      });
+    } else {
+      const newId =
+        "EVT" +
+        String(
+          Math.max(...events.map((e) => parseInt(e.id.replace("EVT", ""))), 0) +
+            1
+        ).padStart(3, "0");
+
+      const newEvent: Event = { id: newId, ...values };
+      setEvents([...events, newEvent]);
+      toast({
+        title: "Event Created!",
+        description: `The event "${values.title}" has been successfully created.`,
+      });
+    }
+    setEditingEvent(null);
     form.reset();
   }
 
@@ -72,13 +125,17 @@ export default function ManageEventsPage() {
     <div className="py-6 grid gap-10 lg:grid-cols-2">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
-          Create New Event
+          {editingEvent ? "Edit Event" : "Create New Event"}
         </h2>
         <Card>
           <CardHeader>
-            <CardTitle>Event Details</CardTitle>
+            <CardTitle>
+              {editingEvent ? `Editing "${editingEvent.title}"` : "Event Details"}
+            </CardTitle>
             <CardDescription>
-              Fill in the details to create a new event for parents.
+              {editingEvent
+                ? "Update the details for this event."
+                : "Fill in the details to create a new event for parents."}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -123,7 +180,10 @@ export default function ManageEventsPage() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Describe the event..." {...field} />
+                        <Textarea
+                          placeholder="Describe the event..."
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -132,11 +192,18 @@ export default function ManageEventsPage() {
                 <FormField
                   control={form.control}
                   name="image"
-                  render={({ field }) => (
+                  render={({ field: { onChange, onBlur, name, ref } }) => (
                     <FormItem>
                       <FormLabel>Event Image</FormLabel>
                       <FormControl>
-                        <Input type="file" {...field} />
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => onChange(e.target.files)}
+                          onBlur={onBlur}
+                          name={name}
+                          ref={ref}
+                        />
                       </FormControl>
                       <FormDescription>
                         Upload an image for the event.
@@ -145,9 +212,21 @@ export default function ManageEventsPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Create Event
-                </Button>
+                <div className="flex gap-2">
+                  <Button type="submit" className="w-full">
+                    {editingEvent ? "Update Event" : "Create Event"}
+                  </Button>
+                  {editingEvent && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleCancelClick}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                </div>
               </form>
             </Form>
           </CardContent>
@@ -167,13 +246,17 @@ export default function ManageEventsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {existingEvents.map((event) => (
+              {events.map((event) => (
                 <TableRow key={event.id}>
                   <TableCell className="font-medium">{event.title}</TableCell>
                   <TableCell>{event.date}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditClick(event)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button
