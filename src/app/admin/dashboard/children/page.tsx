@@ -66,7 +66,8 @@ export default function ChildrenPage() {
               <TableHead>Child's Name</TableHead>
               <TableHead>Age</TableHead>
               <TableHead>Parent's Name</TableHead>
-              <TableHead>Contact</TableHead>
+              <TableHead>Parent Email</TableHead>
+              <TableHead>Parent Phone</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -86,7 +87,8 @@ export default function ChildrenPage() {
                 <TableCell className="font-medium">{child.name}</TableCell>
                 <TableCell>{child.age}</TableCell>
                 <TableCell>{child.parent}</TableCell>
-                <TableCell>{child.contact}</TableCell>
+                <TableCell>{child.parentEmail}</TableCell>
+                <TableCell>{child.parentPhone}</TableCell>
               </TableRow>
             ))}
           </TableBody>

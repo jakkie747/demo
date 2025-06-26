@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFormState } from "react-hook-form";
 import * as z from "zod";
 import { Baby, Home, User, Mail, Phone, Upload } from "lucide-react";
 
@@ -49,6 +49,17 @@ const formSchema = z.object({
   childPhoto: z.any().optional(),
 });
 
+function FileFormControl({ control, name }: { control: any; name: string }) {
+  const { errors } = useFormState({ control, name });
+  return (
+    <Input
+      type="file"
+      {...control.register(name)}
+      className="pl-10"
+    />
+  );
+}
+
 export default function RegisterPage() {
   const { toast } = useToast();
 
@@ -61,12 +72,13 @@ export default function RegisterPage() {
       parentName: "",
       parentEmail: "",
       parentPhone: "",
+      childPhoto: undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const file = values.childPhoto?.[0];
-    let photoDataUrl = "";
+    let photoDataUrl = "https://placehold.co/100x100.png";
 
     if (file) {
       try {
@@ -101,7 +113,8 @@ export default function RegisterPage() {
         name: values.childName,
         age: values.childAge,
         parent: values.parentName,
-        contact: values.parentEmail,
+        parentEmail: values.parentEmail,
+        parentPhone: values.parentPhone,
         photo: photoDataUrl,
       };
 
@@ -173,12 +186,7 @@ export default function RegisterPage() {
                       <FormItem>
                         <FormLabel>Age</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="e.g. 3"
-                            {...field}
-                            value={field.value ?? ""}
-                          />
+                          <Input type="number" placeholder="e.g. 3" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -214,20 +222,13 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="childPhoto"
-                render={({ field: { onChange, value, ...rest } }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Child's Photo</FormLabel>
-                    <FormControl>
+                     <FormControl>
                       <div className="relative">
                         <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                          type="file"
-                          {...rest}
-                          onChange={(event) => {
-                            onChange(event.target.files);
-                          }}
-                          className="pl-10"
-                        />
+                        <FileFormControl name="childPhoto" control={form.control} />
                       </div>
                     </FormControl>
                     <FormDescription>
