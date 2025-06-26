@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -8,48 +10,51 @@ import {
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function DashboardPage() {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-6 py-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Registered Children
+              {t("registeredChildren")}
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">125</div>
             <p className="text-xs text-muted-foreground">
-              +5 from last month
+              {t("fromLastMonth")}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Upcoming Events
+              {t("upcomingEventsCard")}
             </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">4</div>
             <p className="text-xs text-muted-foreground">
-              Sports Day is next week
+              {t("sportsDayNextWeek")}
             </p>
           </CardContent>
         </Card>
         <Card className="flex flex-col justify-center items-center bg-accent/20 border-dashed">
           <CardHeader>
-            <CardTitle className="text-lg">Create New Event</CardTitle>
+            <CardTitle className="text-lg">{t("createNewEvent")}</CardTitle>
           </CardHeader>
           <CardContent>
             <Button asChild>
               <Link href="/admin/dashboard/events">
                 <PlusCircle className="mr-2 h-4 w-4" />
-                New Event
+                {t("newEvent")}
               </Link>
             </Button>
           </CardContent>
@@ -57,31 +62,31 @@ export default function DashboardPage() {
       </div>
 
       <div>
-        <h3 className="text-2xl font-semibold mb-4">Quick Links</h3>
+        <h3 className="text-2xl font-semibold mb-4">{t("quickLinks")}</h3>
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>View All Children</CardTitle>
+              <CardTitle>{t("viewAllChildren")}</CardTitle>
               <CardDescription>
-                See and manage all registered child profiles.
+                {t("viewAllChildrenDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="secondary">
-                <Link href="/admin/dashboard/children">Manage Children</Link>
+                <Link href="/admin/dashboard/children">{t("manageChildren")}</Link>
               </Button>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Manage Events</CardTitle>
+              <CardTitle>{t("manageEventsCard")}</CardTitle>
               <CardDescription>
-                Create new events or edit existing ones.
+                {t("manageEventsDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="secondary">
-                <Link href="/admin/dashboard/events">Manage Events</Link>
+                <Link href="/admin/dashboard/events">{t("manageEvents")}</Link>
               </Button>
             </CardContent>
           </Card>

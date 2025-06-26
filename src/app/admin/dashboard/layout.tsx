@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 import {
   SidebarProvider,
@@ -21,6 +24,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useLanguage();
   return (
     <SidebarProvider>
       <Sidebar>
@@ -45,10 +49,10 @@ export default function DashboardLayout({
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Logout">
+              <SidebarMenuButton asChild tooltip={t('logout')}>
                 <Link href="/admin">
                   <LogOut />
-                  <span>Logout</span>
+                  <span>{t('logout')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -58,7 +62,7 @@ export default function DashboardLayout({
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4">
           <SidebarTrigger />
-          <h1 className="text-xl font-semibold">Admin Dashboard</h1>
+          <h1 className="text-xl font-semibold">{t('adminDashboard')}</h1>
         </header>
         <main className="p-4 sm:px-6 sm:py-0">{children}</main>
       </SidebarInset>

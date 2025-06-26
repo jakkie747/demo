@@ -44,6 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/context/LanguageContext";
 
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long"),
@@ -88,6 +89,7 @@ const initialEvents: Event[] = [
 
 export default function ManageEventsPage() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [events, setEvents] = useState<Event[]>([]);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
@@ -129,7 +131,7 @@ export default function ManageEventsPage() {
       title: event.title,
       date: event.date,
       description: event.description,
-      image: undefined, // Cannot pre-fill file input
+      image: undefined,
     });
   };
 
@@ -149,8 +151,8 @@ export default function ManageEventsPage() {
       );
       updateAndStoreEvents(updatedEvents);
       toast({
-        title: "Event Deleted!",
-        description: `The event "${eventToDelete.title}" has been successfully deleted.`,
+        title: t('eventDeleted'),
+        description: t('eventDeletedDesc', { title: eventToDelete.title }),
         variant: "destructive",
       });
       setEventToDelete(null);
@@ -187,8 +189,8 @@ export default function ManageEventsPage() {
       );
       updateAndStoreEvents(updatedEvents);
       toast({
-        title: "Event Updated!",
-        description: `The event "${values.title}" has been successfully updated.`,
+        title: t('eventUpdated'),
+        description: t('eventUpdatedDesc', { title: values.title }),
       });
     } else {
       const newId =
@@ -207,8 +209,8 @@ export default function ManageEventsPage() {
       };
       updateAndStoreEvents([...events, newEvent]);
       toast({
-        title: "Event Created!",
-        description: `The event "${values.title}" has been successfully created.`,
+        title: t('eventCreated'),
+        description: t('eventCreatedDesc', { title: values.title }),
       });
     }
     setEditingEvent(null);
@@ -219,19 +221,19 @@ export default function ManageEventsPage() {
     <div className="py-6 grid gap-10 lg:grid-cols-2">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
-          {editingEvent ? "Edit Event" : "Create New Event"}
+          {editingEvent ? t('editEvent') : t('createNewEventTitle')}
         </h2>
         <Card>
           <CardHeader>
             <CardTitle>
               {editingEvent
-                ? `Editing "${editingEvent.title}"`
-                : "Event Details"}
+                ? t('editing', { title: editingEvent.title })
+                : t('eventDetails')}
             </CardTitle>
             <CardDescription>
               {editingEvent
-                ? "Update the details for this event."
-                : "Fill in the details to create a new event for parents."}
+                ? t('updateEventDetails')
+                : t('createEventDetails')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -245,10 +247,10 @@ export default function ManageEventsPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Event Title</FormLabel>
+                      <FormLabel>{t('eventTitle')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g. Annual Sports Day"
+                          placeholder={t('egSportsDay')}
                           {...field}
                         />
                       </FormControl>
@@ -261,7 +263,7 @@ export default function ManageEventsPage() {
                   name="date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Event Date</FormLabel>
+                      <FormLabel>{t('eventDate')}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -274,10 +276,10 @@ export default function ManageEventsPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>{t('description')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Describe the event..."
+                          placeholder={t('describeEvent')}
                           {...field}
                         />
                       </FormControl>
@@ -287,13 +289,14 @@ export default function ManageEventsPage() {
                 />
                  {editingEvent?.image && (
                   <div className="space-y-2">
-                    <FormLabel>Current Image</FormLabel>
+                    <FormLabel>{t('currentImage')}</FormLabel>
                     <Image
                       src={editingEvent.image}
                       alt={editingEvent.title}
                       width={100}
                       height={100}
                       className="rounded-md object-cover border"
+                      unoptimized
                     />
                   </div>
                 )}
@@ -302,7 +305,7 @@ export default function ManageEventsPage() {
                   name="image"
                   render={({ field: { onChange, onBlur, name, ref } }) => (
                     <FormItem>
-                      <FormLabel>Event Image</FormLabel>
+                      <FormLabel>{t('eventImage')}</FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -315,8 +318,8 @@ export default function ManageEventsPage() {
                       </FormControl>
                       <FormDescription>
                         {editingEvent
-                          ? "Upload a new image to replace the current one."
-                          : "Upload an image for the event."}
+                          ? t('replaceImage')
+                          : t('uploadImage')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -324,7 +327,7 @@ export default function ManageEventsPage() {
                 />
                 <div className="flex gap-2">
                   <Button type="submit" className="w-full">
-                    {editingEvent ? "Update Event" : "Create Event"}
+                    {editingEvent ? t('updateEvent') : t('createEvent')}
                   </Button>
                   {editingEvent && (
                     <Button
@@ -333,7 +336,7 @@ export default function ManageEventsPage() {
                       className="w-full"
                       onClick={handleCancelClick}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Button>
                   )}
                 </div>
@@ -344,15 +347,15 @@ export default function ManageEventsPage() {
       </div>
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
-          Existing Events
+          {t('existingEvents')}
         </h2>
         <Card>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('title')}</TableHead>
+                <TableHead>{t('date')}</TableHead>
+                <TableHead>{t('actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -390,16 +393,15 @@ export default function ManageEventsPage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                event "{eventToDelete?.title}".
+                {t('areYouSureDesc', { title: eventToDelete?.title || ''})}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={confirmDelete}>
-                Delete
+                {t('delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -34,6 +34,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { initialChildren, type Child } from "@/lib/data";
+import { useLanguage } from "@/context/LanguageContext";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -52,6 +53,7 @@ const formSchema = z.object({
 
 export default function RegisterPage() {
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,7 +96,6 @@ export default function RegisterPage() {
       let existingChildren: Child[];
       if (storedChildrenJSON) {
         const parsedChildren: Child[] = JSON.parse(storedChildrenJSON);
-        // Data migration: If the first child is missing email, the data is stale.
         if (parsedChildren.length > 0 && parsedChildren[0].parentEmail === undefined) {
           existingChildren = initialChildren;
         } else {
@@ -124,8 +125,8 @@ export default function RegisterPage() {
       );
 
       toast({
-        title: "Registration Submitted!",
-        description: `Thank you for registering ${values.childName}. We will be in touch shortly.`,
+        title: t('regSuccessTitle'),
+        description: t('regSuccessDesc', { childName: values.childName }),
       });
       form.reset();
     } catch (error) {
@@ -143,18 +144,17 @@ export default function RegisterPage() {
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
           <CardTitle className="font-headline text-3xl text-primary">
-            Register Your Child
+            {t('registerTitle')}
           </CardTitle>
           <CardDescription>
-            Fill out the form below to enroll your child at Blinkogies. We can't
-            wait to meet them!
+            {t('registerSub')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <h3 className="text-xl font-headline text-primary/80">
-                Child's Information
+                {t('childInfo')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField
@@ -162,12 +162,12 @@ export default function RegisterPage() {
                   name="childName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>{t('fullName')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Baby className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                           <Input
-                            placeholder="e.g. Jane Doe"
+                            placeholder={t('egJaneDoe')}
                             {...field}
                             className="pl-10"
                           />
@@ -183,9 +183,9 @@ export default function RegisterPage() {
                     name="childAge"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Age</FormLabel>
+                        <FormLabel>{t('age')}</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="e.g. 3" {...field} />
+                          <Input type="number" placeholder={t('eg3')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -196,20 +196,20 @@ export default function RegisterPage() {
                     name="childGender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Gender</FormLabel>
+                        <FormLabel>{t('gender')}</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select gender" />
+                              <SelectValue placeholder={t('selectGender')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="male">{t('male')}</SelectItem>
+                            <SelectItem value="female">{t('female')}</SelectItem>
+                            <SelectItem value="other">{t('other')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -223,7 +223,7 @@ export default function RegisterPage() {
                 name="childPhoto"
                 render={({ field: { onChange, onBlur, name, ref } }) => (
                   <FormItem>
-                    <FormLabel>Child's Photo</FormLabel>
+                    <FormLabel>{t('childPhoto')}</FormLabel>
                      <FormControl>
                       <div className="relative">
                         <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -239,7 +239,7 @@ export default function RegisterPage() {
                       </div>
                     </FormControl>
                     <FormDescription>
-                      An optional photo of your child for their profile.
+                      {t('childPhotoDesc')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -247,19 +247,19 @@ export default function RegisterPage() {
               />
 
               <h3 className="text-xl font-headline text-primary/80 pt-4">
-                Parent/Guardian Information
+                {t('parentInfo')}
               </h3>
               <FormField
                 control={form.control}
                 name="parentName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>{t('fullName')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
-                          placeholder="e.g. John Smith"
+                          placeholder={t('egJohnSmith')}
                           {...field}
                           className="pl-10"
                         />
@@ -275,13 +275,13 @@ export default function RegisterPage() {
                   name="parentEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>{t('emailAddress')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                           <Input
                             type="email"
-                            placeholder="e.g. john.smith@example.com"
+                            placeholder={t('egEmail')}
                             {...field}
                             className="pl-10"
                           />
@@ -296,13 +296,13 @@ export default function RegisterPage() {
                   name="parentPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>{t('phoneNumber')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                           <Input
                             type="tel"
-                            placeholder="e.g. (123) 456-7890"
+                            placeholder={t('egPhone')}
                             {...field}
                             className="pl-10"
                           />
@@ -318,12 +318,12 @@ export default function RegisterPage() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Physical Address</FormLabel>
+                    <FormLabel>{t('physicalAddress')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Home className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                         <Textarea
-                          placeholder="123 Main St, Anytown, USA"
+                          placeholder={t('egAddress')}
                           {...field}
                           className="pl-10"
                         />
@@ -334,7 +334,7 @@ export default function RegisterPage() {
                 )}
               />
               <Button type="submit" size="lg" className="w-full font-semibold">
-                Register Child
+                {t('submitRegistration')}
               </Button>
             </form>
           </Form>

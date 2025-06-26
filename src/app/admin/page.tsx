@@ -14,11 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,8 +30,8 @@ export default function AdminLoginPage() {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Login Successful",
-        description: "Redirecting to your dashboard...",
+        title: t('loginSuccess'),
+        description: t('loginRedirecting'),
       });
       router.push("/admin/dashboard");
     }, 1500);
@@ -44,16 +46,16 @@ export default function AdminLoginPage() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="font-headline text-2xl">
-              Admin Login
+              {t('adminLogin')}
             </CardTitle>
             <CardDescription>
-              Access the Blinkogies Family Hub dashboard.
+              {t('adminLoginSub')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">{t('username')}</Label>
                 <Input
                   id="username"
                   type="text"
@@ -63,7 +65,7 @@ export default function AdminLoginPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -76,7 +78,7 @@ export default function AdminLoginPage() {
                 className="w-full font-semibold"
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? t('loggingIn') : t('login')}
               </Button>
             </form>
           </CardContent>

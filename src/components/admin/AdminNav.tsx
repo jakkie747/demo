@@ -7,20 +7,22 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function AdminNav() {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const menuItems = [
-    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/dashboard", label: t('dashboard'), icon: LayoutDashboard },
     {
       href: "/admin/dashboard/children",
-      label: "Children Profiles",
+      label: t('childrenProfiles'),
       icon: Users,
     },
     {
       href: "/admin/dashboard/events",
-      label: "Manage Events",
+      label: t('manageEvents'),
       icon: CalendarDays,
     },
   ];

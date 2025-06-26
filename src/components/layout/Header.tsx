@@ -1,22 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, Languages } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/register", label: "Register Child" },
-  { href: "/events", label: "Events" },
-];
+import { useLanguage } from "@/context/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const pathname = usePathname();
+  const { language, setLanguage, t } = useLanguage();
+
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "af" : "en");
+  };
+
+  const navLinks = [
+    { href: "/", label: t("home") },
+    { href: "/register", label: t("registerChildNav") },
+    { href: "/events", label: t("eventsNav") },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -41,10 +53,27 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Languages className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">{t("language")}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setLanguage("en")}>
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage("af")}>
+                Afrikaans
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <div className="hidden md:flex">
             <Button asChild variant="outline">
-              <Link href="/admin">Admin Login</Link>
+              <Link href="/admin">{t("adminLoginNav")}</Link>
             </Button>
           </div>
 
@@ -63,22 +92,23 @@ export function Header() {
                 <Logo />
               </div>
               <nav className="flex flex-col gap-4">
-                {[...navLinks, { href: "/admin", label: "Admin Login" }].map(
-                  (link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        "text-lg font-medium transition-colors hover:text-primary",
-                        pathname === link.href
-                          ? "text-primary"
-                          : "text-foreground/60"
-                      )}
-                    >
-                      {link.label}
-                    </Link>
-                  )
-                )}
+                {[
+                  ...navLinks,
+                  { href: "/admin", label: t("adminLoginNav") },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "text-lg font-medium transition-colors hover:text-primary",
+                      pathname === link.href
+                        ? "text-primary"
+                        : "text-foreground/60"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </nav>
             </SheetContent>
           </Sheet>

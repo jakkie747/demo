@@ -15,9 +15,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import type { Child } from "@/lib/data";
 import { initialChildren } from "@/lib/data";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ChildrenPage() {
   const [children, setChildren] = useState<Child[]>([]);
+  const { t } = useLanguage();
 
   const loadChildren = useCallback(() => {
     let storedChildren: Child[];
@@ -25,7 +27,6 @@ export default function ChildrenPage() {
       const storedChildrenJSON = localStorage.getItem("registeredChildren");
       if (storedChildrenJSON) {
         const parsedChildren: Child[] = JSON.parse(storedChildrenJSON);
-        // Data migration: If the first child is missing email, the data is stale.
         if (parsedChildren.length > 0 && parsedChildren[0].parentEmail === undefined) {
           storedChildren = initialChildren;
           localStorage.setItem("registeredChildren", JSON.stringify(initialChildren));
@@ -48,12 +49,7 @@ export default function ChildrenPage() {
 
   useEffect(() => {
     loadChildren();
-
-    // Add event listener to reload data when the window (or tab) gets focus.
-    // This ensures the list is fresh when navigating back to this page.
     window.addEventListener('focus', loadChildren);
-
-    // Cleanup listener on component unmount
     return () => {
       window.removeEventListener('focus', loadChildren);
     };
@@ -62,19 +58,19 @@ export default function ChildrenPage() {
   return (
     <div className="py-6">
       <h2 className="text-3xl font-bold tracking-tight mb-4">
-        Registered Children
+        {t('registeredChildrenTitle')}
       </h2>
       <Card>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Photo</TableHead>
-              <TableHead>Profile No.</TableHead>
-              <TableHead>Child's Name</TableHead>
-              <TableHead>Age</TableHead>
-              <TableHead>Parent's Name</TableHead>
-              <TableHead>Parent Email</TableHead>
-              <TableHead>Parent Phone</TableHead>
+              <TableHead>{t('photo')}</TableHead>
+              <TableHead>{t('profileNo')}</TableHead>
+              <TableHead>{t('childsName')}</TableHead>
+              <TableHead>{t('age')}</TableHead>
+              <TableHead>{t('parentsName')}</TableHead>
+              <TableHead>{t('parentEmail')}</TableHead>
+              <TableHead>{t('parentPhone')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,7 +78,7 @@ export default function ChildrenPage() {
               <TableRow key={child.id}>
                 <TableCell>
                   <Avatar>
-                    <AvatarImage src={child.photo} alt={child.name} />
+                    <AvatarImage src={child.photo} alt={child.name} unoptimized/>
                     <AvatarFallback>
                       {child.name.charAt(0).toUpperCase()}
                     </AvatarFallback>

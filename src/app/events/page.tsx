@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 import Image from "next/image";
+import { useLanguage } from "@/context/LanguageContext";
+import type { TranslationKey } from "@/lib/translations";
 
 type Event = {
   id: string;
@@ -20,64 +22,80 @@ type Event = {
   description: string;
   image?: string;
   aiHint?: string;
+  titleKey?: TranslationKey;
+  descriptionKey?: TranslationKey;
 };
 
-const initialEvents: Event[] = [
+const initialEventsData: Omit<Event, "title" | "description">[] = [
   {
     id: "EVT001",
-    title: "Annual Sports Day",
+    titleKey: "sportsDayTitle",
+    descriptionKey: "sportsDayDesc",
     date: "2024-10-26",
-    description:
-      "Get ready for a day of fun, games, and friendly competition! Parents are welcome to cheer on our little athletes.",
     image: "https://placehold.co/600x400.png",
     aiHint: "children sports day",
   },
   {
     id: "EVT002",
-    title: "Pajama & Movie Day",
+    titleKey: "pajamaDayTitle",
+    descriptionKey: "pajamaDayDesc",
     date: "2024-11-15",
-    description:
-      "A cozy day at school! Children can come in their favorite pajamas as we watch a fun animated movie and enjoy popcorn.",
     image: "https://placehold.co/600x400.png",
     aiHint: "children watching movie",
   },
   {
     id: "EVT003",
-    title: "End-of-Year Concert",
+    titleKey: "concertTitle",
+    descriptionKey: "concertDesc",
     date: "2024-12-05",
-    description:
-      "Our little stars will be showcasing their talents in our annual concert. A performance you won't want to miss!",
     image: "https://placehold.co/600x400.png",
     aiHint: "children stage performance",
   },
 ];
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const { t, language } = useLanguage();
+  const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    try {
-      const storedEventsJSON = localStorage.getItem("events");
-      if (storedEventsJSON) {
-        const storedEvents = JSON.parse(storedEventsJSON);
-        if (storedEvents.length > 0) {
-          setEvents(storedEvents);
+    let active = true;
+
+    const loadEvents = () => {
+      try {
+        const storedEventsJSON = localStorage.getItem("events");
+        if (storedEventsJSON) {
+          const storedEvents = JSON.parse(storedEventsJSON);
+          if (storedEvents.length > 0) {
+            if (active) setEvents(storedEvents);
+            return;
+          }
         }
+      } catch (error) {
+        console.error("Failed to load events from local storage", error);
       }
-    } catch (error) {
-      console.error("Failed to load events from local storage", error);
-    }
-  }, []);
+
+      const translatedInitialEvents = initialEventsData.map((e) => ({
+        ...e,
+        title: t(e.titleKey as TranslationKey),
+        description: t(e.descriptionKey as TranslationKey),
+      }));
+      
+      if (active) setEvents(translatedInitialEvents);
+    };
+
+    loadEvents();
+    
+    return () => { active = false; };
+  }, [language, t]);
 
   return (
     <div className="container py-12 md:py-24">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
         <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl font-headline text-primary">
-          Upcoming Events
+          {t("upcomingEvents")}
         </h1>
         <p className="max-w-[900px] text-foreground/80 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-          Stay updated with all the exciting activities we have planned at
-          Blinkogies!
+          {t("upcomingEventsSub")}
         </p>
       </div>
 
@@ -95,6 +113,7 @@ export default function EventsPage() {
                 width={600}
                 height={400}
                 className="w-full aspect-video object-cover"
+                unoptimized
               />
             </CardHeader>
             <CardContent className="flex-1 p-6">
@@ -109,7 +128,7 @@ export default function EventsPage() {
               <div className="flex items-center text-muted-foreground">
                 <Calendar className="mr-2 h-4 w-4" />
                 <span>
-                  {new Date(event.date).toLocaleDateString("en-US", {
+                  {new Date(event.date).toLocaleDateString(language, {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -124,4 +143,3 @@ export default function EventsPage() {
     </div>
   );
 }
-

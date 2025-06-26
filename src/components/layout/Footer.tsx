@@ -1,13 +1,17 @@
+"use client";
+
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Footer() {
+  const { t } = useLanguage();
   return (
     <footer className="border-t">
       <div className="container mx-auto flex flex-col items-center justify-between gap-6 py-10 sm:flex-row">
         <Logo />
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Blinkogies Family Hub. All rights reserved.
+          {t('copyright', { year: new Date().getFullYear().toString() })}
         </p>
         <div className="flex items-center gap-4">
           <Link
@@ -15,14 +19,14 @@ export function Footer() {
             className="text-sm text-muted-foreground hover:text-primary"
             prefetch={false}
           >
-            Privacy Policy
+            {t('privacyPolicy')}
           </Link>
           <Link
             href="#"
             className="text-sm text-muted-foreground hover:text-primary"
             prefetch={false}
           >
-            Terms of Service
+            {t('termsOfService')}
           </Link>
         </div>
       </div>
