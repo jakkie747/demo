@@ -1,8 +1,10 @@
+
 "use client";
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -52,7 +54,13 @@ const eventFormSchema = z.object({
   image: z.any().optional(),
 });
 
-type Event = z.infer<typeof eventFormSchema> & { id: string };
+type Event = {
+  id: string;
+  title: string;
+  date: string;
+  description: string;
+  image?: string;
+};
 
 const initialEvents: Event[] = [
   {
@@ -60,26 +68,50 @@ const initialEvents: Event[] = [
     title: "Annual Sports Day",
     date: "2024-10-26",
     description: "A day of fun and friendly competition for everyone.",
+    image: "https://placehold.co/600x400.png",
   },
   {
     id: "EVT002",
     title: "Pajama & Movie Day",
     date: "2024-11-15",
     description: "Wear your PJs and enjoy a cozy movie day with popcorn.",
+    image: "https://placehold.co/600x400.png",
   },
   {
     id: "EVT003",
     title: "End-of-Year Concert",
     date: "2024-12-05",
     description: "A spectacular performance by our talented little stars.",
+    image: "https://placehold.co/600x400.png",
   },
 ];
 
 export default function ManageEventsPage() {
   const { toast } = useToast();
-  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [events, setEvents] = useState<Event[]>([]);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+
+  useEffect(() => {
+    try {
+      const storedEventsJSON = localStorage.getItem("events");
+      const storedEvents = storedEventsJSON
+        ? JSON.parse(storedEventsJSON)
+        : initialEvents;
+      setEvents(storedEvents);
+      if (!storedEventsJSON) {
+        localStorage.setItem("events", JSON.stringify(initialEvents));
+      }
+    } catch (error) {
+      console.error("Failed to load events from local storage", error);
+      setEvents(initialEvents);
+    }
+  }, []);
+
+  const updateAndStoreEvents = (updatedEvents: Event[]) => {
+    setEvents(updatedEvents);
+    localStorage.setItem("events", JSON.stringify(updatedEvents));
+  };
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -90,51 +122,70 @@ export default function ManageEventsPage() {
       image: undefined,
     },
   });
-  
-  useEffect(() => {
-    if (editingEvent) {
-      form.reset(editingEvent);
-    } else {
-      form.reset({
-        title: "",
-        date: "",
-        description: "",
-        image: undefined,
-      });
-    }
-  }, [editingEvent, form]);
 
   const handleEditClick = (event: Event) => {
     setEditingEvent(event);
+    form.reset({
+      title: event.title,
+      date: event.date,
+      description: event.description,
+      image: undefined, // Cannot pre-fill file input
+    });
   };
 
   const handleCancelClick = () => {
     setEditingEvent(null);
+    form.reset();
   };
-  
+
   const handleDeleteClick = (event: Event) => {
     setEventToDelete(event);
   };
 
   const confirmDelete = () => {
     if (eventToDelete) {
-      setEvents(events.filter((event) => event.id !== eventToDelete.id));
+      const updatedEvents = events.filter(
+        (event) => event.id !== eventToDelete.id
+      );
+      updateAndStoreEvents(updatedEvents);
       toast({
         title: "Event Deleted!",
         description: `The event "${eventToDelete.title}" has been successfully deleted.`,
         variant: "destructive",
       });
-      setEventToDelete(null); 
+      setEventToDelete(null);
     }
   };
 
-  function onSubmit(values: z.infer<typeof eventFormSchema>) {
+  async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    const file = values.image?.[0];
+    let imageDataUrl: string | undefined = editingEvent?.image;
+
+    if (file) {
+      try {
+        imageDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "File Upload Error",
+          description: "Could not process the uploaded image.",
+        });
+        return;
+      }
+    }
+
     if (editingEvent) {
-      setEvents(
-        events.map((event) =>
-          event.id === editingEvent.id ? { ...event, ...values } : event
-        )
+      const updatedEvents = events.map((event) =>
+        event.id === editingEvent.id
+          ? { ...event, ...values, image: imageDataUrl }
+          : event
       );
+      updateAndStoreEvents(updatedEvents);
       toast({
         title: "Event Updated!",
         description: `The event "${values.title}" has been successfully updated.`,
@@ -143,12 +194,18 @@ export default function ManageEventsPage() {
       const newId =
         "EVT" +
         String(
-          Math.max(...events.map((e) => parseInt(e.id.replace("EVT", ""))), 0) +
-            1
+          Math.max(
+            ...events.map((e) => parseInt(e.id.replace("EVT", ""))),
+            0
+          ) + 1
         ).padStart(3, "0");
 
-      const newEvent: Event = { id: newId, ...values };
-      setEvents([...events, newEvent]);
+      const newEvent: Event = {
+        id: newId,
+        ...values,
+        image: imageDataUrl || "https://placehold.co/600x400.png",
+      };
+      updateAndStoreEvents([...events, newEvent]);
       toast({
         title: "Event Created!",
         description: `The event "${values.title}" has been successfully created.`,
@@ -167,7 +224,9 @@ export default function ManageEventsPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {editingEvent ? `Editing "${editingEvent.title}"` : "Event Details"}
+              {editingEvent
+                ? `Editing "${editingEvent.title}"`
+                : "Event Details"}
             </CardTitle>
             <CardDescription>
               {editingEvent
@@ -226,6 +285,18 @@ export default function ManageEventsPage() {
                     </FormItem>
                   )}
                 />
+                 {editingEvent?.image && (
+                  <div className="space-y-2">
+                    <FormLabel>Current Image</FormLabel>
+                    <Image
+                      src={editingEvent.image}
+                      alt={editingEvent.title}
+                      width={100}
+                      height={100}
+                      className="rounded-md object-cover border"
+                    />
+                  </div>
+                )}
                 <FormField
                   control={form.control}
                   name="image"
@@ -243,7 +314,9 @@ export default function ManageEventsPage() {
                         />
                       </FormControl>
                       <FormDescription>
-                        Upload an image for the event.
+                        {editingEvent
+                          ? "Upload a new image to replace the current one."
+                          : "Upload an image for the event."}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -311,12 +384,16 @@ export default function ManageEventsPage() {
             </TableBody>
           </Table>
         </Card>
-        <AlertDialog open={!!eventToDelete} onOpenChange={(open) => !open && setEventToDelete(null)}>
+        <AlertDialog
+          open={!!eventToDelete}
+          onOpenChange={(open) => !open && setEventToDelete(null)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the event "{eventToDelete?.title}".
+                This action cannot be undone. This will permanently delete the
+                event "{eventToDelete?.title}".
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
