@@ -1,6 +1,5 @@
-
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -92,25 +91,14 @@ export default function ManageEventsPage() {
     },
   });
 
-  useEffect(() => {
-    if (editingEvent) {
-      form.reset(editingEvent);
-    } else {
-      form.reset({
-        title: "",
-        date: "",
-        description: "",
-        image: undefined,
-      });
-    }
-  }, [editingEvent, form]);
-
   const handleEditClick = (event: Event) => {
     setEditingEvent(event);
+    form.reset(event);
   };
 
   const handleCancelClick = () => {
     setEditingEvent(null);
+    form.reset();
   };
   
   const handleDeleteClick = (event: Event) => {
@@ -156,6 +144,7 @@ export default function ManageEventsPage() {
       });
     }
     setEditingEvent(null);
+    form.reset();
   }
 
   return (
