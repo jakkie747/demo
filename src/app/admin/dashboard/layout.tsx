@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -32,11 +33,13 @@ export default function DashboardLayout({
             href="/admin/dashboard"
             className="flex items-center justify-center group p-2"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png"
               alt="Logo"
+              width={176}
+              height={174}
               className="h-14 w-auto group-data-[collapsible=icon]:h-8"
+              unoptimized
             />
           </Link>
         </SidebarHeader>
