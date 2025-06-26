@@ -4,7 +4,7 @@ export function Logo() {
   return (
     <Link href="/" className="flex items-center group" prefetch={false}>
       <img
-        src="https://placehold.co/176x174.png"
+        src="/logo.png"
         alt="Blinkogies Logo"
         className="h-12 w-auto"
       />

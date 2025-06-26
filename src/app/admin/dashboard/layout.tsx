@@ -33,7 +33,7 @@ export default function DashboardLayout({
             className="flex items-center justify-center group p-2"
           >
             <img
-              src="https://placehold.co/176x174.png"
+              src="/logo.png"
               alt="Blinkogies Logo"
               className="h-14 w-auto group-data-[collapsible=icon]:h-8"
             />
