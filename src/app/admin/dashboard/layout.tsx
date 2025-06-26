@@ -34,10 +34,8 @@ export default function DashboardLayout({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://storage.googleapis.com/source-w-uploads-prod/images/655883216.png"
+              src="https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png"
               alt="Logo"
-              width={176}
-              height={174}
               className="h-14 w-auto group-data-[collapsible=icon]:h-8"
             />
           </Link>
