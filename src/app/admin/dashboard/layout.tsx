@@ -17,6 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { Logo } from "@/components/Logo";
 
 export default function DashboardLayout({
   children,
@@ -32,11 +33,7 @@ export default function DashboardLayout({
             href="/admin/dashboard"
             className="flex items-center justify-center group p-2"
           >
-            <img
-              src="/logo.png"
-              alt="Blinkogies Logo"
-              className="h-14 w-auto group-data-[collapsible=icon]:h-8"
-            />
+            <Logo className="h-14 w-auto group-data-[collapsible=icon]:h-8" />
           </Link>
         </SidebarHeader>
         <SidebarContent>
