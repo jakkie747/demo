@@ -33,7 +33,10 @@ export default function DashboardLayout({
             href="/admin/dashboard"
             className="flex items-center justify-center group p-2"
           >
-            <Logo className="h-14 w-auto group-data-[collapsible=icon]:h-8" />
+            <Logo
+              className="h-14 w-auto group-data-[collapsible=icon]:h-8"
+              href={null}
+            />
           </Link>
         </SidebarHeader>
         <SidebarContent>
