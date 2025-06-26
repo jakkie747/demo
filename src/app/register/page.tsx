@@ -2,7 +2,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFormState } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Baby, Home, User, Mail, Phone, Upload } from "lucide-react";
 
@@ -49,16 +49,6 @@ const formSchema = z.object({
   childPhoto: z.any().optional(),
 });
 
-function FileFormControl({ control, name }: { control: any; name: string }) {
-  const { errors } = useFormState({ control, name });
-  return (
-    <Input
-      type="file"
-      {...control.register(name)}
-      className="pl-10"
-    />
-  );
-}
 
 export default function RegisterPage() {
   const { toast } = useToast();
@@ -101,9 +91,18 @@ export default function RegisterPage() {
 
     try {
       const storedChildrenJSON = localStorage.getItem("registeredChildren");
-      const existingChildren: Child[] = storedChildrenJSON
-        ? JSON.parse(storedChildrenJSON)
-        : initialChildren;
+      let existingChildren: Child[];
+      if (storedChildrenJSON) {
+        const parsedChildren: Child[] = JSON.parse(storedChildrenJSON);
+        // Data migration: If the first child is missing email, the data is stale.
+        if (parsedChildren.length > 0 && parsedChildren[0].parentEmail === undefined) {
+          existingChildren = initialChildren;
+        } else {
+          existingChildren = parsedChildren;
+        }
+      } else {
+        existingChildren = initialChildren;
+      }
 
       const nextIdNumber = existingChildren.length + 1;
       const nextId = `BP${String(nextIdNumber).padStart(3, "0")}`;
@@ -222,13 +221,20 @@ export default function RegisterPage() {
               <FormField
                 control={form.control}
                 name="childPhoto"
-                render={() => (
+                render={({ field: { onChange, onBlur, name, ref } }) => (
                   <FormItem>
                     <FormLabel>Child's Photo</FormLabel>
                      <FormControl>
                       <div className="relative">
                         <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <FileFormControl name="childPhoto" control={form.control} />
+                        <Input
+                          type="file"
+                          onChange={(e) => onChange(e.target.files)}
+                          onBlur={onBlur}
+                          name={name}
+                          ref={ref}
+                          className="pl-10"
+                        />
                       </div>
                     </FormControl>
                     <FormDescription>

@@ -24,7 +24,14 @@ export default function ChildrenPage() {
     try {
       const storedChildrenJSON = localStorage.getItem("registeredChildren");
       if (storedChildrenJSON) {
-        storedChildren = JSON.parse(storedChildrenJSON);
+        const parsedChildren: Child[] = JSON.parse(storedChildrenJSON);
+        // Data migration: If the first child is missing email, the data is stale.
+        if (parsedChildren.length > 0 && parsedChildren[0].parentEmail === undefined) {
+          storedChildren = initialChildren;
+          localStorage.setItem("registeredChildren", JSON.stringify(initialChildren));
+        } else {
+          storedChildren = parsedChildren;
+        }
       } else {
         storedChildren = initialChildren;
         localStorage.setItem(
