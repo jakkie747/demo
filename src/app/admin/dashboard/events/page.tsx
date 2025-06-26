@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -90,15 +90,26 @@ export default function ManageEventsPage() {
       image: undefined,
     },
   });
+  
+  useEffect(() => {
+    if (editingEvent) {
+      form.reset(editingEvent);
+    } else {
+      form.reset({
+        title: "",
+        date: "",
+        description: "",
+        image: undefined,
+      });
+    }
+  }, [editingEvent, form]);
 
   const handleEditClick = (event: Event) => {
     setEditingEvent(event);
-    form.reset(event);
   };
 
   const handleCancelClick = () => {
     setEditingEvent(null);
-    form.reset();
   };
   
   const handleDeleteClick = (event: Event) => {
@@ -224,7 +235,7 @@ export default function ManageEventsPage() {
                       <FormControl>
                         <Input
                           type="file"
-                          accept="image/*"
+                          accept="image/png, image/jpeg, image/gif, image/webp, image/avif"
                           onChange={(e) => onChange(e.target.files)}
                           onBlur={onBlur}
                           name={name}

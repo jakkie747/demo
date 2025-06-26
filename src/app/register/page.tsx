@@ -229,6 +229,7 @@ export default function RegisterPage() {
                         <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                           type="file"
+                          accept="image/png, image/jpeg, image/gif, image/webp, image/avif"
                           onChange={(e) => onChange(e.target.files)}
                           onBlur={onBlur}
                           name={name}
