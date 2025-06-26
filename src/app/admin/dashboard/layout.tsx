@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { LogOut, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { LogOut } from "lucide-react";
 
 import {
   SidebarProvider,
@@ -15,6 +16,8 @@ import {
 } from "@/components/ui/sidebar";
 import { AdminNav } from "@/components/admin/AdminNav";
 
+const LOGO_URL = "https://storage.googleapis.com/source-www-uploads-prod/images/655883216.png";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -26,12 +29,15 @@ export default function DashboardLayout({
         <SidebarHeader>
           <Link
             href="/admin/dashboard"
-            className="flex items-center gap-2 group p-2"
+            className="flex items-center justify-center group p-2"
           >
-            <Sparkles className="h-8 w-8 text-sidebar-primary-foreground group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6 transition-all" />
-            <span className="font-headline text-2xl font-bold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-              Blinkogies
-            </span>
+            <Image
+                src={LOGO_URL}
+                alt="Blinkogies Logo"
+                width={176}
+                height={174}
+                className="h-14 w-auto group-data-[collapsible=icon]:h-8"
+              />
           </Link>
         </SidebarHeader>
         <SidebarContent>
