@@ -181,6 +181,7 @@ export default function ManageEventsPage() {
         setEditingEvent(null);
         form.reset();
     } catch (error) {
+        console.error("Failed to save event:", error);
         toast({ variant: "destructive", title: "Error", description: "Could not save event."});
     }
   }
@@ -294,8 +295,8 @@ export default function ManageEventsPage() {
                   )}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" className="w-full">
-                    {editingEvent ? t('updateEvent') : t('createEvent')}
+                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? "Saving..." : editingEvent ? t('updateEvent') : t('createEvent')}
                   </Button>
                   {editingEvent && (
                     <Button
@@ -303,6 +304,7 @@ export default function ManageEventsPage() {
                       variant="outline"
                       className="w-full"
                       onClick={handleCancelClick}
+                      disabled={form.formState.isSubmitting}
                     >
                       {t('cancel')}
                     </Button>
