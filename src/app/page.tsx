@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -18,23 +17,26 @@ export default function Home() {
   const { toast } = useToast();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchActivities = async () => {
       setIsLoading(true);
-      setFetchError(false);
-      const fetchedActivities = await getActivities();
-      if (fetchedActivities === null) {
-        setFetchError(true);
-        setActivities([]);
-      } else {
+      setConfigError(null);
+      try {
+        const fetchedActivities = await getActivities();
         setActivities(fetchedActivities.slice(0, 3)); // Get the 3 most recent
+      } catch (error: any) {
+        if (error.message.includes("Firebase configuration is incomplete")) {
+            setConfigError(error.message);
+        }
+        toast({ variant: "destructive", title: "Error", description: error.message || "Could not load activities."});
+        setActivities([]);
       }
       setIsLoading(false);
     };
     fetchActivities();
-  }, []);
+  }, [toast]);
 
   const renderRecentActivities = () => {
     if (isLoading) {
@@ -52,14 +54,14 @@ export default function Home() {
       ));
     }
     
-    if (fetchError) {
+    if (configError) {
       return (
         <div className="col-span-1 md:col-span-3">
           <Alert variant="destructive">
-            <AlertTitle>Error Loading Activities</AlertTitle>
+            <AlertTitle>Configuration Error</AlertTitle>
             <AlertDescription>
-              <p>Could not load recent activities due to a database connection issue.</p>
-              <p className="mt-2 font-bold">Please ensure your Firebase configuration in <code>src/lib/firebase.ts</code> is correct.</p>
+                <p>{configError}</p>
+                <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
             </AlertDescription>
           </Alert>
         </div>
@@ -83,7 +85,6 @@ export default function Home() {
             height={300}
             className="rounded-lg mb-4 object-cover aspect-[4/3]"
             data-ai-hint={activity.aiHint || 'children playing'}
-            unoptimized
           />
           <p className="text-sm text-muted-foreground">{activity.description}</p>
         </CardContent>
@@ -126,7 +127,6 @@ export default function Home() {
               height={600}
               className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
               data-ai-hint="children drawing"
-              unoptimized
             />
           </div>
         </div>

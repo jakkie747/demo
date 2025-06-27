@@ -1,4 +1,3 @@
-
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,6 +65,7 @@ export default function ManageActivitiesPage() {
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof activityFormSchema>>({
     resolver: zodResolver(activityFormSchema),
@@ -78,6 +78,7 @@ export default function ManageActivitiesPage() {
 
   const fetchActivities = useCallback(async () => {
     setIsLoading(true);
+    setConfigError(null);
     try {
         const fetchedActivities = await getActivities();
         setActivities(fetchedActivities);
@@ -93,6 +94,7 @@ export default function ManageActivitiesPage() {
         } else if (error.message.includes("Firebase configuration is incomplete")) {
             title = "Firebase Configuration Error";
             description = error.message;
+            setConfigError(description);
         }
 
         toast({
@@ -196,6 +198,20 @@ export default function ManageActivitiesPage() {
     }
   }
 
+  if (configError) {
+    return (
+        <div className="container py-12">
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
+  }
+
   return (
     <div className="py-6 grid gap-10 lg:grid-cols-2">
       <div>
@@ -262,7 +278,6 @@ export default function ManageActivitiesPage() {
                       width={100}
                       height={100}
                       className="rounded-md object-cover border"
-                      unoptimized
                     />
                   </div>
                 )}

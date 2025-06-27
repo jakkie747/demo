@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -24,24 +23,25 @@ export default function EventsPage() {
   const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadEvents = async () => {
       setIsLoading(true);
-      setFetchError(false);
-      const fetchedEvents = await getEvents();
-      
-      if (fetchedEvents === null) {
-        setEvents([]);
-        setFetchError(true);
+      setConfigError(null);
+      try {
+        const fetchedEvents = await getEvents();
+        setEvents(fetchedEvents);
+      } catch (error: any) {
+        if (error.message.includes("Firebase configuration is incomplete")) {
+            setConfigError(error.message);
+        }
         toast({ 
             variant: "destructive", 
             title: "Error", 
-            description: "Could not fetch events from the database."
+            description: error.message || "Could not fetch events from the database."
         });
-      } else {
-        setEvents(fetchedEvents);
+        setEvents([]);
       }
       setIsLoading(false);
     };
@@ -49,20 +49,20 @@ export default function EventsPage() {
     loadEvents();
   }, [toast]);
 
-  if (fetchError) {
+  if (configError) {
     return (
         <div className="container py-12">
             <Alert variant="destructive">
-                <AlertTitle>Error Loading Events</AlertTitle>
+                <AlertTitle>Configuration Error</AlertTitle>
                 <AlertDescription>
-                    <p>Could not load events due to a database connection issue.</p>
-                    <p className="mt-2 font-bold">Please ensure your Firebase configuration in <code>src/lib/firebase.ts</code> is correct.</p>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
                 </AlertDescription>
             </Alert>
         </div>
     )
   }
-
+  
   return (
     <div className="container py-12 md:py-24">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
@@ -111,7 +111,6 @@ export default function EventsPage() {
                   width={600}
                   height={400}
                   className="w-full aspect-video object-cover"
-                  unoptimized
                 />
               </CardHeader>
               <CardContent className="flex-1 p-6">

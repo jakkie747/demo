@@ -1,4 +1,3 @@
-
 "use client";
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,22 +66,26 @@ export default function ManageEventsPage() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const fetchEvents = async () => {
-    setIsLoading(true);
-    const fetchedEvents = await getEvents();
-    if (fetchedEvents === null) {
-        toast({ variant: "destructive", title: "Error", description: "Could not fetch events."});
-        setEvents([]);
-    } else {
-        setEvents(fetchedEvents);
-    }
-    setIsLoading(false);
-  };
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchEvents = async () => {
+        setIsLoading(true);
+        setConfigError(null);
+        try {
+            const fetchedEvents = await getEvents();
+            setEvents(fetchedEvents);
+        } catch (error: any) {
+            if (error.message.includes("Firebase configuration is incomplete")) {
+                setConfigError(error.message);
+            }
+            toast({ variant: "destructive", title: "Error", description: error.message || "Could not fetch events."});
+            setEvents([]);
+        }
+        setIsLoading(false);
+      };
     fetchEvents();
-  }, []);
+  }, [toast]);
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -182,6 +185,20 @@ export default function ManageEventsPage() {
     }
   }
 
+  if (configError) {
+    return (
+        <div className="container py-12">
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
+  }
+
   return (
     <div className="py-6 grid gap-10 lg:grid-cols-2">
       <div>
@@ -261,7 +278,6 @@ export default function ManageEventsPage() {
                       width={100}
                       height={100}
                       className="rounded-md object-cover border"
-                      unoptimized
                     />
                   </div>
                 )}

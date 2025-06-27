@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,22 +24,41 @@ export default function ChildrenPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchChildren = async () => {
         setIsLoading(true);
-        const fetchedChildren = await getChildren();
-        if (fetchedChildren === null) {
-            toast({ variant: "destructive", title: "Error", description: "Could not fetch children."});
-            setChildren([]);
-        } else {
+        setConfigError(null);
+        try {
+            const fetchedChildren = await getChildren();
             setChildren(fetchedChildren);
+        } catch (error: any) {
+            if (error.message.includes("Firebase configuration is incomplete")) {
+                setConfigError(error.message);
+            }
+            toast({ variant: "destructive", title: "Error", description: error.message || "Could not fetch children."});
+            setChildren([]);
         }
         setIsLoading(false);
     };
 
     fetchChildren();
   }, [toast]);
+  
+  if (configError) {
+    return (
+        <div className="container py-12">
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
+  }
 
   return (
     <div className="py-6">
@@ -98,7 +116,7 @@ export default function ChildrenPage() {
                 <TableRow key={child.id}>
                   <TableCell>
                     <Avatar>
-                      <AvatarImage src={child.photo} alt={child.name} unoptimized/>
+                      <AvatarImage src={child.photo} alt={child.name} />
                       <AvatarFallback>
                         {child.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
