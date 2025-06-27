@@ -88,7 +88,15 @@ export default function ManageActivitiesPage() {
       const errorMessage = (error as Error).message;
       if (errorMessage.includes("Firebase configuration is incomplete")) {
         setConfigError(errorMessage);
-      } else {
+      } else if (errorMessage.includes("requires an index")) {
+        toast({
+            variant: "destructive",
+            title: "Firestore Index Required",
+            description: "A database index is needed to sort activities. Please check the browser's developer console for a link to create it.",
+            duration: 15000,
+        });
+      }
+      else {
         toast({ variant: "destructive", title: "Error", description: "Could not fetch activities."});
       }
     } finally {

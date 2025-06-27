@@ -16,7 +16,7 @@ import { getStorage, type FirebaseStorage } from "firebase/storage";
 // =================================================================================
 export const firebaseConfig = {
   // PASTE YOUR WEB APP'S API KEY HERE (it's a long string of letters and numbers)
-  apiKey: "",
+  apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
 
   // These values are correct for your project. Do not change them.
   authDomain: "blink-notify-494bf.firebaseapp.com",
@@ -25,7 +25,7 @@ export const firebaseConfig = {
   messagingSenderId: "450079883039",
 
   // PASTE YOUR WEB APP'S APP ID HERE (it starts with "1:")
-  appId: "",
+  appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
 };
 
 // Initialize Firebase

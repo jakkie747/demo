@@ -20,9 +20,9 @@ export const getActivities = async (): Promise<Activity[]> => {
     } catch (error) {
         if (error instanceof Error && error.message.includes("Firebase configuration is incomplete")) {
             console.warn(error.message); // Log for developers, but don't crash the app
-            return []; // Return empty array to allow the page to render
         }
-        // For other types of errors, we still want to see them in the UI
+        // Always re-throw the error so the UI can handle it.
+        // This is especially important for missing index errors.
         throw error;
     }
 };
