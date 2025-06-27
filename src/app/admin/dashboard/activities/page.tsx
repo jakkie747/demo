@@ -68,6 +68,15 @@ export default function ManageActivitiesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [configError, setConfigError] = useState<string | null>(null);
 
+  const form = useForm<z.infer<typeof activityFormSchema>>({
+    resolver: zodResolver(activityFormSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      image: undefined,
+    },
+  });
+
   const fetchActivities = async () => {
     setIsLoading(true);
     try {
