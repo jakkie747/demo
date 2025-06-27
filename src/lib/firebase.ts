@@ -3,43 +3,46 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 // =================================================================================
-// CORRECT FIREBASE CONFIGURATION
+// CRITICAL: COMPLETE YOUR FIREBASE CONFIGURATION
 // =================================================================================
-// The configuration below has been partially pre-filled for your project.
-// However, you still need to provide your Web App's specific `apiKey` and `appId`.
+// Your app is not connected to Firebase. Please complete the configuration below.
 //
 // How to find your Web App's Firebase config:
-// 1. Go to your Firebase project settings: https://console.firebase.google.com/project/blink-notify-494bf/settings/general
-// 2. In the "Your apps" section, make sure you have a Web App (it has a </> icon). If not, create one.
-// 3. Find your Web App in the list and click its name to see its configuration.
-// 4. In the "SDK setup and configuration" section, select the "Config" option.
-// 5. Copy your `apiKey` and `appId` values and paste them into the placeholders below.
+// 1. Go to your Firebase project settings:
+//    https://console.firebase.google.com/project/blink-notify-494bf/settings/general
+// 2. In the "Your apps" section, find your Web App (it has a </> icon).
+// 3. In the "SDK setup and configuration" section, select "Config".
+// 4. Copy the `apiKey` and `appId` values and paste them into the empty strings below.
 // =================================================================================
 export const firebaseConfig = {
-  // TODO: PASTE YOUR WEB APP'S API KEY HERE
-  apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
-  // This value is correct for your project
+  // PASTE YOUR WEB APP'S API KEY HERE (it's a long string of letters and numbers)
+  apiKey: "",
+
+  // These values are correct for your project. Do not change them.
   authDomain: "blink-notify-494bf.firebaseapp.com",
-  // This value is correct for your project
   projectId: "blink-notify-494bf",
-  // This value is correct for your project
   storageBucket: "blink-notify-494bf.appspot.com",
-  // This value is correct for your project
   messagingSenderId: "450079883039",
-  // TODO: PASTE YOUR WEB APP'S APP ID HERE
-  appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
+
+  // PASTE YOUR WEB APP'S APP ID HERE (it starts with "1:")
+  appId: "",
 };
 
 // Initialize Firebase
 let app: FirebaseApp;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
+let db: any;
+let storage: FirebaseStorage | any;
+
+if (firebaseConfig.apiKey && firebaseConfig.appId) {
+    if (!getApps().length) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApp();
+    }
+    db = getFirestore(app);
+    storage = getStorage(app);
 } else {
-  app = getApp();
+    console.warn("Firebase configuration is incomplete. The app will not connect to Firebase. Please update src/lib/firebase.ts");
 }
-
-const db = getFirestore(app);
-const storage: FirebaseStorage = getStorage(app);
-
 
 export { app, db, storage };
