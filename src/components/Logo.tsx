@@ -12,24 +12,20 @@ export function Logo({
     <svg
       role="img"
       aria-label="Blinkogies Logo"
-      className={cn("h-8 w-8", className)}
-      viewBox="0 0 40 40"
+      className={cn("h-8 w-auto", className)}
+      viewBox="0 0 459 460"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        {/* Shape 1 - Blue */}
+      <g transform="translate(-18.87 -17.37)">
         <path
-          d="M10 10 H 20 V 30 H 10 C 5 30, 5 10, 10 10"
-          stroke="hsl(var(--primary))"
+          fill="hsl(var(--primary))"
+          d="M222.7,214.28S233.56,91.4,324,85.12c75.24-5,116.15,64.25,121.23,87.83,5.6,25.93-30.85,73.49-30.85,73.49-74,74.6-200.72-23.77-200.72-23.77Z"
         />
-        {/* Shape 2 - Yellow */}
         <path
-          d="M30 30 H 20 V 10 H 30 C 35 10, 35 30, 30 30"
-          stroke="hsl(var(--accent))"
+          fill="hsl(var(--accent))"
+          d="M254.43,269s-10.86,122.88-101.32,129.16c-75.24,5-116.15-64.25-121.23-87.83-5.6-25.93,30.85-73.49,30.85-73.49,74-74.6,200.72,23.77,200.72,23.77Z"
         />
       </g>
-      <circle cx="13" cy="23" r="1.5" fill="hsl(var(--primary))" />
-      <circle cx="27" cy="17" r="1.5" fill="hsl(var(--accent))" />
     </svg>
   );
 
