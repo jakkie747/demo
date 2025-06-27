@@ -40,12 +40,12 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=600&h=600&fit=crop"
-              alt="Children playing with blocks"
+              src="https://images.unsplash.com/photo-1517582797241-18510845582f?q=80&w=600&h=600&fit=crop"
+              alt="Children drawing at a table"
               width={600}
               height={600}
               className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
-              data-ai-hint="children classroom"
+              data-ai-hint="children drawing"
               unoptimized
             />
           </div>
@@ -76,7 +76,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1506097185888-3ab4594c8b66?q=80&w=400&h=300&fit=crop"
+                  src="https://images.unsplash.com/photo-1596495759344-93b5a19e2468?q=80&w=400&h=300&fit=crop"
                   alt="Child painting on a canvas"
                   width={400}
                   height={300}
@@ -97,12 +97,12 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1519669556878-63bd52a5a846?q=80&w=400&h=300&fit=crop"
-                  alt="An open story book with illustrations"
+                  src="https://images.unsplash.com/photo-1491841550275-57745218787c?q=80&w=400&h=300&fit=crop"
+                  alt="Teacher reading to children"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="open book"
+                  data-ai-hint="teacher reading"
                   unoptimized
                 />
               </CardContent>
@@ -118,12 +118,12 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1616424361655-b44a33c2339d?q=80&w=400&h=300&fit=crop"
-                  alt="Child watering plants in a garden"
+                  src="https://images.unsplash.com/photo-1588691520729-a784c6802526?q=80&w=400&h=300&fit=crop"
+                  alt="Child holding a plant"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="child gardening"
+                  data-ai-hint="child plant"
                   unoptimized
                 />
               </CardContent>
