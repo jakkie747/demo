@@ -7,6 +7,7 @@ import { Calendar, Paintbrush, BookOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { Logo } from "@/components/Logo";
 
 export default function Home() {
   const { t } = useLanguage();
@@ -38,12 +39,9 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <img
-              src="/blinkogies-main.jpg"
-              alt="Blinkogies Kleuterskool & Naskool"
-              width="600"
-              height="600"
-              className="mx-auto overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
+            <Logo
+              href={null}
+              className="mx-auto w-full max-w-[400px] lg:order-last xl:max-w-[600px]"
             />
           </div>
         </div>
