@@ -38,11 +38,9 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <Image
+            <img
               src="https://images.unsplash.com/photo-1576092762791-ddc29a26524b?q=80&w=1080&auto=format&fit=crop"
               alt="Teacher reading to children in a classroom"
-              width={600}
-              height={600}
               className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
             />
           </div>
