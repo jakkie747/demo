@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Allow read and write access to all files for this demo.
+      // In a production app, you would implement more restrictive rules
+      // based on user authentication.
+      allow read, write: if true;
+    }
+  }
+}
