@@ -2,18 +2,31 @@ import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+// =================================================================================
+// IMPORTANT: ACTION REQUIRED
+// =================================================================================
+// Your app is not connecting to Firebase. Please add your project's configuration
+// details below.
+//
+// How to find your Firebase config:
+// 1. Go to your Firebase project: https://console.firebase.google.com/project/blink-notify-494bf/overview
+// 2. Click the gear icon (Project settings) next to "Project Overview".
+// 3. In the "General" tab, scroll down to the "Your apps" section.
+// 4. Find your web app, and in the "SDK setup and configuration" box, select "Config".
+// 5. You will see an object called `firebaseConfig`. Copy the values from that
+//    object and paste them into the `firebaseConfig` object below, replacing
+//    the placeholder values like "PASTE_YOUR_API_KEY_HERE".
+// =================================================================================
+export const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "PASTE_YOUR_API_KEY_HERE",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "PASTE_YOUR_AUTH_DOMAIN_HERE",
   projectId: "blink-notify-494bf",
   storageBucket: "blink-notify-494bf.appspot.com",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "PASTE_YOUR_APP_ID_HERE",
 };
 
 // Initialize Firebase
-// Note: You will need to set up a Firebase project and add your configuration
-// details to environment variables (e.g., in a .env.local file) for this to work.
 const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 const storage: FirebaseStorage = getStorage(app);
