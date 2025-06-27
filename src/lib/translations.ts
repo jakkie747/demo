@@ -82,6 +82,7 @@ export const translations = {
     dashboard: 'Dashboard',
     childrenProfiles: 'Children Profiles',
     manageEvents: 'Manage Events',
+    manageActivities: 'Manage Activities',
 
     // Admin Dashboard Page
     registeredChildren: 'Registered Children',
@@ -96,6 +97,7 @@ export const translations = {
     manageChildren: 'Manage Children',
     manageEventsCard: 'Manage Events',
     manageEventsDesc: 'Create new events or edit existing ones.',
+    manageActivitiesDesc: 'Add or update the "Recent Fun Activities" on the homepage.',
 
     // Admin Children Page
     registeredChildrenTitle: 'Registered Children',
@@ -137,7 +139,27 @@ export const translations = {
     eventDeletedDesc: 'The event "{title}" has been successfully deleted.',
     areYouSure: 'Are you absolutely sure?',
     areYouSureDesc: 'This action cannot be undone. This will permanently delete the event "{title}".',
-    delete: 'Delete'
+    delete: 'Delete',
+    
+    // Admin Activities Page
+    createNewActivityTitle: 'Create New Activity',
+    editingActivity: 'Editing "{title}"',
+    activityDetails: 'Activity Details',
+    updateActivityDetails: 'Update the details for this activity.',
+    createActivityDetails: 'Fill in the details to create a new homepage activity.',
+    activityTitle: 'Activity Title',
+    egArtDay: 'e.g. Art Day!',
+    describeActivity: 'Describe the activity...',
+    activityImage: 'Activity Image',
+    updateActivity: 'Update Activity',
+    createActivity: 'Create Activity',
+    existingActivities: 'Existing Activities',
+    activityUpdated: 'Activity Updated!',
+    activityUpdatedDesc: 'The activity "{title}" has been successfully updated.',
+    activityCreated: 'Activity Created!',
+    activityCreatedDesc: 'The activity "{title}" has been successfully created.',
+    activityDeleted: 'Activity Deleted!',
+    activityDeletedDesc: 'The activity "{title}" has been successfully deleted.'
   },
   af: {
     // Header
@@ -221,6 +243,7 @@ export const translations = {
     dashboard: 'Kontroleskerm',
     childrenProfiles: 'Kinderprofiele',
     manageEvents: 'Bestuur Geleenthede',
+    manageActivities: 'Bestuur Aktiwiteite',
 
     // Admin Dashboard Page
     registeredChildren: 'Geregistreerde Kinders',
@@ -235,6 +258,7 @@ export const translations = {
     manageChildren: 'Bestuur Kinders',
     manageEventsCard: 'Bestuur Geleenthede',
     manageEventsDesc: 'Skep nuwe geleenthede of wysig bestaandes.',
+    manageActivitiesDesc: 'Voeg by of dateer die "Onlangse Prettige Aktiwiteite" op die tuisblad op.',
     
     // Admin Children Page
     registeredChildrenTitle: 'Geregistreerde Kinders',
@@ -276,7 +300,27 @@ export const translations = {
     eventDeletedDesc: 'Die geleentheid "{title}" is suksesvol uitgevee.',
     areYouSure: 'Is jy heeltemal seker?',
     areYouSureDesc: 'Hierdie aksie kan nie ongedaan gemaak word nie. Dit sal die geleentheid "{title}" permanent uitvee.',
-    delete: 'Vee uit'
+    delete: 'Vee uit',
+
+    // Admin Activities Page
+    createNewActivityTitle: 'Skep Nuwe Aktiwiteit',
+    editingActivity: 'Wysig "{title}"',
+    activityDetails: 'Aktiwiteit Besonderhede',
+    updateActivityDetails: 'Dateer die besonderhede vir hierdie aktiwiteit op.',
+    createActivityDetails: "Vul die besonderhede in om 'n nuwe tuisbladaktiwiteit te skep.",
+    activityTitle: 'Aktiwiteit Titel',
+    egArtDay: 'bv. Kunsdag!',
+    describeActivity: 'Beskryf die aktiwiteit...',
+    activityImage: 'Aktiwiteit Beeld',
+    updateActivity: 'Dateer Aktiwiteit Op',
+    createActivity: 'Skep Aktiwiteit',
+    existingActivities: 'Bestaande Aktiwiteite',
+    activityUpdated: 'Aktiwiteit Opgedateer!',
+    activityUpdatedDesc: 'Die aktiwiteit "{title}" is suksesvol opgedateer.',
+    activityCreated: 'Aktiwiteit Geskep!',
+    activityCreatedDesc: 'Die aktiwiteit "{title}" is suksesvol geskep.',
+    activityDeleted: 'Aktiwiteit Uitgevee!',
+    activityDeletedDesc: 'Die aktiwiteit "{title}" is suksesvol uitgevee.'
   },
 };
 

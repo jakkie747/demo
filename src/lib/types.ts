@@ -20,3 +20,12 @@ export interface Event {
   titleKey?: TranslationKey;
   descriptionKey?: TranslationKey;
 }
+
+export interface Activity {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  createdAt: any; // For Firestore timestamp
+  aiHint?: string;
+}

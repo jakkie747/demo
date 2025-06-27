@@ -1,16 +1,36 @@
 
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Paintbrush, BookOpen } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
-import { Logo } from "@/components/Logo";
+import { getActivities } from "@/services/activityService";
+import type { Activity } from "@/lib/types";
 
 export default function Home() {
   const { t } = useLanguage();
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedActivities = await getActivities();
+        setActivities(fetchedActivities.slice(0, 3)); // Get the 3 most recent
+      } catch (error) {
+        console.error("Failed to load activities", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchActivities();
+  }, []);
+
   return (
     <div className="flex flex-col">
       <section className="w-full py-12 md:py-24 lg:py-32 bg-primary/10">
@@ -65,69 +85,42 @@ export default function Home() {
             </div>
           </div>
           <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 sm:grid-cols-2 md:grid-cols-3">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <div className="grid gap-1">
-                  <CardTitle>{t("artDay")}</CardTitle>
-                </div>
-                <div className="ml-auto rounded-full bg-accent/20 p-2">
-                  <Paintbrush className="h-6 w-6 text-accent-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Image
-                  src="https://placehold.co/400x300.png"
-                  alt="Child painting on a canvas"
-                  width={400}
-                  height={300}
-                  className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="child painting"
-                  unoptimized
-                />
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <div className="grid gap-1">
-                  <CardTitle>{t("storyTime")}</CardTitle>
-                </div>
-                <div className="ml-auto rounded-full bg-accent/20 p-2">
-                  <BookOpen className="h-6 w-6 text-accent-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Image
-                  src="https://placehold.co/400x300.png"
-                  alt="Teacher reading to children"
-                  width={400}
-                  height={300}
-                  className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="teacher reading"
-                  unoptimized
-                />
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <div className="grid gap-1">
-                  <CardTitle>{t("gardenDay")}</CardTitle>
-                </div>
-                <div className="ml-auto rounded-full bg-accent/20 p-2">
-                  <Calendar className="h-6 w-6 text-accent-foreground" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Image
-                  src="https://placehold.co/400x300.png"
-                  alt="Child holding a plant"
-                  width={400}
-                  height={300}
-                  className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="child plant"
-                  unoptimized
-                />
-              </CardContent>
-            </Card>
+             {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-32" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="w-full aspect-[4/3] rounded-lg" />
+                    <Skeleton className="h-4 w-full mt-4" />
+                    <Skeleton className="h-4 w-3/4 mt-2" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : activities.length === 0 ? (
+                <p className="col-span-3 text-center text-muted-foreground">No recent activities to show.</p>
+            ) : (
+              activities.map((activity) => (
+                <Card key={activity.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>{activity.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Image
+                      src={activity.image || "https://placehold.co/400x300.png"}
+                      alt={activity.title}
+                      width={400}
+                      height={300}
+                      className="rounded-lg mb-4 object-cover aspect-[4/3]"
+                      data-ai-hint={activity.aiHint || 'children playing'}
+                      unoptimized
+                    />
+                    <p className="text-sm text-muted-foreground">{activity.description}</p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </section>

@@ -8,7 +8,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, PlusCircle } from "lucide-react";
+import { Users, Calendar, PlusCircle, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
       <div>
         <h3 className="text-2xl font-semibold mb-4">{t("quickLinks")}</h3>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle>{t("viewAllChildren")}</CardTitle>
@@ -87,6 +87,19 @@ export default function DashboardPage() {
             <CardContent>
               <Button asChild variant="secondary">
                 <Link href="/admin/dashboard/events">{t("manageEvents")}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle>{t("manageActivities")}</CardTitle>
+              <CardDescription>
+                {t("manageActivitiesDesc")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild variant="secondary">
+                <Link href="/admin/dashboard/activities">{t("manageActivities")}</Link>
               </Button>
             </CardContent>
           </Card>
