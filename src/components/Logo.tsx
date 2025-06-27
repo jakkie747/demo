@@ -11,12 +11,13 @@ export function Logo({
 }) {
   const logoImage = (
     <Image
-      src="/logo.png"
+      src="https://www.blinkogies.co.za/wp-content/uploads/2023/10/Blinkogies-Logo-White-Transparent.png"
       alt="Blinkogies Logo"
       width={140}
       height={32}
       className={cn("h-8 w-auto", className)}
       priority
+      unoptimized
     />
   );
 
