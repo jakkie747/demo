@@ -32,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, AlertTriangle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +49,7 @@ import type { Activity } from "@/lib/types";
 import { getActivities, addActivity, updateActivity, deleteActivity } from "@/services/activityService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 const activityFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long"),
@@ -65,7 +66,7 @@ export default function ManageActivitiesPage() {
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [isConfigured, setIsConfigured] = useState(false);
 
   const form = useForm<z.infer<typeof activityFormSchema>>({
     resolver: zodResolver(activityFormSchema),
@@ -78,39 +79,38 @@ export default function ManageActivitiesPage() {
 
   const fetchActivities = useCallback(async () => {
     setIsLoading(true);
-    setConfigError(null);
     try {
-        const fetchedActivities = await getActivities();
-        setActivities(fetchedActivities);
+      const fetchedActivities = await getActivities();
+      setActivities(fetchedActivities);
     } catch (error: any) {
-        console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
-        
-        let title = "Error Loading Activities";
-        let description = "An unexpected error occurred while fetching activities.";
-        
-        if (error.code === 'failed-precondition') {
-            title = "Database Index Required";
-            description = "Failed to load activities. Please open the browser console (F12) to find a link to create the required database index.";
-        } else if (error.message.includes("Firebase configuration is incomplete")) {
-            title = "Firebase Configuration Error";
-            description = error.message;
-            setConfigError(description);
-        }
+      let title = "Error Loading Activities";
+      let description = error.message || "An unexpected error occurred while fetching activities.";
 
-        toast({
-            variant: "destructive",
-            title: title,
-            description: description,
-            duration: 15000,
-        });
-        setActivities([]);
+      if (error.message.includes("Database Index Required")) {
+        title = "Database Index Required";
+        description = "Failed to load activities. Please open the browser console (F12) to find a link to create the required database index.";
+      }
+
+      toast({
+        variant: "destructive",
+        title: title,
+        description: description,
+        duration: 15000,
+      });
+      setActivities([]);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }, [toast]);
 
   useEffect(() => {
-    fetchActivities();
+    const configured = isFirebaseConfigured();
+    setIsConfigured(configured);
+    if (configured) {
+      fetchActivities();
+    } else {
+      setIsLoading(false);
+    }
   }, [fetchActivities]);
 
   const handleEditClick = (activity: Activity) => {
@@ -135,7 +135,7 @@ export default function ManageActivitiesPage() {
     if (activityToDelete) {
       try {
         if (activityToDelete.image) {
-            await deleteImageFromUrl(activityToDelete.image);
+          await deleteImageFromUrl(activityToDelete.image);
         }
         await deleteActivity(activityToDelete.id);
         await fetchActivities();
@@ -145,8 +145,8 @@ export default function ManageActivitiesPage() {
           variant: "destructive",
         });
       } catch (error) {
-         const errorMessage = (error as Error).message;
-         toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete activity."});
+        const errorMessage = (error as Error).message;
+        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete activity." });
       } finally {
         setActivityToDelete(null);
       }
@@ -165,11 +165,11 @@ export default function ManageActivitiesPage() {
         }
         imageUrl = newImageUrl;
       }
-      
+
       const activityPayload = {
-          title: values.title,
-          description: values.description,
-          image: imageUrl || "https://placehold.co/400x300.png",
+        title: values.title,
+        description: values.description,
+        image: imageUrl || "https://placehold.co/400x300.png",
       };
 
       if (editingActivity) {
@@ -192,24 +192,25 @@ export default function ManageActivitiesPage() {
       setEditingActivity(null);
       form.reset();
     } catch (error) {
-        console.error("Failed to save activity:", error);
-        const errorMessage = (error as Error).message;
-        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save activity."});
+      console.error("Failed to save activity:", error);
+      const errorMessage = (error as Error).message;
+      toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save activity." });
     }
   }
 
-  if (configError) {
+  if (!isConfigured) {
     return (
-        <div className="container py-12">
-            <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
-                <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
-                </AlertDescription>
-            </Alert>
-        </div>
-    )
+      <div className="container py-12">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Firebase Configuration Error</AlertTitle>
+          <AlertDescription>
+            <p>Cannot manage activities because the application is not connected to Firebase.</p>
+            <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (
@@ -269,7 +270,7 @@ export default function ManageActivitiesPage() {
                     </FormItem>
                   )}
                 />
-                 {editingActivity?.image && (
+                {editingActivity?.image && (
                   <div className="space-y-2">
                     <FormLabel>{t('currentImage')}</FormLabel>
                     <Image
@@ -351,9 +352,9 @@ export default function ManageActivitiesPage() {
                 ))
               ) : activities.length === 0 ? (
                 <TableRow>
-                    <TableCell colSpan={3} className="h-24 text-center">
-                        No activities created yet.
-                    </TableCell>
+                  <TableCell colSpan={3} className="h-24 text-center">
+                    No activities created yet.
+                  </TableCell>
                 </TableRow>
               ) : (
                 activities.map((activity) => (
@@ -393,7 +394,7 @@ export default function ManageActivitiesPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
               <AlertDialogDescription>
-                {t('activityDeletedDesc', { title: activityToDelete?.title || ''})}
+                {t('activityDeletedDesc', { title: activityToDelete?.title || '' })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,32 +11,37 @@ import { getActivities } from "@/services/activityService";
 import type { Activity } from "@/lib/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 export default function Home() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [isConfigured, setIsConfigured] = useState(false);
+
+  const fetchActivities = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const fetchedActivities = await getActivities();
+      setActivities(fetchedActivities.slice(0, 3));
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message || "Could not load activities." });
+      setActivities([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    const fetchActivities = async () => {
-      setIsLoading(true);
-      setConfigError(null);
-      try {
-        const fetchedActivities = await getActivities();
-        setActivities(fetchedActivities.slice(0, 3)); // Get the 3 most recent
-      } catch (error: any) {
-        if (error.message.includes("Firebase configuration is incomplete")) {
-            setConfigError(error.message);
-        }
-        toast({ variant: "destructive", title: "Error", description: error.message || "Could not load activities."});
-        setActivities([]);
-      }
+    const configured = isFirebaseConfigured();
+    setIsConfigured(configured);
+    if (configured) {
+      fetchActivities();
+    } else {
       setIsLoading(false);
-    };
-    fetchActivities();
-  }, [toast]);
+    }
+  }, [fetchActivities]);
 
   const renderRecentActivities = () => {
     if (isLoading) {
@@ -53,19 +58,19 @@ export default function Home() {
         </Card>
       ));
     }
-    
-    if (configError) {
+
+    if (!isConfigured) {
       return (
         <div className="col-span-1 md:col-span-3">
           <Alert variant="destructive">
-            <AlertTitle>Configuration Error</AlertTitle>
+            <AlertTitle>Firebase Configuration Error</AlertTitle>
             <AlertDescription>
-                <p>{configError}</p>
-                <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+              <p>Your application is not connected to Firebase.</p>
+              <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
             </AlertDescription>
           </Alert>
         </div>
-      )
+      );
     }
 
     if (activities.length === 0) {

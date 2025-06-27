@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Calendar, Info } from "lucide-react";
+import { Calendar, Info, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Event } from "@/lib/types";
@@ -17,52 +17,57 @@ import { getEvents } from "@/services/eventsService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 export default function EventsPage() {
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [isConfigured, setIsConfigured] = useState(false);
 
-  useEffect(() => {
-    const loadEvents = async () => {
-      setIsLoading(true);
-      setConfigError(null);
-      try {
-        const fetchedEvents = await getEvents();
-        setEvents(fetchedEvents);
-      } catch (error: any) {
-        if (error.message.includes("Firebase configuration is incomplete")) {
-            setConfigError(error.message);
-        }
-        toast({ 
-            variant: "destructive", 
-            title: "Error", 
-            description: error.message || "Could not fetch events from the database."
-        });
-        setEvents([]);
-      }
+  const loadEvents = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const fetchedEvents = await getEvents();
+      setEvents(fetchedEvents);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Could not fetch events from the database."
+      });
+      setEvents([]);
+    } finally {
       setIsLoading(false);
-    };
-
-    loadEvents();
+    }
   }, [toast]);
 
-  if (configError) {
+  useEffect(() => {
+    const configured = isFirebaseConfigured();
+    setIsConfigured(configured);
+    if (configured) {
+      loadEvents();
+    } else {
+      setIsLoading(false);
+    }
+  }, [loadEvents]);
+
+  if (!isConfigured) {
     return (
-        <div className="container py-12">
-            <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
-                <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
-                </AlertDescription>
-            </Alert>
-        </div>
-    )
+      <div className="container py-12">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Firebase Configuration Error</AlertTitle>
+          <AlertDescription>
+            <p>Cannot display events because the application is not connected to the database.</p>
+            <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
-  
+
   return (
     <div className="container py-12 md:py-24">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">

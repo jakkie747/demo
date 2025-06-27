@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -18,46 +18,52 @@ import type { Child } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { isFirebaseConfigured } from "@/lib/firebase";
+import { AlertTriangle } from "lucide-react";
 
 export default function ChildrenPage() {
   const [children, setChildren] = useState<Child[]>([]);
   const { t } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [isConfigured, setIsConfigured] = useState(false);
+
+  const fetchChildren = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const fetchedChildren = await getChildren();
+      setChildren(fetchedChildren);
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message || "Could not fetch children." });
+      setChildren([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    const fetchChildren = async () => {
-        setIsLoading(true);
-        setConfigError(null);
-        try {
-            const fetchedChildren = await getChildren();
-            setChildren(fetchedChildren);
-        } catch (error: any) {
-            if (error.message.includes("Firebase configuration is incomplete")) {
-                setConfigError(error.message);
-            }
-            toast({ variant: "destructive", title: "Error", description: error.message || "Could not fetch children."});
-            setChildren([]);
-        }
-        setIsLoading(false);
-    };
+    const configured = isFirebaseConfigured();
+    setIsConfigured(configured);
+    if (configured) {
+      fetchChildren();
+    } else {
+      setIsLoading(false);
+    }
+  }, [fetchChildren]);
 
-    fetchChildren();
-  }, [toast]);
-  
-  if (configError) {
+  if (!isConfigured) {
     return (
-        <div className="container py-12">
-            <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
-                <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
-                </AlertDescription>
-            </Alert>
-        </div>
-    )
+      <div className="container py-12">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Firebase Configuration Error</AlertTitle>
+          <AlertDescription>
+            <p>Cannot display child profiles because the application is not connected to Firebase.</p>
+            <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (

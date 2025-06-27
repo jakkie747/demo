@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -10,7 +9,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, PlusCircle } from "lucide-react";
+import { Users, Calendar, PlusCircle, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getChildren } from "@/services/childrenService";
@@ -18,6 +17,7 @@ import { getEvents } from "@/services/eventsService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 export default function DashboardPage() {
   const { t } = useLanguage();
@@ -25,49 +25,49 @@ export default function DashboardPage() {
   const [childrenCount, setChildrenCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setFetchError(false);
-      try {
-        const [children, events] = await Promise.all([
-          getChildren(),
-          getEvents(),
-        ]);
-        
-        if (children === null || events === null) {
-          setFetchError(true);
-          toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data."});
-          setChildrenCount(0);
-          setEventsCount(0);
-        } else {
-          setChildrenCount(children.length);
-          setEventsCount(events.length);
-        }
-      } catch (error) {
-        setFetchError(true);
-        toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data."});
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [children, events] = await Promise.all([
+        getChildren(),
+        getEvents(),
+      ]);
+      setChildrenCount(children.length);
+      setEventsCount(events.length);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data." });
+      setChildrenCount(0);
+      setEventsCount(0);
+    } finally {
+      setIsLoading(false);
+    }
   }, [toast]);
 
-  if (fetchError) {
+  useEffect(() => {
+    const configured = isFirebaseConfigured();
+    setIsConfigured(configured);
+    if (configured) {
+      fetchData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [fetchData]);
+
+  if (!isConfigured) {
     return (
-        <div className="container py-12">
-            <Alert variant="destructive">
-                <AlertTitle>Error Loading Dashboard</AlertTitle>
-                <AlertDescription>
-                    <p>Could not load dashboard data due to a database connection issue.</p>
-                     <p className="mt-2 font-bold">Please ensure your Firebase configuration in <code>src/lib/firebase.ts</code> is correct.</p>
-                </AlertDescription>
-            </Alert>
-        </div>
-    )
+      <div className="container py-12">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Firebase Configuration Error</AlertTitle>
+          <AlertDescription>
+            <p>The dashboard cannot be displayed because the application is not connected to Firebase.</p>
+            <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (

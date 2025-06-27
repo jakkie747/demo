@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -32,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, AlertTriangle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +49,7 @@ import type { Event } from "@/lib/types";
 import { getEvents, addEvent, updateEvent, deleteEvent } from "@/services/eventsService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long"),
@@ -66,26 +67,7 @@ export default function ManageEventsPage() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-        setIsLoading(true);
-        setConfigError(null);
-        try {
-            const fetchedEvents = await getEvents();
-            setEvents(fetchedEvents);
-        } catch (error: any) {
-            if (error.message.includes("Firebase configuration is incomplete")) {
-                setConfigError(error.message);
-            }
-            toast({ variant: "destructive", title: "Error", description: error.message || "Could not fetch events."});
-            setEvents([]);
-        }
-        setIsLoading(false);
-      };
-    fetchEvents();
-  }, [toast]);
+  const [isConfigured, setIsConfigured] = useState(false);
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -96,6 +78,29 @@ export default function ManageEventsPage() {
       image: undefined,
     },
   });
+
+  const fetchEvents = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const fetchedEvents = await getEvents();
+      setEvents(fetchedEvents);
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message || "Could not fetch events." });
+      setEvents([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    const configured = isFirebaseConfigured();
+    setIsConfigured(configured);
+    if (configured) {
+      fetchEvents();
+    } else {
+      setIsLoading(false);
+    }
+  }, [fetchEvents]);
 
   const handleEditClick = (event: Event) => {
     setEditingEvent(event);
@@ -131,7 +136,7 @@ export default function ManageEventsPage() {
         });
       } catch (error) {
          const errorMessage = (error as Error).message;
-         toast({ variant: "destructive", title: "Error", description: "Could not delete event."});
+         toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete event." });
       } finally {
         setEventToDelete(null);
       }
@@ -185,18 +190,19 @@ export default function ManageEventsPage() {
     }
   }
 
-  if (configError) {
+  if (!isConfigured) {
     return (
-        <div className="container py-12">
-            <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
-                <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
-                </AlertDescription>
-            </Alert>
-        </div>
-    )
+      <div className="container py-12">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Firebase Configuration Error</AlertTitle>
+          <AlertDescription>
+            <p>Cannot manage events because the application is not connected to Firebase.</p>
+            <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (

@@ -15,8 +15,8 @@ import { getStorage, type FirebaseStorage } from "firebase/storage";
 // 4. Copy the `apiKey` and `appId` values and paste them into the empty strings below.
 // =================================================================================
 export const firebaseConfig = {
-  // PASTE YOUR WEB APP'S API KEY HERE (it's a long string of letters and numbers)
-  apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
+  // PASTE YOUR WEB APP'S API KEY HERE
+  apiKey: "",
 
   // These values are correct for your project. Do not change them.
   authDomain: "blink-notify-494bf.firebaseapp.com",
@@ -24,16 +24,20 @@ export const firebaseConfig = {
   storageBucket: "blink-notify-494bf.appspot.com",
   messagingSenderId: "450079883039",
 
-  // PASTE YOUR WEB APP'S APP ID HERE (it starts with "1:")
-  appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
+  // PASTE YOUR WEB APP'S APP ID HERE
+  appId: "",
 };
 
-// Initialize Firebase
-let app: FirebaseApp;
-let db: any;
-let storage: FirebaseStorage | any;
+let app: FirebaseApp | null = null;
+let db: any | null = null;
+let storage: FirebaseStorage | any | null = null;
 
-if (firebaseConfig.apiKey && firebaseConfig.appId) {
+// Helper to check if the config is populated, so we can show a nice error.
+export const isFirebaseConfigured = () => {
+    return firebaseConfig.apiKey !== "" && firebaseConfig.appId !== "";
+}
+
+if (isFirebaseConfigured()) {
     if (!getApps().length) {
       app = initializeApp(firebaseConfig);
     } else {
@@ -41,8 +45,6 @@ if (firebaseConfig.apiKey && firebaseConfig.appId) {
     }
     db = getFirestore(app);
     storage = getStorage(app);
-} else {
-    console.warn("Firebase configuration is incomplete. The app will not connect to Firebase. Please update src/lib/firebase.ts");
 }
 
 export { app, db, storage };

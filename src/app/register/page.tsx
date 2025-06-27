@@ -1,11 +1,10 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Baby, Home, User, Mail, Phone, Upload } from "lucide-react";
+import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +38,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { addChild } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
 import { uploadImage } from "@/services/storageService";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -58,7 +58,11 @@ const formSchema = z.object({
 export default function RegisterPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [isConfigured, setIsConfigured] = useState(false);
+
+  useEffect(() => {
+    setIsConfigured(isFirebaseConfigured());
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,7 +97,6 @@ export default function RegisterPage() {
 
       await addChild(newChildData);
 
-      setConfigError(null);
       toast({
         title: t('regSuccessTitle'),
         description: t('regSuccessDesc', { childName: values.childName }),
@@ -102,15 +105,11 @@ export default function RegisterPage() {
     } catch (error) {
       console.error("Failed to save registration:", error);
       const errorMessage = (error as Error).message;
-      if (errorMessage.includes("Firebase configuration is incomplete")) {
-        setConfigError(errorMessage);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: errorMessage || "There was a problem saving the registration.",
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: errorMessage || "There was a problem saving the registration.",
+      });
     }
   }
 
@@ -126,12 +125,13 @@ export default function RegisterPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {configError && (
+          {!isConfigured && (
               <Alert variant="destructive" className="mb-8">
-                  <AlertTitle>Configuration Error</AlertTitle>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Firebase Configuration Error</AlertTitle>
                   <AlertDescription>
-                      <p>{configError}</p>
-                      <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                      <p>Cannot submit registration because the application is not connected to the database.</p>
+                      <p className="mt-2 font-bold">Please contact the administrator or, if you are the admin, update <code>src/lib/firebase.ts</code> with your project credentials.</p>
                   </AlertDescription>
               </Alert>
           )}
@@ -317,7 +317,7 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="w-full font-semibold" disabled={form.formState.isSubmitting || !!configError}>
+              <Button type="submit" size="lg" className="w-full font-semibold" disabled={form.formState.isSubmitting || !isConfigured}>
                  {form.formState.isSubmitting ? "Submitting..." : t('submitRegistration')}
               </Button>
             </form>
