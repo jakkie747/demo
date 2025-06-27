@@ -39,8 +39,8 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1611581719398-08fe2eb020c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8cHJlc2Nob29sJTIwY2hpbGRyZW4lMjBwbGF5aW5nJTIwaW4lMjBhJTIwY2xhc3Nyb29tfGVufDB8fHx8MTc1MDk5NDAzOXww&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Preschool children playing in a classroom"
+              src="https://images.unsplash.com/photo-1576092762791-ddc29a26524b?q=80&w=1080&auto=format&fit=crop"
+              alt="Teacher reading to children in a classroom"
               width={600}
               height={600}
               className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
