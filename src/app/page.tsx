@@ -42,10 +42,11 @@ export default function Home() {
             <div
               className="mx-auto aspect-square w-full rounded-full bg-cover bg-center lg:order-last"
               style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1517581298379-56e6d8a4325a?q=80&w=1080&auto=format&fit=crop')`,
+                backgroundImage: `url('https://www.blinkogies.co.za/wp-content/uploads/2021/08/Blinkogies-15-1.jpg')`,
               }}
               role="img"
-              aria-label="Children painting in a preschool classroom"
+              aria-label="Children playing with toys in a classroom"
+              data-ai-hint="children classroom"
             ></div>
           </div>
         </div>
