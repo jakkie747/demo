@@ -33,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Terminal } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,12 +44,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Event } from "@/lib/types";
 import { getEvents, addEvent, updateEvent, deleteEvent } from "@/services/eventsService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
-import { isStorageConfigured } from "@/lib/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const eventFormSchema = z.object({
@@ -141,7 +139,7 @@ export default function ManageEventsPage() {
     let imageUrl: string | undefined = editingEvent?.image;
 
     try {
-      if (file && isStorageConfigured) {
+      if (file) {
         const newImageUrl = await uploadImage(file, 'events');
         if (editingEvent?.image) {
           await deleteImageFromUrl(editingEvent.image);
@@ -279,18 +277,8 @@ export default function ManageEventsPage() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
-                          disabled={!isStorageConfigured}
                         />
                       </FormControl>
-                      {!isStorageConfigured && (
-                        <Alert variant="destructive" className="mt-2">
-                            <Terminal className="h-4 w-4" />
-                            <AlertTitle>Storage Not Configured</AlertTitle>
-                            <AlertDescription>
-                                Image uploads are disabled. To enable them, add a Secret with the name <code>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</code> and your Firebase Storage bucket URL as the value. After saving the secret, a new deployment may be required for the change to take effect.
-                            </AlertDescription>
-                        </Alert>
-                      )}
                       <FormDescription>
                         {editingEvent
                           ? t('replaceImage')

@@ -33,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Terminal } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,12 +44,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Activity } from "@/lib/types";
 import { getActivities, addActivity, updateActivity, deleteActivity } from "@/services/activityService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
-import { isStorageConfigured } from "@/lib/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const activityFormSchema = z.object({
@@ -138,7 +136,7 @@ export default function ManageActivitiesPage() {
     let imageUrl: string | undefined = editingActivity?.image;
 
     try {
-      if (file && isStorageConfigured) {
+      if (file) {
         // If a new image is uploaded, upload it to storage
         const newImageUrl = await uploadImage(file, 'activities');
         // If we are editing and there was an old image, delete it
@@ -263,18 +261,8 @@ export default function ManageActivitiesPage() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
-                          disabled={!isStorageConfigured}
                         />
                       </FormControl>
-                       {!isStorageConfigured && (
-                        <Alert variant="destructive" className="mt-2">
-                            <Terminal className="h-4 w-4" />
-                            <AlertTitle>Storage Not Configured</AlertTitle>
-                            <AlertDescription>
-                                Image uploads are disabled. To enable them, add a Secret with the name <code>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</code> and your Firebase Storage bucket URL as the value. After saving the secret, a new deployment may be required for the change to take effect.
-                            </AlertDescription>
-                        </Alert>
-                      )}
                       <FormDescription>
                         {editingActivity
                           ? t('replaceImage')

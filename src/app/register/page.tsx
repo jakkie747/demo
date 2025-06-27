@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Baby, Home, User, Mail, Phone, Upload, Terminal } from "lucide-react";
+import { Baby, Home, User, Mail, Phone, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,12 +33,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import { addChild } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
 import { uploadImage } from "@/services/storageService";
-import { isStorageConfigured } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -77,7 +75,7 @@ export default function RegisterPage() {
     let photoUrl = "https://placehold.co/100x100.png";
 
     try {
-      if (file && isStorageConfigured) {
+      if (file) {
         photoUrl = await uploadImage(file, 'children');
       }
 
@@ -203,19 +201,9 @@ export default function RegisterPage() {
                           name={name}
                           ref={ref}
                           className="pl-10"
-                          disabled={!isStorageConfigured}
                         />
                       </div>
                     </FormControl>
-                    {!isStorageConfigured && (
-                        <Alert variant="destructive" className="mt-2">
-                            <Terminal className="h-4 w-4" />
-                            <AlertTitle>Storage Not Configured</AlertTitle>
-                            <AlertDescription>
-                                Photo uploads are disabled. To enable them, add a Secret with the name <code>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</code> and your Firebase Storage bucket URL as the value. The registration will use a default placeholder image until this is configured.
-                            </AlertDescription>
-                        </Alert>
-                    )}
                     <FormDescription>
                       {t('childPhotoDesc')}
                     </FormDescription>

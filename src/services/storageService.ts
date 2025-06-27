@@ -1,14 +1,7 @@
 import { storage } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
-if (!storage) {
-    console.warn("Firebase Storage is not initialized. All storage operations will fail if attempted.");
-}
-
 export const uploadImage = async (file: File, path: 'activities' | 'events' | 'children'): Promise<string> => {
-    if (!storage) {
-        throw new Error("Firebase Storage is not configured. Please set NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET in your environment variables.");
-    }
     const filePath = `${path}/${Date.now()}-${file.name}`;
     const storageRef = ref(storage, filePath);
     await uploadBytes(storageRef, file);
@@ -18,10 +11,6 @@ export const uploadImage = async (file: File, path: 'activities' | 'events' | 'c
 
 // Function to delete an image from a Firebase Storage URL
 export const deleteImageFromUrl = async (url: string): Promise<void> => {
-    if (!storage) {
-        // If storage isn't configured, we can't delete anything anyway.
-        return;
-    }
     // Don't try to delete placeholder images from an external service
     if (!url.includes('firebasestorage.googleapis.com')) {
         return;
