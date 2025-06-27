@@ -73,7 +73,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1549492423-60f6412e021e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyMHx8Y2hpbGQlMjBwYWludGluZ3xlbnwwfHx8fDE3NTE1NDcwMjN8MA&ixlib=rb-4.1.0&q=80&w=1080"
+                  src="/art-day.jpg"
                   alt="Art Day"
                   width={400}
                   height={300}
@@ -96,7 +96,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1543623353-219743a4e98f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0ZWFjaGVyJTIwcmVhZGluZyUyMGNoaWxkcmVufGVufDB8fHx8MTc1MDk4OTM1MHww&ixlib=rb-4.1.0&q=80&w=1080"
+                  src="/story-time.jpg"
                   alt="Story Time"
                   width={400}
                   height={300}
@@ -119,7 +119,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1620221360244-938368380838?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8Y2hpbGRyZW4lMjBnYXJkZW5pbmd8ZW58MHx8fHwxNzUxNTQ3MDIyfDA&ixlib=rb-4.1.0&q=80&w=1080"
+                  src="/garden-day.jpg"
                   alt="Garden Day"
                   width={400}
                   height={300}
