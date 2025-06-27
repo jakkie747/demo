@@ -45,7 +45,6 @@ export default function Home() {
               width={600}
               height={600}
               className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
-              unoptimized
             />
           </div>
         </div>
@@ -81,7 +80,6 @@ export default function Home() {
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="art class"
-                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("artDayDesc")}
@@ -105,7 +103,6 @@ export default function Home() {
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="story time"
-                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("storyTimeDesc")}
@@ -129,7 +126,6 @@ export default function Home() {
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="gardening kids"
-                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("gardenDayDesc")}
