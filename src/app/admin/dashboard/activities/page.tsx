@@ -44,6 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Activity } from "@/lib/types";
 import { getActivities, addActivity, updateActivity, deleteActivity } from "@/services/activityService";
@@ -65,15 +66,22 @@ export default function ManageActivitiesPage() {
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   const fetchActivities = async () => {
     setIsLoading(true);
     try {
       const fetchedActivities = await getActivities();
       setActivities(fetchedActivities);
+      setConfigError(null);
     } catch (error) {
       console.error("Failed to load activities from Firestore", error);
-      toast({ variant: "destructive", title: "Error", description: "Could not fetch activities."});
+      const errorMessage = (error as Error).message;
+      if (errorMessage.includes("Firebase configuration is incomplete")) {
+        setConfigError(errorMessage);
+      } else {
+        toast({ variant: "destructive", title: "Error", description: "Could not fetch activities."});
+      }
     } finally {
       setIsLoading(false);
     }
@@ -82,15 +90,6 @@ export default function ManageActivitiesPage() {
   useEffect(() => {
     fetchActivities();
   }, []);
-
-  const form = useForm<z.infer<typeof activityFormSchema>>({
-    resolver: zodResolver(activityFormSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      image: undefined,
-    },
-  });
 
   const handleEditClick = (activity: Activity) => {
     setEditingActivity(activity);
@@ -124,7 +123,12 @@ export default function ManageActivitiesPage() {
           variant: "destructive",
         });
       } catch (error) {
-         toast({ variant: "destructive", title: "Error", description: "Could not delete activity."});
+         const errorMessage = (error as Error).message;
+         if (errorMessage.includes("Firebase configuration is incomplete")) {
+            setConfigError(errorMessage);
+         } else {
+            toast({ variant: "destructive", title: "Error", description: "Could not delete activity."});
+         }
       } finally {
         setActivityToDelete(null);
       }
@@ -166,13 +170,33 @@ export default function ManageActivitiesPage() {
           description: t('activityCreatedDesc', { title: values.title }),
         });
       }
+      setConfigError(null);
       await fetchActivities();
       setEditingActivity(null);
       form.reset();
     } catch (error) {
         console.error("Failed to save activity:", error);
-        toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not save activity."});
+        const errorMessage = (error as Error).message;
+        if (errorMessage.includes("Firebase configuration is incomplete")) {
+            setConfigError(errorMessage);
+        } else {
+            toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save activity."});
+        }
     }
+  }
+
+  if (configError) {
+    return (
+        <div className="container py-12">
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
   }
 
   return (

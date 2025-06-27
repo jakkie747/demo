@@ -16,11 +16,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { Event } from "@/lib/types";
 import { getEvents } from "@/services/eventsService";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 export default function EventsPage() {
   const { t, language } = useLanguage();
+  const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -28,15 +32,36 @@ export default function EventsPage() {
       try {
         const fetchedEvents = await getEvents();
         setEvents(fetchedEvents);
+        setConfigError(null);
       } catch (error) {
         console.error("Failed to load events from Firestore", error);
+        const errorMessage = (error as Error).message;
+        if (errorMessage.includes("Firebase configuration is incomplete")) {
+            setConfigError(errorMessage);
+        } else {
+            toast({ variant: "destructive", title: "Error", description: "Could not fetch events."});
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     loadEvents();
-  }, []);
+  }, [toast]);
+
+  if (configError) {
+    return (
+        <div className="container py-12">
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
+  }
 
   return (
     <div className="container py-12 md:py-24">

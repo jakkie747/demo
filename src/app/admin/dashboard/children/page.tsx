@@ -17,11 +17,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { getChildren } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ChildrenPage() {
   const [children, setChildren] = useState<Child[]>([]);
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchChildren = async () => {
@@ -29,16 +33,36 @@ export default function ChildrenPage() {
         setIsLoading(true);
         const fetchedChildren = await getChildren();
         setChildren(fetchedChildren);
+        setConfigError(null);
       } catch (error) {
         console.error("Failed to load children from Firestore", error);
-        // Optionally, show a toast message to the user
+        const errorMessage = (error as Error).message;
+        if (errorMessage.includes("Firebase configuration is incomplete")) {
+            setConfigError(errorMessage);
+        } else {
+            toast({ variant: "destructive", title: "Error", description: "Could not fetch children."});
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchChildren();
-  }, []);
+  }, [toast]);
+
+  if (configError) {
+    return (
+        <div className="container py-12">
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
+  }
 
   return (
     <div className="py-6">

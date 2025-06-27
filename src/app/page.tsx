@@ -10,11 +10,15 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getActivities } from "@/services/activityService";
 import type { Activity } from "@/lib/types";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -22,14 +26,74 @@ export default function Home() {
         setIsLoading(true);
         const fetchedActivities = await getActivities();
         setActivities(fetchedActivities.slice(0, 3)); // Get the 3 most recent
+        setConfigError(null);
       } catch (error) {
         console.error("Failed to load activities", error);
+        const errorMessage = (error as Error).message;
+        if (errorMessage.includes("Firebase configuration is incomplete")) {
+            setConfigError(errorMessage);
+        } else {
+            toast({ variant: "destructive", title: "Error", description: "Could not fetch recent activities."});
+        }
       } finally {
         setIsLoading(false);
       }
     };
     fetchActivities();
-  }, []);
+  }, [toast]);
+
+  const renderRecentActivities = () => {
+    if (configError) {
+        return (
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Recent activities cannot be displayed. Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        )
+    }
+
+    if (isLoading) {
+      return Array.from({ length: 3 }).map((_, i) => (
+        <Card key={i}>
+          <CardHeader>
+            <Skeleton className="h-6 w-32" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="w-full aspect-[4/3] rounded-lg" />
+            <Skeleton className="h-4 w-full mt-4" />
+            <Skeleton className="h-4 w-3/4 mt-2" />
+          </CardContent>
+        </Card>
+      ));
+    }
+
+    if (activities.length === 0) {
+      return <p className="col-span-3 text-center text-muted-foreground">No recent activities to show.</p>;
+    }
+
+    return activities.map((activity) => (
+      <Card key={activity.id} className="hover:shadow-lg transition-shadow">
+        <CardHeader>
+          <CardTitle>{activity.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Image
+            src={activity.image || "https://placehold.co/400x300.png"}
+            alt={activity.title}
+            width={400}
+            height={300}
+            className="rounded-lg mb-4 object-cover aspect-[4/3]"
+            data-ai-hint={activity.aiHint || 'children playing'}
+            unoptimized
+          />
+          <p className="text-sm text-muted-foreground">{activity.description}</p>
+        </CardContent>
+      </Card>
+    ));
+  };
 
   return (
     <div className="flex flex-col">
@@ -85,42 +149,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 sm:grid-cols-2 md:grid-cols-3">
-             {isLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i}>
-                  <CardHeader>
-                    <Skeleton className="h-6 w-32" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="w-full aspect-[4/3] rounded-lg" />
-                    <Skeleton className="h-4 w-full mt-4" />
-                    <Skeleton className="h-4 w-3/4 mt-2" />
-                  </CardContent>
-                </Card>
-              ))
-            ) : activities.length === 0 ? (
-                <p className="col-span-3 text-center text-muted-foreground">No recent activities to show.</p>
-            ) : (
-              activities.map((activity) => (
-                <Card key={activity.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle>{activity.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Image
-                      src={activity.image || "https://placehold.co/400x300.png"}
-                      alt={activity.title}
-                      width={400}
-                      height={300}
-                      className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                      data-ai-hint={activity.aiHint || 'children playing'}
-                      unoptimized
-                    />
-                    <p className="text-sm text-muted-foreground">{activity.description}</p>
-                  </CardContent>
-                </Card>
-              ))
-            )}
+             {renderRecentActivities()}
           </div>
         </div>
       </section>

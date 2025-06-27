@@ -44,6 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Event } from "@/lib/types";
 import { getEvents, addEvent, updateEvent, deleteEvent } from "@/services/eventsService";
@@ -66,15 +67,22 @@ export default function ManageEventsPage() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
       const fetchedEvents = await getEvents();
       setEvents(fetchedEvents);
+      setConfigError(null);
     } catch (error) {
       console.error("Failed to load events from Firestore", error);
-      toast({ variant: "destructive", title: "Error", description: "Could not fetch events."});
+      const errorMessage = (error as Error).message;
+      if (errorMessage.includes("Firebase configuration is incomplete")) {
+        setConfigError(errorMessage);
+      } else {
+        toast({ variant: "destructive", title: "Error", description: "Could not fetch events."});
+      }
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +135,12 @@ export default function ManageEventsPage() {
           variant: "destructive",
         });
       } catch (error) {
-         toast({ variant: "destructive", title: "Error", description: "Could not delete event."});
+         const errorMessage = (error as Error).message;
+         if (errorMessage.includes("Firebase configuration is incomplete")) {
+            setConfigError(errorMessage);
+         } else {
+            toast({ variant: "destructive", title: "Error", description: "Could not delete event."});
+         }
       } finally {
         setEventToDelete(null);
       }
@@ -171,13 +184,33 @@ export default function ManageEventsPage() {
           description: t('eventCreatedDesc', { title: values.title }),
         });
       }
+      setConfigError(null);
       await fetchEvents();
       setEditingEvent(null);
       form.reset();
     } catch (error) {
         console.error("Failed to save event:", error);
-        toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not save event."});
+        const errorMessage = (error as Error).message;
+        if (errorMessage.includes("Firebase configuration is incomplete")) {
+            setConfigError(errorMessage);
+        } else {
+            toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save event."});
+        }
     }
+  }
+
+  if (configError) {
+    return (
+        <div className="container py-12">
+            <Alert variant="destructive">
+                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertDescription>
+                    <p>{configError}</p>
+                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                </AlertDescription>
+            </Alert>
+        </div>
+    )
   }
 
   return (
