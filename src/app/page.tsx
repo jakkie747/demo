@@ -40,12 +40,13 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://placehold.co/600x600.png"
+              src="https://images.unsplash.com/photo-1546494493-01a248135435?q=80&w=1740&auto=format&fit=crop"
               width={600}
               height={600}
               alt="Children playing in a classroom"
               data-ai-hint="children classroom"
               className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
+              unoptimized
             />
           </div>
         </div>
@@ -75,12 +76,13 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
+                  src="https://images.unsplash.com/photo-1534439839958-3c46a6a09156?q=80&w=1740&auto=format&fit=crop"
                   alt="Art Day"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="child painting"
+                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("artDayDesc")}
@@ -98,12 +100,13 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
+                  src="https://images.unsplash.com/photo-1491841550275-524b35134375?q=80&w=1740&auto=format&fit=crop"
                   alt="Story Time"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="teacher reading"
+                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("storyTimeDesc")}
@@ -121,12 +124,13 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
+                  src="https://images.unsplash.com/photo-1583935292025-a6e4d5f403bc?q=80&w=1740&auto=format&fit=crop"
                   alt="Garden Day"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="kids gardening"
+                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("gardenDayDesc")}
