@@ -39,14 +39,13 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <div
-              className="mx-auto aspect-square w-full rounded-full bg-cover bg-center lg:order-last"
-              style={{
-                backgroundImage: `url('/image%203.jpg')`,
-              }}
-              role="img"
-              aria-label="Children playing in a classroom"
-            ></div>
+            <Image
+              src="/image 3.jpg"
+              width={600}
+              height={600}
+              alt="Children playing in a classroom"
+              className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
+            />
           </div>
         </div>
       </section>
