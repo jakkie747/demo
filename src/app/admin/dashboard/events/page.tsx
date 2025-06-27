@@ -49,7 +49,7 @@ import type { Event } from "@/lib/types";
 import { getEvents, addEvent, updateEvent, deleteEvent } from "@/services/eventsService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long"),
@@ -198,8 +198,31 @@ export default function ManageEventsPage() {
       form.reset();
     } catch (error) {
         console.error("Failed to save event:", error);
-        const errorMessage = (error as Error).message;
-        toast({ variant: "destructive", title: "Error Saving Event", description: errorMessage || "Could not save the event. Check the console for more details."});
+        let errorMessage = (error as Error).message || "Could not save the event. Check the console for more details.";
+        let errorTitle = "Error Saving Event";
+
+        if (errorMessage.includes("timed out")) {
+            errorTitle = "Image Upload Timed Out (CORS Issue)";
+            errorMessage = "This is a common Firebase setup issue. Please check the developer console for instructions on how to fix it."
+            console.group("Firebase CORS Configuration Instructions");
+            console.log("The timeout during image upload is caused by a security setting on your Firebase project that blocks requests from your web app.");
+            console.log("To fix this, you need to apply a new CORS policy to your Firebase Storage bucket. This is a one-time setup.");
+            console.log("1. Open Cloud Shell: Go to the Google Cloud Console (https://console.cloud.google.com/) for your project (" + firebaseConfig.projectId + "). In the top-right corner, click the 'Activate Cloud Shell' button (it looks like a >_ terminal icon).");
+            console.log("2. Create Configuration File: A terminal will open. Copy and paste the following command into it and press Enter:");
+            console.log("echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json");
+            console.log("3. Apply the Policy: Now, copy and paste the following command, then press Enter. This tells Firebase Storage to use your new policy.");
+            console.log("gsutil cors set cors.json gs://" + firebaseConfig.storageBucket);
+            console.log("After running the final command, try uploading your image again. It should now work immediately.");
+            console.groupEnd();
+        }
+
+        toast({ 
+          variant: "destructive", 
+          title: errorTitle, 
+          description: errorMessage,
+          duration: 15000,
+        });
+
     } finally {
       console.log("Submission finished.");
       setIsSaving(false);
