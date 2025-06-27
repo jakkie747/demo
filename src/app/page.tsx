@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -38,12 +39,11 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://placehold.co/600x400.png"
-              data-ai-hint="children playing preschool"
-              alt="Hero"
+              src="/hero-image.png"
+              alt="Blinkogies Kleuterskool & Naskool"
               width={600}
-              height={400}
-              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
+              height={600}
+              className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
               unoptimized
             />
           </div>
