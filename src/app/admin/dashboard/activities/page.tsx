@@ -135,8 +135,6 @@ export default function ManageActivitiesPage() {
     const file = values.image?.[0];
     let imageUrl: string | undefined = editingActivity?.image;
 
-    form.formState.isSubmitting = true;
-
     try {
       if (file) {
         // If a new image is uploaded, upload it to storage
@@ -176,8 +174,6 @@ export default function ManageActivitiesPage() {
     } catch (error) {
         console.error("Failed to save activity:", error);
         toast({ variant: "destructive", title: "Error", description: "Could not save activity."});
-    } finally {
-      form.formState.isSubmitting = false;
     }
   }
 
