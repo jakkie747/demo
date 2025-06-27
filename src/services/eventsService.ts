@@ -5,8 +5,9 @@ import type { Event } from '@/lib/types';
 const eventsCollectionRef = collection(db, 'events');
 
 export const getEvents = async (): Promise<Event[]> => {
-    const q = query(eventsCollectionRef, orderBy('date', 'desc'));
-    const snapshot = await getDocs(q);
+    // We are temporarily removing the orderBy clause to diagnose a potential missing index issue in Firestore.
+    // This will fetch events, but they may not be in chronological order.
+    const snapshot = await getDocs(eventsCollectionRef);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
 };
 
