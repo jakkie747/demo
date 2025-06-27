@@ -27,5 +27,6 @@ export interface Activity {
   description: string;
   image: string;
   createdAt: any; // For Firestore timestamp
+  updatedAt?: any; // For Firestore timestamp
   aiHint?: string;
 }

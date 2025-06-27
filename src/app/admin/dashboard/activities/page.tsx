@@ -159,7 +159,7 @@ export default function ManageActivitiesPage() {
           description: t('activityUpdatedDesc', { title: values.title }),
         });
       } else {
-        const newActivity: Omit<Activity, 'id' | 'createdAt'> = {
+        const newActivity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'> = {
           ...activityPayload
         };
         await addActivity(newActivity);
