@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -39,9 +38,13 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <Logo
-              href={null}
-              className="mx-auto h-auto w-full max-w-[400px] lg:order-last xl:max-w-[600px]"
+            <Image
+              src="https://placehold.co/600x600.png"
+              alt="A fun, childlike, cartoony picture"
+              width={600}
+              height={600}
+              className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
+              data-ai-hint="cartoon kids"
             />
           </div>
         </div>
