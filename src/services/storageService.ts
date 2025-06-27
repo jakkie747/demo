@@ -1,5 +1,8 @@
 import { storage } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { promiseWithTimeout } from "@/lib/utils";
+
+const TIMEOUT_DURATION = 15000; // 15 seconds
 
 export const uploadImage = async (file: File, path: 'activities' | 'events' | 'children'): Promise<string> => {
     if (!storage) {
@@ -7,8 +10,18 @@ export const uploadImage = async (file: File, path: 'activities' | 'events' | 'c
     }
     const filePath = `${path}/${Date.now()}-${file.name}`;
     const storageRef = ref(storage, filePath);
-    await uploadBytes(storageRef, file);
-    const downloadUrl = await getDownloadURL(storageRef);
+    
+    await promiseWithTimeout(
+        uploadBytes(storageRef, file), 
+        TIMEOUT_DURATION, 
+        new Error(`Image upload to ${filePath} timed out. Check storage rules and network.`)
+    );
+
+    const downloadUrl = await promiseWithTimeout(
+        getDownloadURL(storageRef),
+        TIMEOUT_DURATION,
+        new Error(`Getting download URL for ${filePath} timed out.`)
+    );
     return downloadUrl;
 };
 
@@ -26,7 +39,11 @@ export const deleteImageFromUrl = async (url: string): Promise<void> => {
     
     try {
         const storageRef = ref(storage, url);
-        await deleteObject(storageRef);
+        await promiseWithTimeout(
+            deleteObject(storageRef),
+            TIMEOUT_DURATION,
+            new Error(`Deleting image ${url} timed out.`)
+        );
     } catch (error: any) {
         // If the file doesn't exist, we can ignore the error.
         if (error.code !== 'storage/object-not-found') {
