@@ -17,7 +17,7 @@ import { getStorage, type FirebaseStorage } from "firebase/storage";
 // =================================================================================
 export const firebaseConfig = {
   // TODO: PASTE YOUR WEB APP'S API KEY HERE
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
+  apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
   // This value is correct for your project
   authDomain: "blink-notify-494bf.firebaseapp.com",
   // This value is correct for your project
@@ -27,7 +27,7 @@ export const firebaseConfig = {
   // This value is correct for your project
   messagingSenderId: "450079883039",
   // TODO: PASTE YOUR WEB APP'S APP ID HERE
-  appId: "PASTE_YOUR_WEB_APP_ID_HERE",
+  appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
 };
 
 // Initialize Firebase
