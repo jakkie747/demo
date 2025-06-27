@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Baby, Home, User, Mail, Phone, Upload } from "lucide-react";
+import { Baby, Home, User, Mail, Phone, Upload, Terminal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,9 +33,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import { addChild } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
+import { uploadImage } from "@/services/storageService";
+import { isStorageConfigured } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -71,35 +74,20 @@ export default function RegisterPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const file = values.childPhoto?.[0];
-    let photoDataUrl = "https://placehold.co/100x100.png";
-
-    if (file) {
-      try {
-        photoDataUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      } catch (error) {
-        console.error("Error reading file:", error);
-        toast({
-          variant: "destructive",
-          title: "File Upload Error",
-          description: "Could not read the uploaded photo.",
-        });
-        return;
-      }
-    }
+    let photoUrl = "https://placehold.co/100x100.png";
 
     try {
+      if (file && isStorageConfigured) {
+        photoUrl = await uploadImage(file, 'children');
+      }
+
       const newChildData: Omit<Child, "id"> = {
         name: values.childName,
         age: values.childAge,
         parent: values.parentName,
         parentEmail: values.parentEmail,
         parentPhone: values.parentPhone,
-        photo: photoDataUrl,
+        photo: photoUrl,
       };
 
       await addChild(newChildData);
@@ -114,7 +102,7 @@ export default function RegisterPage() {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem saving the registration to the database.",
+        description: (error as Error).message || "There was a problem saving the registration.",
       });
     }
   }
@@ -215,9 +203,19 @@ export default function RegisterPage() {
                           name={name}
                           ref={ref}
                           className="pl-10"
+                          disabled={!isStorageConfigured}
                         />
                       </div>
                     </FormControl>
+                    {!isStorageConfigured && (
+                        <Alert variant="destructive" className="mt-2">
+                            <Terminal className="h-4 w-4" />
+                            <AlertTitle>Storage Not Configured</AlertTitle>
+                            <AlertDescription>
+                                Photo uploads are disabled because the Firebase Storage bucket is not configured. The registration will use a default placeholder image.
+                            </AlertDescription>
+                        </Alert>
+                    )}
                     <FormDescription>
                       {t('childPhotoDesc')}
                     </FormDescription>
@@ -313,8 +311,8 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="w-full font-semibold">
-                {t('submitRegistration')}
+              <Button type="submit" size="lg" className="w-full font-semibold" disabled={form.formState.isSubmitting}>
+                 {form.formState.isSubmitting ? "Submitting..." : t('submitRegistration')}
               </Button>
             </form>
           </Form>

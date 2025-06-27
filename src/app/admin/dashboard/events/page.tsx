@@ -33,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Terminal } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,9 +44,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Event } from "@/lib/types";
 import { getEvents, addEvent, updateEvent, deleteEvent } from "@/services/eventsService";
+import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+import { isStorageConfigured } from "@/lib/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const eventFormSchema = z.object({
@@ -115,6 +118,9 @@ export default function ManageEventsPage() {
   const confirmDelete = async () => {
     if (eventToDelete) {
       try {
+        if (eventToDelete.image) {
+          await deleteImageFromUrl(eventToDelete.image);
+        }
         await deleteEvent(eventToDelete.id);
         await fetchEvents();
         toast({
@@ -132,57 +138,47 @@ export default function ManageEventsPage() {
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
     const file = values.image?.[0];
-    let imageDataUrl: string | undefined = editingEvent?.image;
-
-    if (file) {
-      try {
-        imageDataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "File Upload Error",
-          description: "Could not process the uploaded image.",
-        });
-        return;
-      }
-    }
-    
-    const eventPayload = {
-        title: values.title,
-        date: values.date,
-        description: values.description,
-        image: imageDataUrl,
-    };
+    let imageUrl: string | undefined = editingEvent?.image;
 
     try {
-        if (editingEvent) {
-          await updateEvent(editingEvent.id, eventPayload);
-          toast({
-            title: t('eventUpdated'),
-            description: t('eventUpdatedDesc', { title: values.title }),
-          });
-        } else {
-          const newEvent: Omit<Event, 'id'> = {
-            ...eventPayload,
-            image: imageDataUrl || "https://placehold.co/600x400.png",
-          };
-          await addEvent(newEvent);
-          toast({
-            title: t('eventCreated'),
-            description: t('eventCreatedDesc', { title: values.title }),
-          });
+      if (file && isStorageConfigured) {
+        const newImageUrl = await uploadImage(file, 'events');
+        if (editingEvent?.image) {
+          await deleteImageFromUrl(editingEvent.image);
         }
-        await fetchEvents();
-        setEditingEvent(null);
-        form.reset();
+        imageUrl = newImageUrl;
+      }
+    
+      const eventPayload = {
+          title: values.title,
+          date: values.date,
+          description: values.description,
+          image: imageUrl,
+      };
+
+      if (editingEvent) {
+        await updateEvent(editingEvent.id, eventPayload);
+        toast({
+          title: t('eventUpdated'),
+          description: t('eventUpdatedDesc', { title: values.title }),
+        });
+      } else {
+        const newEvent: Omit<Event, 'id'> = {
+          ...eventPayload,
+          image: imageUrl || "https://placehold.co/600x400.png",
+        };
+        await addEvent(newEvent);
+        toast({
+          title: t('eventCreated'),
+          description: t('eventCreatedDesc', { title: values.title }),
+        });
+      }
+      await fetchEvents();
+      setEditingEvent(null);
+      form.reset();
     } catch (error) {
         console.error("Failed to save event:", error);
-        toast({ variant: "destructive", title: "Error", description: "Could not save event."});
+        toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not save event."});
     }
   }
 
@@ -283,8 +279,18 @@ export default function ManageEventsPage() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
+                          disabled={!isStorageConfigured}
                         />
                       </FormControl>
+                      {!isStorageConfigured && (
+                        <Alert variant="destructive" className="mt-2">
+                            <Terminal className="h-4 w-4" />
+                            <AlertTitle>Storage Not Configured</AlertTitle>
+                            <AlertDescription>
+                                Image uploads are disabled. Please configure the Firebase Storage bucket in your environment variables to enable this feature.
+                            </AlertDescription>
+                        </Alert>
+                      )}
                       <FormDescription>
                         {editingEvent
                           ? t('replaceImage')

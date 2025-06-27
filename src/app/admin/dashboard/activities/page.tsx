@@ -33,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Terminal } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,10 +44,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Activity } from "@/lib/types";
 import { getActivities, addActivity, updateActivity, deleteActivity } from "@/services/activityService";
-import { uploadActivityImage, deleteImageFromUrl } from "@/services/storageService";
+import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+import { isStorageConfigured } from "@/lib/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const activityFormSchema = z.object({
@@ -136,9 +138,9 @@ export default function ManageActivitiesPage() {
     let imageUrl: string | undefined = editingActivity?.image;
 
     try {
-      if (file) {
+      if (file && isStorageConfigured) {
         // If a new image is uploaded, upload it to storage
-        const newImageUrl = await uploadActivityImage(file);
+        const newImageUrl = await uploadImage(file, 'activities');
         // If we are editing and there was an old image, delete it
         if (editingActivity?.image) {
           await deleteImageFromUrl(editingActivity.image);
@@ -173,7 +175,7 @@ export default function ManageActivitiesPage() {
       form.reset();
     } catch (error) {
         console.error("Failed to save activity:", error);
-        toast({ variant: "destructive", title: "Error", description: "Could not save activity."});
+        toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not save activity."});
     }
   }
 
@@ -261,8 +263,18 @@ export default function ManageActivitiesPage() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
+                          disabled={!isStorageConfigured}
                         />
                       </FormControl>
+                       {!isStorageConfigured && (
+                        <Alert variant="destructive" className="mt-2">
+                            <Terminal className="h-4 w-4" />
+                            <AlertTitle>Storage Not Configured</AlertTitle>
+                            <AlertDescription>
+                                Image uploads are disabled. Please configure the Firebase Storage bucket in your environment variables to enable this feature.
+                            </AlertDescription>
+                        </Alert>
+                      )}
                       <FormDescription>
                         {editingActivity
                           ? t('replaceImage')
