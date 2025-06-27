@@ -17,6 +17,7 @@ export function Logo({
       height={32}
       className={cn("h-8 w-auto", className)}
       priority
+      unoptimized
     />
   );
 
