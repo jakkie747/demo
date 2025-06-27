@@ -18,12 +18,12 @@ import { getStorage, type FirebaseStorage } from "firebase/storage";
 //    the placeholder values like "PASTE_YOUR_API_KEY_HERE".
 // =================================================================================
 export const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "PASTE_YOUR_API_KEY_HERE",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "PASTE_YOUR_AUTH_DOMAIN_HERE",
+  apiKey: "PASTE_YOUR_API_KEY_HERE",
+  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
   projectId: "blink-notify-494bf",
   storageBucket: "blink-notify-494bf.appspot.com",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "PASTE_YOUR_APP_ID_HERE",
+  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+  appId: "PASTE_YOUR_APP_ID_HERE",
 };
 
 // Initialize Firebase
