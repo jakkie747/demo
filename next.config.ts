@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         hostname: 'www.blinkogies.co.za',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

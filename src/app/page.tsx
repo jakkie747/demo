@@ -39,8 +39,7 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://placehold.co/600x600.png"
-              data-ai-hint="children playing"
+              src="https://images.unsplash.com/flagged/photo-1567116681178-c326fa4e2c8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjaGlsZHJlbiUyMHBsYXlpbmd8ZW58MHx8fHwxNzUwOTg5MzUwfDA&ixlib=rb-4.1.0&q=80&w=1080"
               alt="Blinkogies Kleuterskool & Naskool"
               width={600}
               height={600}
@@ -75,8 +74,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
-                  data-ai-hint="child painting"
+                  src="https://images.unsplash.com/photo-1560421683-6856ea585c78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjaGlsZCUyMHBhaW50aW5nfGVufDB8fHx8MTc1MDk4OTM1MHww&ixlib=rb-4.1.0&q=80&w=1080"
                   alt="Art Day"
                   width={400}
                   height={300}
@@ -99,8 +97,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
-                  data-ai-hint="teacher reading children"
+                  src="https://images.unsplash.com/photo-1714646793091-8cb251152d72?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZWFjaGVyJTIwcmVhZGluZyUyMGNoaWxkcmVufGVufDB8fHx8MTc1MDk4OTM1MHww&ixlib=rb-4.1.0&q=80&w=1080"
                   alt="Story Time"
                   width={400}
                   height={300}
@@ -123,8 +120,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
-                  data-ai-hint="children gardening"
+                  src="https://images.unsplash.com/photo-1595182747083-6d249e14f0fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjaGlsZHJlbiUyMGdhcmRlbmluZ3xlbnwwfHx8fDE3NTA5ODkzNTF8MA&ixlib=rb-4.1.0&q=80&w=1080"
                   alt="Garden Day"
                   width={400}
                   height={300}
