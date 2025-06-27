@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -11,9 +13,34 @@ import { Button } from "@/components/ui/button";
 import { Users, Calendar, PlusCircle, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { getChildren } from "@/services/childrenService";
+import { getEvents } from "@/services/eventsService";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
   const { t } = useLanguage();
+  const [childrenCount, setChildrenCount] = useState(0);
+  const [eventsCount, setEventsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [children, events] = await Promise.all([
+          getChildren(),
+          getEvents(),
+        ]);
+        setChildrenCount(children.length);
+        setEventsCount(events.length);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="space-y-6 py-6">
@@ -26,9 +53,13 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">125</div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-16" />
+            ) : (
+              <div className="text-2xl font-bold">{childrenCount}</div>
+            )}
             <p className="text-xs text-muted-foreground">
-              {t("fromLastMonth")}
+              {/* This can be made dynamic later */}
             </p>
           </CardContent>
         </Card>
@@ -40,9 +71,13 @@ export default function DashboardPage() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
+             {isLoading ? (
+              <Skeleton className="h-8 w-10" />
+            ) : (
+              <div className="text-2xl font-bold">{eventsCount}</div>
+            )}
             <p className="text-xs text-muted-foreground">
-              {t("sportsDayNextWeek")}
+               {/* This can be made dynamic later */}
             </p>
           </CardContent>
         </Card>
@@ -67,22 +102,20 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>{t("viewAllChildren")}</CardTitle>
-              <CardDescription>
-                {t("viewAllChildrenDesc")}
-              </CardDescription>
+              <CardDescription>{t("viewAllChildrenDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="secondary">
-                <Link href="/admin/dashboard/children">{t("manageChildren")}</Link>
+                <Link href="/admin/dashboard/children">
+                  {t("manageChildren")}
+                </Link>
               </Button>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
               <CardTitle>{t("manageEventsCard")}</CardTitle>
-              <CardDescription>
-                {t("manageEventsDesc")}
-              </CardDescription>
+              <CardDescription>{t("manageEventsDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="secondary">
@@ -90,16 +123,16 @@ export default function DashboardPage() {
               </Button>
             </CardContent>
           </Card>
-           <Card>
+          <Card>
             <CardHeader>
               <CardTitle>{t("manageActivities")}</CardTitle>
-              <CardDescription>
-                {t("manageActivitiesDesc")}
-              </CardDescription>
+              <CardDescription>{t("manageActivitiesDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="secondary">
-                <Link href="/admin/dashboard/activities">{t("manageActivities")}</Link>
+                <Link href="/admin/dashboard/activities">
+                  {t("manageActivities")}
+                </Link>
               </Button>
             </CardContent>
           </Card>
