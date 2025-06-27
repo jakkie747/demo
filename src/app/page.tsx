@@ -40,12 +40,12 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1549499859-a36b32b988f8?w=600&h=600&fit=crop&q=80"
-              alt="Children playing together"
+              src="https://images.unsplash.com/photo-1588075592446-265fd1e6e76f"
+              alt="Children painting in a classroom"
               width={600}
               height={600}
               className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
-              data-ai-hint="children playing"
+              data-ai-hint="children classroom painting"
               unoptimized
             />
           </div>
@@ -76,7 +76,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1582738412108-7560a70558a2?w=400&h=300&fit=crop&q=80"
+                  src="https://images.unsplash.com/photo-1582738412108-7560a70558a2"
                   alt="Art Day"
                   width={400}
                   height={300}
@@ -84,9 +84,6 @@ export default function Home() {
                   data-ai-hint="child painting"
                   unoptimized
                 />
-                <p className="text-sm text-muted-foreground">
-                  {t("artDayDesc")}
-                </p>
               </CardContent>
             </Card>
             <Card className="hover:shadow-lg transition-shadow">
@@ -100,7 +97,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1491841550275-5b462bf415c5?w=400&h=300&fit=crop&q=80"
+                  src="https://images.unsplash.com/photo-1491841550275-5b462bf415c5"
                   alt="Story Time"
                   width={400}
                   height={300}
@@ -108,9 +105,6 @@ export default function Home() {
                   data-ai-hint="teacher reading"
                   unoptimized
                 />
-                <p className="text-sm text-muted-foreground">
-                  {t("storyTimeDesc")}
-                </p>
               </CardContent>
             </Card>
             <Card className="hover:shadow-lg transition-shadow">
@@ -124,7 +118,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1620221142572-13a8703b3d85?w=400&h=300&fit=crop&q=80"
+                  src="https://images.unsplash.com/photo-1620221142572-13a8703b3d85"
                   alt="Garden Day"
                   width={400}
                   height={300}
@@ -132,9 +126,6 @@ export default function Home() {
                   data-ai-hint="kids gardening"
                   unoptimized
                 />
-                <p className="text-sm text-muted-foreground">
-                  {t("gardenDayDesc")}
-                </p>
               </CardContent>
             </Card>
           </div>
