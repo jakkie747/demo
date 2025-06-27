@@ -39,7 +39,8 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="/hero-image.png"
+              src="https://placehold.co/600x600.png"
+              data-ai-hint="children playing"
               alt="Blinkogies Kleuterskool & Naskool"
               width={600}
               height={600}
