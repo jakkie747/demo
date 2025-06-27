@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -74,12 +75,13 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
+                  src="https://images.unsplash.com/photo-1596495759344-93e87175439b?q=80&w=1080&auto=format&fit=crop"
                   alt="Art Day"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="art class"
+                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("artDayDesc")}
@@ -97,12 +99,13 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
+                  src="https://images.unsplash.com/photo-1519340241574-266d6e116981?q=80&w=1080&auto=format&fit=crop"
                   alt="Story Time"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="story time"
+                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("storyTimeDesc")}
@@ -120,12 +123,13 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://placehold.co/400x300.png"
+                  src="https://images.unsplash.com/photo-1620221191316-90b549b3a323?q=80&w=1080&auto=format&fit=crop"
                   alt="Garden Day"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   data-ai-hint="gardening kids"
+                  unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("gardenDayDesc")}
