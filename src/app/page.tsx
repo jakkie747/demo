@@ -40,8 +40,8 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1517594422361-5e3e8a342956"
-              alt="Children playing in a classroom"
+              src="https://images.unsplash.com/photo-1518895516883-a09971f16d76"
+              alt="Children sitting in a circle"
               width={600}
               height={600}
               className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
@@ -76,7 +76,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1582738412108-7560a70558a2"
+                  src="https://images.unsplash.com/photo-1565502621379-4e5b318a6e82"
                   alt="Art Day"
                   width={400}
                   height={300}
@@ -97,12 +97,12 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1491841550275-5b462bf415c5"
+                  src="https://images.unsplash.com/photo-1551029506-08e9462e2669"
                   alt="Story Time"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="teacher reading"
+                  data-ai-hint="open book"
                   unoptimized
                 />
               </CardContent>
@@ -118,12 +118,12 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1620221142572-13a8703b3d85"
+                  src="https://images.unsplash.com/photo-1466692496674-8141394145b3"
                   alt="Garden Day"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="kids gardening"
+                  data-ai-hint="child gardening"
                   unoptimized
                 />
               </CardContent>
