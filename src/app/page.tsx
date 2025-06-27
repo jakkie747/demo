@@ -40,7 +40,7 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1527419752894-748a3c5d9e5b?q=80&w=1080&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1488998527040-cf5330052197?q=80&w=1080&auto=format&fit=crop"
               width={600}
               height={600}
               alt="Children playing in a classroom"
@@ -75,7 +75,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1563231367-9c3f914421b4?q=80&w=1080&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1517926956359-71714144d47d?q=80&w=1080&auto=format&fit=crop"
                   alt="Art Day"
                   width={400}
                   height={300}
@@ -121,7 +121,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1616423647198-a69d2a84d852?q=80&w=1080&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1593113646773-ae18c60a87d7?q=80&w=1080&auto=format&fit=crop"
                   alt="Garden Day"
                   width={400}
                   height={300}
