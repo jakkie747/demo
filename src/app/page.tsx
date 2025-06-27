@@ -41,7 +41,7 @@ export default function Home() {
             </div>
             <Logo
               href={null}
-              className="mx-auto w-full max-w-[400px] lg:order-last xl:max-w-[600px]"
+              className="mx-auto h-auto w-full max-w-[400px] lg:order-last xl:max-w-[600px]"
             />
           </div>
         </div>
