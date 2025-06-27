@@ -67,25 +67,17 @@ export default function ManageEventsPage() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
 
   const fetchEvents = async () => {
     setIsLoading(true);
-    try {
-      const fetchedEvents = await getEvents();
-      setEvents(fetchedEvents);
-      setConfigError(null);
-    } catch (error) {
-      console.error("Failed to load events from Firestore", error);
-      const errorMessage = (error as Error).message;
-      if (errorMessage.includes("Firebase configuration is incomplete")) {
-        setConfigError(errorMessage);
-      } else {
+    const fetchedEvents = await getEvents();
+    if (fetchedEvents === null) {
         toast({ variant: "destructive", title: "Error", description: "Could not fetch events."});
-      }
-    } finally {
-      setIsLoading(false);
+        setEvents([]);
+    } else {
+        setEvents(fetchedEvents);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -136,11 +128,7 @@ export default function ManageEventsPage() {
         });
       } catch (error) {
          const errorMessage = (error as Error).message;
-         if (errorMessage.includes("Firebase configuration is incomplete")) {
-            setConfigError(errorMessage);
-         } else {
-            toast({ variant: "destructive", title: "Error", description: "Could not delete event."});
-         }
+         toast({ variant: "destructive", title: "Error", description: "Could not delete event."});
       } finally {
         setEventToDelete(null);
       }
@@ -184,33 +172,14 @@ export default function ManageEventsPage() {
           description: t('eventCreatedDesc', { title: values.title }),
         });
       }
-      setConfigError(null);
       await fetchEvents();
       setEditingEvent(null);
       form.reset();
     } catch (error) {
         console.error("Failed to save event:", error);
         const errorMessage = (error as Error).message;
-        if (errorMessage.includes("Firebase configuration is incomplete")) {
-            setConfigError(errorMessage);
-        } else {
-            toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save event."});
-        }
+        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save event."});
     }
-  }
-
-  if (configError) {
-    return (
-        <div className="container py-12">
-            <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
-                <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
-                </AlertDescription>
-            </Alert>
-        </div>
-    )
   }
 
   return (

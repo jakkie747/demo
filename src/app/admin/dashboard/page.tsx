@@ -25,27 +25,30 @@ export default function DashboardPage() {
   const [childrenCount, setChildrenCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+      setFetchError(false);
       try {
-        setIsLoading(true);
         const [children, events] = await Promise.all([
           getChildren(),
           getEvents(),
         ]);
-        setChildrenCount(children.length);
-        setEventsCount(events.length);
-        setConfigError(null);
-      } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
-        const errorMessage = (error as Error).message;
-        if (errorMessage.includes("Firebase configuration is incomplete")) {
-            setConfigError(errorMessage);
+        
+        if (children === null || events === null) {
+          setFetchError(true);
+          toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data."});
+          setChildrenCount(0);
+          setEventsCount(0);
         } else {
-            toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data."});
+          setChildrenCount(children.length);
+          setEventsCount(events.length);
         }
+      } catch (error) {
+        setFetchError(true);
+        toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data."});
       } finally {
         setIsLoading(false);
       }
@@ -53,14 +56,14 @@ export default function DashboardPage() {
     fetchData();
   }, [toast]);
 
-  if (configError) {
+  if (fetchError) {
     return (
         <div className="container py-12">
             <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertTitle>Error Loading Dashboard</AlertTitle>
                 <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                    <p>Could not load dashboard data due to a database connection issue.</p>
+                     <p className="mt-2 font-bold">Please ensure your Firebase configuration in <code>src/lib/firebase.ts</code> is correct.</p>
                 </AlertDescription>
             </Alert>
         </div>

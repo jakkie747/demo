@@ -24,39 +24,39 @@ export default function EventsPage() {
   const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const loadEvents = async () => {
       setIsLoading(true);
-      try {
-        const fetchedEvents = await getEvents();
+      setFetchError(false);
+      const fetchedEvents = await getEvents();
+      
+      if (fetchedEvents === null) {
+        setEvents([]);
+        setFetchError(true);
+        toast({ 
+            variant: "destructive", 
+            title: "Error", 
+            description: "Could not fetch events from the database."
+        });
+      } else {
         setEvents(fetchedEvents);
-        setConfigError(null);
-      } catch (error) {
-        console.error("Failed to load events from Firestore", error);
-        const errorMessage = (error as Error).message;
-        if (errorMessage.includes("Firebase configuration is incomplete")) {
-            setConfigError(errorMessage);
-        } else {
-            toast({ variant: "destructive", title: "Error", description: "Could not fetch events."});
-        }
-      } finally {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
 
     loadEvents();
   }, [toast]);
 
-  if (configError) {
+  if (fetchError) {
     return (
         <div className="container py-12">
             <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
+                <AlertTitle>Error Loading Events</AlertTitle>
                 <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
+                    <p>Could not load events due to a database connection issue.</p>
+                    <p className="mt-2 font-bold">Please ensure your Firebase configuration in <code>src/lib/firebase.ts</code> is correct.</p>
                 </AlertDescription>
             </Alert>
         </div>

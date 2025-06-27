@@ -9,18 +9,15 @@ const getDb = () => {
   return db;
 };
 
-export const getEvents = async (): Promise<Event[]> => {
+export const getEvents = async (): Promise<Event[] | null> => {
     try {
         const firestoreDb = getDb();
         const eventsCollectionRef = collection(firestoreDb, 'events');
         const snapshot = await getDocs(eventsCollectionRef);
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
     } catch (error) {
-        if (error instanceof Error && error.message.includes("Firebase configuration is incomplete")) {
-            console.warn(error.message);
-            return [];
-        }
-        throw error;
+        console.error("Error fetching events:", error);
+        return null;
     }
 };
 

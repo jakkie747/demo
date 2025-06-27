@@ -9,18 +9,15 @@ const getDb = () => {
   return db;
 };
 
-export const getChildren = async (): Promise<Child[]> => {
+export const getChildren = async (): Promise<Child[] | null> => {
     try {
         const firestoreDb = getDb();
         const childrenCollectionRef = collection(firestoreDb, 'children');
         const snapshot = await getDocs(childrenCollectionRef);
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Child));
     } catch (error) {
-        if (error instanceof Error && error.message.includes("Firebase configuration is incomplete")) {
-            console.warn(error.message);
-            return [];
-        }
-        throw error;
+        console.error("Error fetching children:", error);
+        return null;
     }
 };
 

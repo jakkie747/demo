@@ -18,43 +18,25 @@ export default function Home() {
   const { toast } = useToast();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [configError, setConfigError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const fetchActivities = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedActivities = await getActivities();
+      setIsLoading(true);
+      setFetchError(false);
+      const fetchedActivities = await getActivities();
+      if (fetchedActivities === null) {
+        setFetchError(true);
+        setActivities([]);
+      } else {
         setActivities(fetchedActivities.slice(0, 3)); // Get the 3 most recent
-        setConfigError(null);
-      } catch (error) {
-        console.error("Failed to load activities", error);
-        const errorMessage = (error as Error).message;
-        if (errorMessage.includes("Firebase configuration is incomplete")) {
-            setConfigError(errorMessage);
-        } else {
-            toast({ variant: "destructive", title: "Error", description: "Could not fetch recent activities."});
-        }
-      } finally {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
     fetchActivities();
-  }, [toast]);
+  }, []);
 
   const renderRecentActivities = () => {
-    if (configError) {
-        return (
-            <Alert variant="destructive">
-                <AlertTitle>Configuration Error</AlertTitle>
-                <AlertDescription>
-                    <p>{configError}</p>
-                    <p className="mt-2 font-bold">Recent activities cannot be displayed. Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
-                </AlertDescription>
-            </Alert>
-        )
-    }
-
     if (isLoading) {
       return Array.from({ length: 3 }).map((_, i) => (
         <Card key={i}>
@@ -68,6 +50,20 @@ export default function Home() {
           </CardContent>
         </Card>
       ));
+    }
+    
+    if (fetchError) {
+      return (
+        <div className="col-span-1 md:col-span-3">
+          <Alert variant="destructive">
+            <AlertTitle>Error Loading Activities</AlertTitle>
+            <AlertDescription>
+              <p>Could not load recent activities due to a database connection issue.</p>
+              <p className="mt-2 font-bold">Please ensure your Firebase configuration in <code>src/lib/firebase.ts</code> is correct.</p>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )
     }
 
     if (activities.length === 0) {

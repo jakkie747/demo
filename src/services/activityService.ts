@@ -9,7 +9,7 @@ const getDb = () => {
   return db;
 };
 
-export const getActivities = async (): Promise<Activity[]> => {
+export const getActivities = async (): Promise<Activity[] | null> => {
     try {
         const firestoreDb = getDb();
         const activitiesCollectionRef = collection(firestoreDb, 'activities');
@@ -18,12 +18,8 @@ export const getActivities = async (): Promise<Activity[]> => {
         const activities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
         return activities;
     } catch (error) {
-        if (error instanceof Error && error.message.includes("Firebase configuration is incomplete")) {
-            console.warn(error.message); // Log for developers, but don't crash the app
-        }
-        // Always re-throw the error so the UI can handle it.
-        // This is especially important for missing index errors.
-        throw error;
+        console.error("Error fetching activities. If this is a 'missing index' error, please click the link in the error details to create it in Firebase:", error);
+        return null;
     }
 };
 
