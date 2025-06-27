@@ -40,8 +40,8 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1576092762791-ddc29a26524b?q=80&w=1080&auto=format&fit=crop"
-              alt="Teacher reading to children in a classroom"
+              src="https://images.unsplash.com/photo-1517581298379-56e6d8a4325a?q=80&w=1080&auto=format&fit=crop"
+              alt="Children painting in a preschool classroom"
               width={600}
               height={600}
               className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
