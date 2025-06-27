@@ -3,13 +3,18 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage
 
 const getStorageInstance = () => {
     if (!storage) {
-        throw new Error("Firebase configuration is incomplete. The storage connection could not be established. Please update src/lib/firebase.ts with your project's apiKey and appId.");
+        console.warn("Firebase configuration is incomplete. The storage connection could not be established. Please update src/lib/firebase.ts with your project's apiKey and appId.");
+        return null;
     }
     return storage;
 }
 
 export const uploadImage = async (file: File, path: 'activities' | 'events' | 'children'): Promise<string> => {
     const storageInstance = getStorageInstance();
+    if (!storageInstance) {
+        // This error will be caught by the component's try-catch block and displayed to the user.
+        throw new Error("Firebase configuration is incomplete. The storage connection could not be established. Please update src/lib/firebase.ts with your project's apiKey and appId.");
+    }
     const filePath = `${path}/${Date.now()}-${file.name}`;
     const storageRef = ref(storageInstance, filePath);
     await uploadBytes(storageRef, file);
@@ -23,8 +28,14 @@ export const deleteImageFromUrl = async (url: string): Promise<void> => {
     if (!url.includes('firebasestorage.googleapis.com')) {
         return;
     }
+    
+    const storageInstance = getStorageInstance();
+    if (!storageInstance) {
+        // If storage isn't configured, we can't delete, so just exit gracefully.
+        return;
+    }
+    
     try {
-        const storageInstance = getStorageInstance();
         const storageRef = ref(storageInstance, url);
         await deleteObject(storageRef);
     } catch (error: any) {
