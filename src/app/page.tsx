@@ -74,12 +74,12 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1596495759344-93e87175439b?q=80&w=1080&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1588448343154-2c1383792271?q=80&w=1080&auto=format&fit=crop"
                   alt="Art Day"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="art class"
+                  data-ai-hint="child painting"
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("artDayDesc")}
@@ -97,12 +97,12 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1519340241574-266d6e116981?q=80&w=1080&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1551029128-0134559e2a74?q=80&w=1080&auto=format&fit=crop"
                   alt="Story Time"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="story time"
+                  data-ai-hint="teacher reading"
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("storyTimeDesc")}
@@ -120,12 +120,12 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1620221191316-90b549b3a323?q=80&w=1080&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1619362344093-e40a18a8e9e4?q=80&w=1080&auto=format&fit=crop"
                   alt="Garden Day"
                   width={400}
                   height={300}
                   className="rounded-lg mb-4 object-cover aspect-[4/3]"
-                  data-ai-hint="gardening kids"
+                  data-ai-hint="kids gardening"
                 />
                 <p className="text-sm text-muted-foreground">
                   {t("gardenDayDesc")}
