@@ -33,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Terminal } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,13 +44,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Event } from "@/lib/types";
 import { getEvents, addEvent, updateEvent, deleteEvent } from "@/services/eventsService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { firebaseConfig } from "@/lib/firebase";
 
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long"),
@@ -69,13 +67,7 @@ export default function ManageEventsPage() {
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const isFirebaseConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('PASTE_YOUR');
-
   const fetchEvents = async () => {
-    if (!isFirebaseConfigured) {
-        setIsLoading(false);
-        return;
-    }
     setIsLoading(true);
     try {
       const fetchedEvents = await getEvents();
@@ -90,7 +82,7 @@ export default function ManageEventsPage() {
 
   useEffect(() => {
     fetchEvents();
-  }, [isFirebaseConfigured]);
+  }, []);
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -186,23 +178,6 @@ export default function ManageEventsPage() {
         console.error("Failed to save event:", error);
         toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not save event."});
     }
-  }
-
-  if (!isFirebaseConfigured) {
-    return (
-        <Alert variant="destructive" className="my-8">
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>Firebase Not Configured</AlertTitle>
-            <AlertDescription>
-                <p className="mb-2">
-                    Your application cannot connect to the database. Please configure your Firebase credentials.
-                </p>
-                <p>
-                    Open the file <code className="font-mono bg-muted p-1 rounded">src/lib/firebase.ts</code> and follow the instructions in the comments to add your project's configuration.
-                </p>
-            </AlertDescription>
-        </Alert>
-    )
   }
 
   return (

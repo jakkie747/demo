@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Baby, Home, User, Mail, Phone, Upload, Terminal } from "lucide-react";
+import { Baby, Home, User, Mail, Phone, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,12 +33,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import { addChild } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
 import { uploadImage } from "@/services/storageService";
-import { firebaseConfig } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -58,7 +56,6 @@ const formSchema = z.object({
 export default function RegisterPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const isFirebaseConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('PASTE_YOUR');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -110,20 +107,6 @@ export default function RegisterPage() {
 
   return (
     <div className="container py-12 md:py-24">
-       {!isFirebaseConfigured && (
-        <Alert variant="destructive" className="mb-8">
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>Firebase Not Configured</AlertTitle>
-            <AlertDescription>
-                <p className="mb-2">
-                    Registrations are currently disabled because the application cannot connect to the database.
-                </p>
-                <p>
-                    Please open the file <code className="font-mono bg-muted p-1 rounded">src/lib/firebase.ts</code> and follow the instructions in the comments to add your project's configuration.
-                </p>
-            </AlertDescription>
-        </Alert>
-      )}
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
           <CardTitle className="font-headline text-3xl text-primary">
@@ -153,7 +136,6 @@ export default function RegisterPage() {
                             placeholder={t('egJaneDoe')}
                             {...field}
                             className="pl-10"
-                            disabled={!isFirebaseConfigured}
                           />
                         </div>
                       </FormControl>
@@ -169,7 +151,7 @@ export default function RegisterPage() {
                       <FormItem>
                         <FormLabel>{t('age')}</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder={t('eg3')} {...field} disabled={!isFirebaseConfigured}/>
+                          <Input type="number" placeholder={t('eg3')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -184,7 +166,6 @@ export default function RegisterPage() {
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
-                          disabled={!isFirebaseConfigured}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -220,7 +201,6 @@ export default function RegisterPage() {
                           name={name}
                           ref={ref}
                           className="pl-10"
-                          disabled={!isFirebaseConfigured}
                         />
                       </div>
                     </FormControl>
@@ -248,7 +228,6 @@ export default function RegisterPage() {
                           placeholder={t('egJohnSmith')}
                           {...field}
                           className="pl-10"
-                          disabled={!isFirebaseConfigured}
                         />
                       </div>
                     </FormControl>
@@ -271,7 +250,6 @@ export default function RegisterPage() {
                             placeholder={t('egEmail')}
                             {...field}
                             className="pl-10"
-                            disabled={!isFirebaseConfigured}
                           />
                         </div>
                       </FormControl>
@@ -293,7 +271,6 @@ export default function RegisterPage() {
                             placeholder={t('egPhone')}
                             {...field}
                             className="pl-10"
-                            disabled={!isFirebaseConfigured}
                           />
                         </div>
                       </FormControl>
@@ -315,7 +292,6 @@ export default function RegisterPage() {
                           placeholder={t('egAddress')}
                           {...field}
                           className="pl-10"
-                          disabled={!isFirebaseConfigured}
                         />
                       </div>
                     </FormControl>
@@ -323,7 +299,7 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="w-full font-semibold" disabled={form.formState.isSubmitting || !isFirebaseConfigured}>
+              <Button type="submit" size="lg" className="w-full font-semibold" disabled={form.formState.isSubmitting}>
                  {form.formState.isSubmitting ? "Submitting..." : t('submitRegistration')}
               </Button>
             </form>
