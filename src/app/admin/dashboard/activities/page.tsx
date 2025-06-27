@@ -47,6 +47,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import type { Activity } from "@/lib/types";
 import { getActivities, addActivity, updateActivity, deleteActivity } from "@/services/activityService";
+import { uploadActivityImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const activityFormSchema = z.object({
@@ -112,6 +113,9 @@ export default function ManageActivitiesPage() {
   const confirmDelete = async () => {
     if (activityToDelete) {
       try {
+        if (activityToDelete.image) {
+            await deleteImageFromUrl(activityToDelete.image);
+        }
         await deleteActivity(activityToDelete.id);
         await fetchActivities();
         toast({
@@ -129,56 +133,51 @@ export default function ManageActivitiesPage() {
 
   async function onSubmit(values: z.infer<typeof activityFormSchema>) {
     const file = values.image?.[0];
-    let imageDataUrl: string | undefined = editingActivity?.image;
+    let imageUrl: string | undefined = editingActivity?.image;
 
-    if (file) {
-      try {
-        imageDataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "File Upload Error",
-          description: "Could not process the uploaded image.",
-        });
-        return;
-      }
-    }
-    
-    const activityPayload = {
-        title: values.title,
-        description: values.description,
-        image: imageDataUrl,
-    };
+    form.formState.isSubmitting = true;
 
     try {
-        if (editingActivity) {
-          await updateActivity(editingActivity.id, activityPayload);
-          toast({
-            title: t('activityUpdated'),
-            description: t('activityUpdatedDesc', { title: values.title }),
-          });
-        } else {
-          const newActivity: Omit<Activity, 'id' | 'createdAt'> = {
-            ...activityPayload,
-            image: imageDataUrl || "https://placehold.co/400x300.png",
-          };
-          await addActivity(newActivity);
-          toast({
-            title: t('activityCreated'),
-            description: t('activityCreatedDesc', { title: values.title }),
-          });
+      if (file) {
+        // If a new image is uploaded, upload it to storage
+        const newImageUrl = await uploadActivityImage(file);
+        // If we are editing and there was an old image, delete it
+        if (editingActivity?.image) {
+          await deleteImageFromUrl(editingActivity.image);
         }
-        await fetchActivities();
-        setEditingActivity(null);
-        form.reset();
+        imageUrl = newImageUrl;
+      }
+      
+      const activityPayload = {
+          title: values.title,
+          description: values.description,
+          image: imageUrl || "https://placehold.co/400x300.png",
+      };
+
+      if (editingActivity) {
+        await updateActivity(editingActivity.id, activityPayload);
+        toast({
+          title: t('activityUpdated'),
+          description: t('activityUpdatedDesc', { title: values.title }),
+        });
+      } else {
+        const newActivity: Omit<Activity, 'id' | 'createdAt'> = {
+          ...activityPayload
+        };
+        await addActivity(newActivity);
+        toast({
+          title: t('activityCreated'),
+          description: t('activityCreatedDesc', { title: values.title }),
+        });
+      }
+      await fetchActivities();
+      setEditingActivity(null);
+      form.reset();
     } catch (error) {
         console.error("Failed to save activity:", error);
         toast({ variant: "destructive", title: "Error", description: "Could not save activity."});
+    } finally {
+      form.formState.isSubmitting = false;
     }
   }
 
