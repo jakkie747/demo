@@ -40,10 +40,11 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="/image%203.jpg"
+              src="https://placehold.co/600x600.png"
               width={600}
               height={600}
               alt="Children playing in a classroom"
+              data-ai-hint="children classroom"
               className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
             />
           </div>
@@ -74,7 +75,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1588448343154-2c1383792271?q=80&w=1080&auto=format&fit=crop"
+                  src="https://placehold.co/400x300.png"
                   alt="Art Day"
                   width={400}
                   height={300}
@@ -97,7 +98,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1551029128-0134559e2a74?q=80&w=1080&auto=format&fit=crop"
+                  src="https://placehold.co/400x300.png"
                   alt="Story Time"
                   width={400}
                   height={300}
@@ -120,7 +121,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1619362344093-e40a18a8e9e4?q=80&w=1080&auto=format&fit=crop"
+                  src="https://placehold.co/400x300.png"
                   alt="Garden Day"
                   width={400}
                   height={300}
