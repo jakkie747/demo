@@ -39,13 +39,14 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <Image
-              src="https://images.unsplash.com/photo-1517581298379-56e6d8a4325a?q=80&w=1080&auto=format&fit=crop"
-              alt="Children painting in a preschool classroom"
-              width={600}
-              height={600}
-              className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
-            />
+            <div
+              className="mx-auto aspect-square w-full rounded-full bg-cover bg-center lg:order-last"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1517581298379-56e6d8a4325a?q=80&w=1080&auto=format&fit=crop')`,
+              }}
+              role="img"
+              aria-label="Children painting in a preschool classroom"
+            ></div>
           </div>
         </div>
       </section>
