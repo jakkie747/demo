@@ -1,6 +1,6 @@
 
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -76,26 +76,40 @@ export default function ManageActivitiesPage() {
     },
   });
 
-  const fetchActivities = async () => {
+  const fetchActivities = useCallback(async () => {
     setIsLoading(true);
-    const fetchedActivities = await getActivities();
-    if (fetchedActivities === null) {
-      toast({
-          variant: "destructive",
-          title: "Error Loading Activities",
-          description: "Could not load activities. Please check the developer console for a link to create a required database index.",
-          duration: 15000,
-      });
-      setActivities([]);
-    } else {
-      setActivities(fetchedActivities);
+    try {
+        const fetchedActivities = await getActivities();
+        setActivities(fetchedActivities);
+    } catch (error: any) {
+        console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
+        
+        let title = "Error Loading Activities";
+        let description = "An unexpected error occurred while fetching activities.";
+        
+        if (error.code === 'failed-precondition') {
+            title = "Database Index Required";
+            description = "Failed to load activities. Please open the browser console (F12) to find a link to create the required database index.";
+        } else if (error.message.includes("Firebase configuration is incomplete")) {
+            title = "Firebase Configuration Error";
+            description = error.message;
+        }
+
+        toast({
+            variant: "destructive",
+            title: title,
+            description: description,
+            duration: 15000,
+        });
+        setActivities([]);
+    } finally {
+        setIsLoading(false);
     }
-    setIsLoading(false);
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchActivities();
-  }, []);
+  }, [fetchActivities]);
 
   const handleEditClick = (activity: Activity) => {
     setEditingActivity(activity);

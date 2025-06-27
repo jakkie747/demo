@@ -9,18 +9,13 @@ const getDb = () => {
   return db;
 };
 
-export const getActivities = async (): Promise<Activity[] | null> => {
-    try {
-        const firestoreDb = getDb();
-        const activitiesCollectionRef = collection(firestoreDb, 'activities');
-        const q = query(activitiesCollectionRef, orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
-        const activities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
-        return activities;
-    } catch (error) {
-        console.error("Error fetching activities. If this is a 'missing index' error, please click the link in the error details to create it in Firebase:", error);
-        return null;
-    }
+export const getActivities = async (): Promise<Activity[]> => {
+    const firestoreDb = getDb();
+    const activitiesCollectionRef = collection(firestoreDb, 'activities');
+    const q = query(activitiesCollectionRef, orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+    const activities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+    return activities;
 };
 
 export const addActivity = async (activityData: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
