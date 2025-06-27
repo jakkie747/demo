@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -13,47 +13,32 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import type { Child } from "@/lib/data";
-import { initialChildren } from "@/lib/data";
 import { useLanguage } from "@/context/LanguageContext";
+import { getChildren } from "@/services/childrenService";
+import type { Child } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ChildrenPage() {
   const [children, setChildren] = useState<Child[]>([]);
   const { t } = useLanguage();
-
-  const loadChildren = useCallback(() => {
-    let storedChildren: Child[];
-    try {
-      const storedChildrenJSON = localStorage.getItem("registeredChildren");
-      if (storedChildrenJSON) {
-        const parsedChildren: Child[] = JSON.parse(storedChildrenJSON);
-        if (parsedChildren.length > 0 && parsedChildren[0].parentEmail === undefined) {
-          storedChildren = initialChildren;
-          localStorage.setItem("registeredChildren", JSON.stringify(initialChildren));
-        } else {
-          storedChildren = parsedChildren;
-        }
-      } else {
-        storedChildren = initialChildren;
-        localStorage.setItem(
-          "registeredChildren",
-          JSON.stringify(initialChildren)
-        );
-      }
-    } catch (error) {
-      console.error("Failed to load children from local storage", error);
-      storedChildren = initialChildren;
-    }
-    setChildren(storedChildren);
-  }, []);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadChildren();
-    window.addEventListener('focus', loadChildren);
-    return () => {
-      window.removeEventListener('focus', loadChildren);
+    const fetchChildren = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedChildren = await getChildren();
+        setChildren(fetchedChildren);
+      } catch (error) {
+        console.error("Failed to load children from Firestore", error);
+        // Optionally, show a toast message to the user
+      } finally {
+        setIsLoading(false);
+      }
     };
-  }, [loadChildren]);
+
+    fetchChildren();
+  }, []);
 
   return (
     <div className="py-6">
@@ -74,26 +59,60 @@ export default function ChildrenPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {children.map((child) => (
-              <TableRow key={child.id}>
-                <TableCell>
-                  <Avatar>
-                    <AvatarImage src={child.photo} alt={child.name} unoptimized/>
-                    <AvatarFallback>
-                      {child.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{child.id}</Badge>
-                </TableCell>
-                <TableCell className="font-medium">{child.name}</TableCell>
-                <TableCell>{child.age}</TableCell>
-                <TableCell>{child.parent}</TableCell>
-                <TableCell>{child.parentEmail}</TableCell>
-                <TableCell>{child.parentPhone}</TableCell>
-              </TableRow>
-            ))}
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-10" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                   <TableCell>
+                    <Skeleton className="h-4 w-40" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : children.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                        No children registered yet.
+                    </TableCell>
+                </TableRow>
+            ) : (
+              children.map((child) => (
+                <TableRow key={child.id}>
+                  <TableCell>
+                    <Avatar>
+                      <AvatarImage src={child.photo} alt={child.name} unoptimized/>
+                      <AvatarFallback>
+                        {child.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{child.id.substring(0, 8)}...</Badge>
+                  </TableCell>
+                  <TableCell className="font-medium">{child.name}</TableCell>
+                  <TableCell>{child.age}</TableCell>
+                  <TableCell>{child.parent}</TableCell>
+                  <TableCell>{child.parentEmail}</TableCell>
+                  <TableCell>{child.parentPhone}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </Card>

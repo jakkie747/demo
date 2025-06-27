@@ -45,6 +45,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/LanguageContext";
+import type { Event } from "@/lib/types";
+import { getEvents, addEvent, updateEvent, deleteEvent } from "@/services/eventsService";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const eventFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long"),
@@ -55,65 +58,30 @@ const eventFormSchema = z.object({
   image: z.any().optional(),
 });
 
-type Event = {
-  id: string;
-  title: string;
-  date: string;
-  description: string;
-  image?: string;
-};
-
-const initialEvents: Event[] = [
-  {
-    id: "EVT001",
-    title: "Annual Sports Day",
-    date: "2024-10-26",
-    description: "A day of fun and friendly competition for everyone.",
-    image: "https://placehold.co/600x400.png",
-  },
-  {
-    id: "EVT002",
-    title: "Pajama & Movie Day",
-    date: "2024-11-15",
-    description: "Wear your PJs and enjoy a cozy movie day with popcorn.",
-    image: "https://placehold.co/600x400.png",
-  },
-  {
-    id: "EVT003",
-    title: "End-of-Year Concert",
-    date: "2024-12-05",
-    description: "A spectacular performance by our talented little stars.",
-    image: "https://placehold.co/600x400.png",
-  },
-];
-
 export default function ManageEventsPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [events, setEvents] = useState<Event[]>([]);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchEvents = async () => {
+    setIsLoading(true);
+    try {
+      const fetchedEvents = await getEvents();
+      setEvents(fetchedEvents);
+    } catch (error) {
+      console.error("Failed to load events from Firestore", error);
+      toast({ variant: "destructive", title: "Error", description: "Could not fetch events."});
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    try {
-      const storedEventsJSON = localStorage.getItem("events");
-      const storedEvents = storedEventsJSON
-        ? JSON.parse(storedEventsJSON)
-        : initialEvents;
-      setEvents(storedEvents);
-      if (!storedEventsJSON) {
-        localStorage.setItem("events", JSON.stringify(initialEvents));
-      }
-    } catch (error) {
-      console.error("Failed to load events from local storage", error);
-      setEvents(initialEvents);
-    }
+    fetchEvents();
   }, []);
-
-  const updateAndStoreEvents = (updatedEvents: Event[]) => {
-    setEvents(updatedEvents);
-    localStorage.setItem("events", JSON.stringify(updatedEvents));
-  };
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -144,18 +112,21 @@ export default function ManageEventsPage() {
     setEventToDelete(event);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (eventToDelete) {
-      const updatedEvents = events.filter(
-        (event) => event.id !== eventToDelete.id
-      );
-      updateAndStoreEvents(updatedEvents);
-      toast({
-        title: t('eventDeleted'),
-        description: t('eventDeletedDesc', { title: eventToDelete.title }),
-        variant: "destructive",
-      });
-      setEventToDelete(null);
+      try {
+        await deleteEvent(eventToDelete.id);
+        await fetchEvents();
+        toast({
+          title: t('eventDeleted'),
+          description: t('eventDeletedDesc', { title: eventToDelete.title }),
+          variant: "destructive",
+        });
+      } catch (error) {
+         toast({ variant: "destructive", title: "Error", description: "Could not delete event."});
+      } finally {
+        setEventToDelete(null);
+      }
     }
   };
 
@@ -180,41 +151,38 @@ export default function ManageEventsPage() {
         return;
       }
     }
+    
+    const eventPayload = {
+        title: values.title,
+        date: values.date,
+        description: values.description,
+        image: imageDataUrl,
+    };
 
-    if (editingEvent) {
-      const updatedEvents = events.map((event) =>
-        event.id === editingEvent.id
-          ? { ...event, ...values, image: imageDataUrl }
-          : event
-      );
-      updateAndStoreEvents(updatedEvents);
-      toast({
-        title: t('eventUpdated'),
-        description: t('eventUpdatedDesc', { title: values.title }),
-      });
-    } else {
-      const newId =
-        "EVT" +
-        String(
-          Math.max(
-            ...events.map((e) => parseInt(e.id.replace("EVT", ""))),
-            0
-          ) + 1
-        ).padStart(3, "0");
-
-      const newEvent: Event = {
-        id: newId,
-        ...values,
-        image: imageDataUrl || "https://placehold.co/600x400.png",
-      };
-      updateAndStoreEvents([...events, newEvent]);
-      toast({
-        title: t('eventCreated'),
-        description: t('eventCreatedDesc', { title: values.title }),
-      });
+    try {
+        if (editingEvent) {
+          await updateEvent(editingEvent.id, eventPayload);
+          toast({
+            title: t('eventUpdated'),
+            description: t('eventUpdatedDesc', { title: values.title }),
+          });
+        } else {
+          const newEvent: Omit<Event, 'id'> = {
+            ...eventPayload,
+            image: imageDataUrl || "https://placehold.co/600x400.png",
+          };
+          await addEvent(newEvent);
+          toast({
+            title: t('eventCreated'),
+            description: t('eventCreatedDesc', { title: values.title }),
+          });
+        }
+        await fetchEvents();
+        setEditingEvent(null);
+        form.reset();
+    } catch (error) {
+        toast({ variant: "destructive", title: "Error", description: "Could not save event."});
     }
-    setEditingEvent(null);
-    form.reset();
   }
 
   return (
@@ -359,31 +327,47 @@ export default function ManageEventsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {events.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">{event.title}</TableCell>
-                  <TableCell>{event.date}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditClick(event)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteClick(event)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+                  </TableRow>
+                ))
+              ) : events.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={3} className="h-24 text-center">
+                        No events created yet.
+                    </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                events.map((event) => (
+                  <TableRow key={event.id}>
+                    <TableCell className="font-medium">{event.title}</TableCell>
+                    <TableCell>{event.date}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditClick(event)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteClick(event)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </Card>

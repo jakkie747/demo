@@ -33,8 +33,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { initialChildren, type Child } from "@/lib/data";
 import { useLanguage } from "@/context/LanguageContext";
+import { addChild } from "@/services/childrenService";
+import type { Child } from "@/lib/types";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -92,24 +93,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const storedChildrenJSON = localStorage.getItem("registeredChildren");
-      let existingChildren: Child[];
-      if (storedChildrenJSON) {
-        const parsedChildren: Child[] = JSON.parse(storedChildrenJSON);
-        if (parsedChildren.length > 0 && parsedChildren[0].parentEmail === undefined) {
-          existingChildren = initialChildren;
-        } else {
-          existingChildren = parsedChildren;
-        }
-      } else {
-        existingChildren = initialChildren;
-      }
-
-      const nextIdNumber = existingChildren.length + 1;
-      const nextId = `BP${String(nextIdNumber).padStart(3, "0")}`;
-
-      const newChild: Child = {
-        id: nextId,
+      const newChildData: Omit<Child, "id"> = {
         name: values.childName,
         age: values.childAge,
         parent: values.parentName,
@@ -118,11 +102,7 @@ export default function RegisterPage() {
         photo: photoDataUrl,
       };
 
-      const updatedChildren = [...existingChildren, newChild];
-      localStorage.setItem(
-        "registeredChildren",
-        JSON.stringify(updatedChildren)
-      );
+      await addChild(newChildData);
 
       toast({
         title: t('regSuccessTitle'),
@@ -134,7 +114,7 @@ export default function RegisterPage() {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem saving the registration.",
+        description: "There was a problem saving the registration to the database.",
       });
     }
   }
