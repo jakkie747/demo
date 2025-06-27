@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -37,13 +38,12 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <Image
+            <img
               src="/blinkogies-main.jpg"
               alt="Blinkogies Kleuterskool & Naskool"
-              width={600}
-              height={600}
+              width="600"
+              height="600"
               className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
-              unoptimized
             />
           </div>
         </div>
