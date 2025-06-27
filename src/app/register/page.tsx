@@ -212,7 +212,7 @@ export default function RegisterPage() {
                             <Terminal className="h-4 w-4" />
                             <AlertTitle>Storage Not Configured</AlertTitle>
                             <AlertDescription>
-                                Photo uploads are disabled because the Firebase Storage bucket is not configured. The registration will use a default placeholder image.
+                                Photo uploads are disabled. To enable them, add a Secret with the name <code>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</code> and your Firebase Storage bucket URL as the value. The registration will use a default placeholder image until this is configured.
                             </AlertDescription>
                         </Alert>
                     )}

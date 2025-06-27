@@ -271,7 +271,7 @@ export default function ManageActivitiesPage() {
                             <Terminal className="h-4 w-4" />
                             <AlertTitle>Storage Not Configured</AlertTitle>
                             <AlertDescription>
-                                Image uploads are disabled. Please configure the Firebase Storage bucket in your environment variables to enable this feature.
+                                Image uploads are disabled. To enable them, add a Secret with the name <code>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</code> and your Firebase Storage bucket URL as the value. After saving the secret, a new deployment may be required for the change to take effect.
                             </AlertDescription>
                         </Alert>
                       )}
