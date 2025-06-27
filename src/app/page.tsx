@@ -42,11 +42,10 @@ export default function Home() {
             <div
               className="mx-auto aspect-square w-full rounded-full bg-cover bg-center lg:order-last"
               style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1519340241574-266d6e116981?q=80&w=1080&auto=format&fit=crop')`,
+                backgroundImage: `url('/image%203.jpg')`,
               }}
               role="img"
-              aria-label="Children playing with toys in a classroom"
-              data-ai-hint="children classroom"
+              aria-label="Children playing in a classroom"
             ></div>
           </div>
         </div>
