@@ -79,12 +79,20 @@ export default function RegisterPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!isConfigured) {
+      toast({
+        variant: "destructive",
+        title: "Firebase Not Configured",
+        description: "Please configure your Firebase credentials in src/lib/firebase.ts before saving.",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     const file = values.childPhoto?.[0];
     let photoUrl = "https://placehold.co/100x100.png";
 
     try {
-      console.log("Registration submission started.");
       if (file) {
         console.log("Uploading child's photo...");
         photoUrl = await uploadImage(file, 'children');
@@ -109,8 +117,9 @@ export default function RegisterPage() {
         description: t('regSuccessDesc', { childName: values.childName }),
       });
       form.reset();
+
     } catch (error) {
-      console.error("Failed to save registration:", error);
+      console.error("Caught an error in onSubmit:", error);
       let errorMessage = (error as Error).message || "There was a problem saving the registration. Check the console for more details.";
       let errorTitle = "Uh oh! Something went wrong.";
       

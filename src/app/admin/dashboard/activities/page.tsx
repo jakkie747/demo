@@ -156,12 +156,20 @@ export default function ManageActivitiesPage() {
   };
 
   async function onSubmit(values: z.infer<typeof activityFormSchema>) {
+    if (!isConfigured) {
+      toast({
+        variant: "destructive",
+        title: "Firebase Not Configured",
+        description: "Please configure your Firebase credentials in src/lib/firebase.ts before saving.",
+      });
+      return;
+    }
+
     setIsSaving(true);
     const file = values.image?.[0];
     let imageUrl: string | undefined = editingActivity?.image;
 
     try {
-      console.log("Submission started.");
       if (file) {
         console.log("Uploading image...");
         const newImageUrl = await uploadImage(file, 'activities');
@@ -200,13 +208,15 @@ export default function ManageActivitiesPage() {
           description: t('activityCreatedDesc', { title: values.title }),
         });
       }
+      
       console.log("Fetching updated activities...");
       await fetchActivities();
       console.log("Activities fetched.");
       setEditingActivity(null);
       form.reset();
+
     } catch (error) {
-      console.error("Failed to save activity:", error);
+      console.error("Caught an error in onSubmit:", error);
       let errorMessage = (error as Error).message || "Could not save the activity. Check the console for more details.";
       let errorTitle = "Error Saving Activity";
 
@@ -351,7 +361,7 @@ export default function ManageActivitiesPage() {
                   )}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" className="w-full" disabled={isSaving}>
+                  <Button type="submit" className="w-full" disabled={isSaving || !isConfigured}>
                     {isSaving ? "Saving..." : editingActivity ? t('updateActivity') : t('createActivity')}
                   </Button>
                   {editingActivity && (

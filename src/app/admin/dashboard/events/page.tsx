@@ -145,12 +145,20 @@ export default function ManageEventsPage() {
   };
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    if (!isConfigured) {
+      toast({
+        variant: "destructive",
+        title: "Firebase Not Configured",
+        description: "Please configure your Firebase credentials in src/lib/firebase.ts before saving.",
+      });
+      return;
+    }
+
     setIsSaving(true);
     const file = values.image?.[0];
     let imageUrl: string | undefined = editingEvent?.image;
 
     try {
-      console.log("Submission started.");
       if (file) {
         console.log("Uploading image...");
         const newImageUrl = await uploadImage(file, 'events');
@@ -191,13 +199,15 @@ export default function ManageEventsPage() {
           description: t('eventCreatedDesc', { title: values.title }),
         });
       }
+      
       console.log("Fetching updated events...");
       await fetchEvents();
       console.log("Events fetched.");
       setEditingEvent(null);
       form.reset();
+
     } catch (error) {
-        console.error("Failed to save event:", error);
+        console.error("Caught an error in onSubmit:", error);
         let errorMessage = (error as Error).message || "Could not save the event. Check the console for more details.";
         let errorTitle = "Error Saving Event";
 
@@ -355,7 +365,7 @@ export default function ManageEventsPage() {
                   )}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" className="w-full" disabled={isSaving}>
+                  <Button type="submit" className="w-full" disabled={isSaving || !isConfigured}>
                     {isSaving ? "Saving..." : editingEvent ? t('updateEvent') : t('createEvent')}
                   </Button>
                   {editingEvent && (
