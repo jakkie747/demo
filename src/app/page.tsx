@@ -40,7 +40,7 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="/image 3.jpg"
+              src="/image%203.jpg"
               width={600}
               height={600}
               alt="Children playing in a classroom"
