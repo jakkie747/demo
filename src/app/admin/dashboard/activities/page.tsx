@@ -177,6 +177,7 @@ export default function ManageActivitiesPage() {
         setEditingActivity(null);
         form.reset();
     } catch (error) {
+        console.error("Failed to save activity:", error);
         toast({ variant: "destructive", title: "Error", description: "Could not save activity."});
     }
   }
@@ -277,8 +278,8 @@ export default function ManageActivitiesPage() {
                   )}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" className="w-full">
-                    {editingActivity ? t('updateActivity') : t('createActivity')}
+                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? "Saving..." : editingActivity ? t('updateActivity') : t('createActivity')}
                   </Button>
                   {editingActivity && (
                     <Button
@@ -286,6 +287,7 @@ export default function ManageActivitiesPage() {
                       variant="outline"
                       className="w-full"
                       onClick={handleCancelClick}
+                      disabled={form.formState.isSubmitting}
                     >
                       {t('cancel')}
                     </Button>
