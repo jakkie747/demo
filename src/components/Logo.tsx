@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export function Logo({
@@ -8,33 +9,20 @@ export function Logo({
   className?: string;
   href?: string | null;
 }) {
-  const svg = (
-    <svg
-      role="img"
-      aria-label="Blinkogies Logo"
+  const logoImage = (
+    <Image
+      src="/logo.png"
+      alt="Blinkogies Logo"
+      width={140}
+      height={32}
       className={cn("h-8 w-auto", className)}
-      viewBox="0 0 459 460"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <g transform="translate(-18.87 -17.37)">
-        <path
-          fill="hsl(var(--primary))"
-          d="M222.7,214.28S233.56,91.4,324,85.12c75.24-5,116.15,64.25,121.23,87.83,5.6,25.93-30.85,73.49-30.85,73.49-74,74.6-200.72-23.77-200.72-23.77Z"
-        />
-        <path
-          fill="hsl(var(--accent))"
-          d="M254.43,269s-10.86,122.88-101.32,129.16c-75.24,5-116.15-64.25-121.23-87.83-5.6-25.93,30.85-73.49,30.85-73.49,74-74.6,200.72,23.77,200.72,23.77Z"
-        />
-      </g>
-    </svg>
+      priority
+    />
   );
 
   const content = (
     <div className="flex items-center gap-3">
-      {svg}
-      <span className="font-headline text-2xl font-bold text-primary group-data-[collapsible=icon]:hidden">
-        Blinkogies
-      </span>
+      {logoImage}
     </div>
   );
 
