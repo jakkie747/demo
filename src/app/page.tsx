@@ -38,13 +38,12 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <Image
+            <img
               src="/blinkogies-main.png"
               alt="Blinkogies Kleuterskool & Naskool"
-              width={600}
-              height={600}
-              className="mx-auto aspect-square overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
-              unoptimized
+              width="600"
+              height="600"
+              className="mx-auto overflow-hidden rounded-full object-cover sm:w-full lg:order-last"
             />
           </div>
         </div>
