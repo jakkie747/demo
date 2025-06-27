@@ -39,12 +39,12 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1574100004472-e536d3b6bacc?w=600&h=600&fit=crop&q=80"
-              alt="Children in a classroom"
+              src="https://images.unsplash.com/photo-1517586504542-365e776326a7?w=600&h=600&fit=crop&q=80"
+              alt="Children in a preschool classroom"
               width={600}
               height={600}
               className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
-              data-ai-hint="children classroom"
+              data-ai-hint="preschool classroom"
               unoptimized
             />
           </div>
