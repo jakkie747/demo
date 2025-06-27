@@ -31,12 +31,9 @@ export default function DashboardLayout({
         <SidebarHeader>
           <Link
             href="/admin/dashboard"
-            className="flex items-center justify-center group p-2"
+            className="flex items-center justify-start group p-4"
           >
-            <Logo
-              className="h-14 w-auto group-data-[collapsible=icon]:h-8"
-              href={null}
-            />
+            <Logo href={null} />
           </Link>
         </SidebarHeader>
         <SidebarContent>
