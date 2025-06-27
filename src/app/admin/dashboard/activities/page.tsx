@@ -171,13 +171,9 @@ export default function ManageActivitiesPage() {
 
     try {
       if (file) {
-        console.log("Uploading image...");
         const newImageUrl = await uploadImage(file, 'activities');
-        console.log("Image uploaded successfully:", newImageUrl);
         if (editingActivity?.image) {
-          console.log("Deleting old image...");
           await deleteImageFromUrl(editingActivity.image);
-          console.log("Old image deleted.");
         }
         imageUrl = newImageUrl;
       }
@@ -189,34 +185,27 @@ export default function ManageActivitiesPage() {
       };
 
       if (editingActivity) {
-        console.log("Updating activity...");
         await updateActivity(editingActivity.id, activityPayload);
-        console.log("Activity updated.");
         toast({
           title: t('activityUpdated'),
           description: t('activityUpdatedDesc', { title: values.title }),
         });
       } else {
-        console.log("Adding new activity...");
         const newActivity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'> = {
           ...activityPayload
         };
         await addActivity(newActivity);
-        console.log("New activity added.");
         toast({
           title: t('activityCreated'),
           description: t('activityCreatedDesc', { title: values.title }),
         });
       }
       
-      console.log("Fetching updated activities...");
       await fetchActivities();
-      console.log("Activities fetched.");
       setEditingActivity(null);
       form.reset();
 
     } catch (error) {
-      console.error("Caught an error in onSubmit:", error);
       let errorMessage = (error as Error).message || "Could not save the activity. Check the console for more details.";
       let errorTitle = "Error Saving Activity";
 
@@ -243,7 +232,6 @@ export default function ManageActivitiesPage() {
       });
 
     } finally {
-      console.log("Submission finished.");
       setIsSaving(false);
     }
   }

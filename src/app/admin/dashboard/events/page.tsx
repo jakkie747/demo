@@ -160,13 +160,9 @@ export default function ManageEventsPage() {
 
     try {
       if (file) {
-        console.log("Uploading image...");
         const newImageUrl = await uploadImage(file, 'events');
-        console.log("Image uploaded successfully:", newImageUrl);
         if (editingEvent?.image) {
-          console.log("Deleting old image...");
           await deleteImageFromUrl(editingEvent.image);
-          console.log("Old image deleted.");
         }
         imageUrl = newImageUrl;
       }
@@ -179,35 +175,28 @@ export default function ManageEventsPage() {
       };
 
       if (editingEvent) {
-        console.log("Updating event...");
         await updateEvent(editingEvent.id, eventPayload);
-        console.log("Event updated.");
         toast({
           title: t('eventUpdated'),
           description: t('eventUpdatedDesc', { title: values.title }),
         });
       } else {
-        console.log("Adding new event...");
         const newEvent: Omit<Event, 'id'> = {
           ...eventPayload,
           image: imageUrl || "https://placehold.co/600x400.png",
         };
         await addEvent(newEvent);
-        console.log("New event added.");
         toast({
           title: t('eventCreated'),
           description: t('eventCreatedDesc', { title: values.title }),
         });
       }
       
-      console.log("Fetching updated events...");
       await fetchEvents();
-      console.log("Events fetched.");
       setEditingEvent(null);
       form.reset();
 
     } catch (error) {
-        console.error("Caught an error in onSubmit:", error);
         let errorMessage = (error as Error).message || "Could not save the event. Check the console for more details.";
         let errorTitle = "Error Saving Event";
 
@@ -234,7 +223,6 @@ export default function ManageEventsPage() {
         });
 
     } finally {
-      console.log("Submission finished.");
       setIsSaving(false);
     }
   }

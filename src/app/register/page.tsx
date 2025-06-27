@@ -94,9 +94,7 @@ export default function RegisterPage() {
 
     try {
       if (file) {
-        console.log("Uploading child's photo...");
         photoUrl = await uploadImage(file, 'children');
-        console.log("Photo uploaded successfully:", photoUrl);
       }
 
       const newChildData: Omit<Child, "id"> = {
@@ -108,9 +106,7 @@ export default function RegisterPage() {
         photo: photoUrl,
       };
 
-      console.log("Adding child to database...");
       await addChild(newChildData);
-      console.log("Child added successfully.");
 
       toast({
         title: t('regSuccessTitle'),
@@ -119,7 +115,6 @@ export default function RegisterPage() {
       form.reset();
 
     } catch (error) {
-      console.error("Caught an error in onSubmit:", error);
       let errorMessage = (error as Error).message || "There was a problem saving the registration. Check the console for more details.";
       let errorTitle = "Uh oh! Something went wrong.";
       
@@ -146,7 +141,6 @@ export default function RegisterPage() {
       });
 
     } finally {
-      console.log("Registration submission finished.");
       setIsSubmitting(false);
     }
   }
