@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -39,7 +38,7 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/flagged/photo-1567116681178-c326fa4e2c8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjaGlsZHJlbiUyMHBsYXlpbmd8ZW58MHx8fHwxNzUwOTg5MzUwfDA&ixlib=rb-4.1.0&q=80&w=1080"
+              src="https://www.blinkogies.co.za/wp-content/uploads/2024/05/20240212_104258-2048x1152.jpg"
               alt="Blinkogies Kleuterskool & Naskool"
               width={600}
               height={600}
@@ -74,11 +73,11 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1560421683-6856ea585c78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjaGlsZCUyMHBhaW50aW5nfGVufDB8fHx8MTc1MDk4OTM1MHww&ixlib=rb-4.1.0&q=80&w=1080"
+                  src="https://www.blinkogies.co.za/wp-content/uploads/2024/05/20240212_104141-1536x864.jpg"
                   alt="Art Day"
                   width={400}
                   height={300}
-                  className="rounded-lg mb-4"
+                  className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
@@ -97,11 +96,11 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1714646793091-8cb251152d72?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0ZWFjaGVyJTIwcmVhZGluZyUyMGNoaWxkcmVufGVufDB8fHx8MTc1MDk4OTM1MHww&ixlib=rb-4.1.0&q=80&w=1080"
+                  src="https://www.blinkogies.co.za/wp-content/uploads/2024/05/20240212_104118-1-1536x864.jpg"
                   alt="Story Time"
                   width={400}
                   height={300}
-                  className="rounded-lg mb-4"
+                  className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
@@ -120,11 +119,11 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Image
-                  src="https://images.unsplash.com/photo-1595182747083-6d249e14f0fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjaGlsZHJlbiUyMGdhcmRlbmluZ3xlbnwwfHx8fDE3NTA5ODkzNTF8MA&ixlib=rb-4.1.0&q=80&w=1080"
+                  src="https://www.blinkogies.co.za/wp-content/uploads/2024/05/20240212_104229-1536x864.jpg"
                   alt="Garden Day"
                   width={400}
                   height={300}
-                  className="rounded-lg mb-4"
+                  className="rounded-lg mb-4 object-cover aspect-[4/3]"
                   unoptimized
                 />
                 <p className="text-sm text-muted-foreground">
