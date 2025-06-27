@@ -38,7 +38,7 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="/blinkogies main.jpg"
+              src="/blinkogies-main.jpg"
               alt="Blinkogies Kleuterskool & Naskool"
               width={600}
               height={600}
