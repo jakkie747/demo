@@ -59,6 +59,7 @@ export default function RegisterPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [isConfigured, setIsConfigured] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setIsConfigured(isFirebaseConfigured());
@@ -78,12 +79,16 @@ export default function RegisterPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     const file = values.childPhoto?.[0];
     let photoUrl = "https://placehold.co/100x100.png";
 
     try {
+      console.log("Registration submission started.");
       if (file) {
+        console.log("Uploading child's photo...");
         photoUrl = await uploadImage(file, 'children');
+        console.log("Photo uploaded successfully:", photoUrl);
       }
 
       const newChildData: Omit<Child, "id"> = {
@@ -95,7 +100,9 @@ export default function RegisterPage() {
         photo: photoUrl,
       };
 
+      console.log("Adding child to database...");
       await addChild(newChildData);
+      console.log("Child added successfully.");
 
       toast({
         title: t('regSuccessTitle'),
@@ -108,8 +115,11 @@ export default function RegisterPage() {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: errorMessage || "There was a problem saving the registration.",
+        description: errorMessage || "There was a problem saving the registration. Check the console for more details.",
       });
+    } finally {
+      console.log("Registration submission finished.");
+      setIsSubmitting(false);
     }
   }
 
@@ -154,6 +164,7 @@ export default function RegisterPage() {
                             placeholder={t('egJaneDoe')}
                             {...field}
                             className="pl-10"
+                            disabled={isSubmitting}
                           />
                         </div>
                       </FormControl>
@@ -169,7 +180,7 @@ export default function RegisterPage() {
                       <FormItem>
                         <FormLabel>{t('age')}</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder={t('eg3')} {...field} />
+                          <Input type="number" placeholder={t('eg3')} {...field} disabled={isSubmitting}/>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -184,6 +195,7 @@ export default function RegisterPage() {
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
+                          disabled={isSubmitting}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -219,6 +231,7 @@ export default function RegisterPage() {
                           name={name}
                           ref={ref}
                           className="pl-10"
+                          disabled={isSubmitting}
                         />
                       </div>
                     </FormControl>
@@ -246,6 +259,7 @@ export default function RegisterPage() {
                           placeholder={t('egJohnSmith')}
                           {...field}
                           className="pl-10"
+                          disabled={isSubmitting}
                         />
                       </div>
                     </FormControl>
@@ -268,6 +282,7 @@ export default function RegisterPage() {
                             placeholder={t('egEmail')}
                             {...field}
                             className="pl-10"
+                            disabled={isSubmitting}
                           />
                         </div>
                       </FormControl>
@@ -289,6 +304,7 @@ export default function RegisterPage() {
                             placeholder={t('egPhone')}
                             {...field}
                             className="pl-10"
+                            disabled={isSubmitting}
                           />
                         </div>
                       </FormControl>
@@ -310,6 +326,7 @@ export default function RegisterPage() {
                           placeholder={t('egAddress')}
                           {...field}
                           className="pl-10"
+                          disabled={isSubmitting}
                         />
                       </div>
                     </FormControl>
@@ -317,8 +334,8 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="w-full font-semibold" disabled={form.formState.isSubmitting || !isConfigured}>
-                 {form.formState.isSubmitting ? "Submitting..." : t('submitRegistration')}
+              <Button type="submit" size="lg" className="w-full font-semibold" disabled={isSubmitting || !isConfigured}>
+                 {isSubmitting ? "Submitting..." : t('submitRegistration')}
               </Button>
             </form>
           </Form>

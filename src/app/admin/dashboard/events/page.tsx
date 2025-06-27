@@ -67,6 +67,7 @@ export default function ManageEventsPage() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [isConfigured, setIsConfigured] = useState(false);
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -144,14 +145,20 @@ export default function ManageEventsPage() {
   };
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    setIsSaving(true);
     const file = values.image?.[0];
     let imageUrl: string | undefined = editingEvent?.image;
 
     try {
+      console.log("Submission started.");
       if (file) {
+        console.log("Uploading image...");
         const newImageUrl = await uploadImage(file, 'events');
+        console.log("Image uploaded successfully:", newImageUrl);
         if (editingEvent?.image) {
+          console.log("Deleting old image...");
           await deleteImageFromUrl(editingEvent.image);
+          console.log("Old image deleted.");
         }
         imageUrl = newImageUrl;
       }
@@ -164,29 +171,38 @@ export default function ManageEventsPage() {
       };
 
       if (editingEvent) {
+        console.log("Updating event...");
         await updateEvent(editingEvent.id, eventPayload);
+        console.log("Event updated.");
         toast({
           title: t('eventUpdated'),
           description: t('eventUpdatedDesc', { title: values.title }),
         });
       } else {
+        console.log("Adding new event...");
         const newEvent: Omit<Event, 'id'> = {
           ...eventPayload,
           image: imageUrl || "https://placehold.co/600x400.png",
         };
         await addEvent(newEvent);
+        console.log("New event added.");
         toast({
           title: t('eventCreated'),
           description: t('eventCreatedDesc', { title: values.title }),
         });
       }
+      console.log("Fetching updated events...");
       await fetchEvents();
+      console.log("Events fetched.");
       setEditingEvent(null);
       form.reset();
     } catch (error) {
         console.error("Failed to save event:", error);
         const errorMessage = (error as Error).message;
-        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save event."});
+        toast({ variant: "destructive", title: "Error Saving Event", description: errorMessage || "Could not save the event. Check the console for more details."});
+    } finally {
+      console.log("Submission finished.");
+      setIsSaving(false);
     }
   }
 
@@ -240,6 +256,7 @@ export default function ManageEventsPage() {
                         <Input
                           placeholder={t('egSportsDay')}
                           {...field}
+                          disabled={isSaving}
                         />
                       </FormControl>
                       <FormMessage />
@@ -253,7 +270,7 @@ export default function ManageEventsPage() {
                     <FormItem>
                       <FormLabel>{t('eventDate')}</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input type="date" {...field} disabled={isSaving}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -269,6 +286,7 @@ export default function ManageEventsPage() {
                         <Textarea
                           placeholder={t('describeEvent')}
                           {...field}
+                          disabled={isSaving}
                         />
                       </FormControl>
                       <FormMessage />
@@ -301,6 +319,7 @@ export default function ManageEventsPage() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
+                          disabled={isSaving}
                         />
                       </FormControl>
                       <FormDescription>
@@ -313,8 +332,8 @@ export default function ManageEventsPage() {
                   )}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? "Saving..." : editingEvent ? t('updateEvent') : t('createEvent')}
+                  <Button type="submit" className="w-full" disabled={isSaving}>
+                    {isSaving ? "Saving..." : editingEvent ? t('updateEvent') : t('createEvent')}
                   </Button>
                   {editingEvent && (
                     <Button
@@ -322,7 +341,7 @@ export default function ManageEventsPage() {
                       variant="outline"
                       className="w-full"
                       onClick={handleCancelClick}
-                      disabled={form.formState.isSubmitting}
+                      disabled={isSaving}
                     >
                       {t('cancel')}
                     </Button>

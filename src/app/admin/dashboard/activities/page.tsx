@@ -66,6 +66,7 @@ export default function ManageActivitiesPage() {
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [isConfigured, setIsConfigured] = useState(false);
 
   const form = useForm<z.infer<typeof activityFormSchema>>({
@@ -86,9 +87,10 @@ export default function ManageActivitiesPage() {
       let title = "Error Loading Activities";
       let description = error.message || "An unexpected error occurred while fetching activities.";
 
-      if (error.message.includes("Database Index Required")) {
+      if (error.message.includes("firestore/failed-precondition")) {
         title = "Database Index Required";
-        description = "Failed to load activities. Please open the browser console (F12) to find a link to create the required database index.";
+        description = "A database index is required. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh the page.";
+        console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
       }
 
       toast({
@@ -154,14 +156,20 @@ export default function ManageActivitiesPage() {
   };
 
   async function onSubmit(values: z.infer<typeof activityFormSchema>) {
+    setIsSaving(true);
     const file = values.image?.[0];
     let imageUrl: string | undefined = editingActivity?.image;
 
     try {
+      console.log("Submission started.");
       if (file) {
+        console.log("Uploading image...");
         const newImageUrl = await uploadImage(file, 'activities');
+        console.log("Image uploaded successfully:", newImageUrl);
         if (editingActivity?.image) {
+          console.log("Deleting old image...");
           await deleteImageFromUrl(editingActivity.image);
+          console.log("Old image deleted.");
         }
         imageUrl = newImageUrl;
       }
@@ -173,28 +181,37 @@ export default function ManageActivitiesPage() {
       };
 
       if (editingActivity) {
+        console.log("Updating activity...");
         await updateActivity(editingActivity.id, activityPayload);
+        console.log("Activity updated.");
         toast({
           title: t('activityUpdated'),
           description: t('activityUpdatedDesc', { title: values.title }),
         });
       } else {
+        console.log("Adding new activity...");
         const newActivity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'> = {
           ...activityPayload
         };
         await addActivity(newActivity);
+        console.log("New activity added.");
         toast({
           title: t('activityCreated'),
           description: t('activityCreatedDesc', { title: values.title }),
         });
       }
+      console.log("Fetching updated activities...");
       await fetchActivities();
+      console.log("Activities fetched.");
       setEditingActivity(null);
       form.reset();
     } catch (error) {
       console.error("Failed to save activity:", error);
       const errorMessage = (error as Error).message;
-      toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not save activity." });
+      toast({ variant: "destructive", title: "Error Saving Activity", description: errorMessage || "Could not save the activity. Check the console for more details." });
+    } finally {
+      console.log("Submission finished.");
+      setIsSaving(false);
     }
   }
 
@@ -248,6 +265,7 @@ export default function ManageActivitiesPage() {
                         <Input
                           placeholder={t('egArtDay')}
                           {...field}
+                          disabled={isSaving}
                         />
                       </FormControl>
                       <FormMessage />
@@ -264,6 +282,7 @@ export default function ManageActivitiesPage() {
                         <Textarea
                           placeholder={t('describeActivity')}
                           {...field}
+                          disabled={isSaving}
                         />
                       </FormControl>
                       <FormMessage />
@@ -296,6 +315,7 @@ export default function ManageActivitiesPage() {
                           onBlur={onBlur}
                           name={name}
                           ref={ref}
+                          disabled={isSaving}
                         />
                       </FormControl>
                       <FormDescription>
@@ -308,8 +328,8 @@ export default function ManageActivitiesPage() {
                   )}
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? "Saving..." : editingActivity ? t('updateActivity') : t('createActivity')}
+                  <Button type="submit" className="w-full" disabled={isSaving}>
+                    {isSaving ? "Saving..." : editingActivity ? t('updateActivity') : t('createActivity')}
                   </Button>
                   {editingActivity && (
                     <Button
@@ -317,7 +337,7 @@ export default function ManageActivitiesPage() {
                       variant="outline"
                       className="w-full"
                       onClick={handleCancelClick}
-                      disabled={form.formState.isSubmitting}
+                      disabled={isSaving}
                     >
                       {t('cancel')}
                     </Button>
