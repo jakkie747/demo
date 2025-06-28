@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className={cn("min-h-screen font-body antialiased with-bg-image")}>
         <LanguageProvider>
           <PwaRegistry />
-          <div className="relative isolate flex min-h-dvh flex-col bg-background/80">
+          <div className="relative isolate flex min-h-dvh flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
