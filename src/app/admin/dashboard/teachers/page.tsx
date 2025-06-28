@@ -149,9 +149,10 @@ export default function ManageTeachersPage() {
 
   async function onSubmit(values: z.infer<typeof teacherFormSchema>) {
     setIsSaving(true);
-    try {
-      if (editingTeacher) {
-        // UPDATE LOGIC
+    
+    // UPDATE Teacher Logic
+    if (editingTeacher) {
+      try {
         let photoUrl = editingTeacher.photo;
         const file = values.photo?.[0];
 
@@ -185,46 +186,53 @@ export default function ManageTeachersPage() {
           description: t('teacherUpdatedDesc', { name: values.name }),
         });
         
-      } else {
-        // CREATE LOGIC
-        if (!values.password) {
-          form.setError("password", { type: "manual", message: "Password is required for new teachers." });
-          throw new Error("Password is required."); // Throw to prevent success toast
-        }
+        setEditingTeacher(null);
+        form.reset();
 
-        const file = values.photo?.[0];
-        let photoUrl = "https://placehold.co/100x100.png";
+      } catch (error) {
+        const errorMessage = (error as Error).message || "An error occurred during update.";
+        toast({ variant: "destructive", title: "Error", description: errorMessage });
+      } finally {
+        setIsSaving(false);
+      }
+      return;
+    }
 
-        if (file) {
-          photoUrl = await uploadImage(file, 'teachers');
-        }
-
-        const newTeacher: Omit<Teacher, 'id'> = {
-          name: values.name,
-          email: values.email,
-          password_insecure: values.password,
-          role: 'teacher',
-          photo: photoUrl,
-        };
-        await addTeacher(newTeacher);
-        
-        toast({
-          title: t('teacherEnrolled'),
-          description: t('teacherEnrolledDesc', { name: values.name }),
-        });
-        
-        // After creating, fetch all teachers to get the new one with its ID
-        await fetchTeachers();
+    // CREATE Teacher Logic
+    try {
+      if (!values.password) {
+        form.setError("password", { type: "manual", message: "Password is required for new teachers." });
+        setIsSaving(false);
+        return;
       }
 
-      // Reset form and state on success
-      setEditingTeacher(null);
+      const file = values.photo?.[0];
+      let photoUrl = "https://placehold.co/100x100.png";
+
+      if (file) {
+        photoUrl = await uploadImage(file, 'teachers');
+      }
+
+      const newTeacher: Omit<Teacher, 'id'> = {
+        name: values.name,
+        email: values.email,
+        password_insecure: values.password,
+        role: 'teacher',
+        photo: photoUrl,
+      };
+      await addTeacher(newTeacher);
+      
+      toast({
+        title: t('teacherEnrolled'),
+        description: t('teacherEnrolledDesc', { name: values.name }),
+      });
+      
+      await fetchTeachers();
       form.reset();
 
     } catch (error) {
-      // Don't toast for the password validation error, as it's shown in the form.
-      if ((error as Error).message !== "Password is required.") {
-          const errorMessage = (error as Error).message || "An error occurred.";
+      if ((error as Error).message !== "Password is required for new teachers.") {
+          const errorMessage = (error as Error).message || "An error occurred during creation.";
           toast({ variant: "destructive", title: "Error", description: errorMessage });
       }
     } finally {
