@@ -79,7 +79,8 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: hsl(var(--background));
     background-image: url('https://storage.googleapis.com/gweb-aip-web-2024-previews/us-central1/projects/blink-notify-494bf/assets/1719581023797');
     background-size: cover;
     background-position: center;
@@ -89,5 +90,6 @@
 
   .dark body {
     background-image: none;
+    background-color: hsl(var(--background));
   }
 }
