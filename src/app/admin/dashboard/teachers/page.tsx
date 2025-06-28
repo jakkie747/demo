@@ -31,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, AlertTriangle } from "lucide-react";
+import { Edit, Trash2, AlertTriangle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,17 +45,18 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers, addTeacher, deleteTeacher } from "@/services/teacherService";
-import { uploadImage } from "@/services/storageService";
+import { getTeachers, addTeacher, updateTeacher, deleteTeacher } from "@/services/teacherService";
+import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 const teacherFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
   email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(6, "Password must be at least 6 characters long."),
+  password: z.string().min(6, "Password must be at least 6 characters long.").optional(),
   photo: z.any().optional(),
 });
 
@@ -63,6 +64,7 @@ export default function ManageTeachersPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
   const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -102,6 +104,22 @@ export default function ManageTeachersPage() {
   }, [fetchTeachers]);
 
 
+  const handleEditClick = (teacher: Teacher) => {
+    setEditingTeacher(teacher);
+    form.reset({
+      name: teacher.name,
+      email: teacher.email,
+      password: "",
+      photo: undefined,
+    });
+  };
+
+  const handleCancelClick = () => {
+    setEditingTeacher(null);
+    form.reset();
+  };
+
+
   const handleDeleteClick = (teacher: Teacher) => {
     setTeacherToDelete(teacher);
   };
@@ -109,6 +127,9 @@ export default function ManageTeachersPage() {
   const confirmDelete = async () => {
     if (teacherToDelete) {
       try {
+        if (teacherToDelete.photo && teacherToDelete.photo.includes('firebasestorage')) {
+          await deleteImageFromUrl(teacherToDelete.photo);
+        }
         await deleteTeacher(teacherToDelete.id);
         await fetchTeachers();
         toast({
@@ -128,6 +149,36 @@ export default function ManageTeachersPage() {
   async function onSubmit(values: z.infer<typeof teacherFormSchema>) {
     setIsSaving(true);
     try {
+      if (editingTeacher) {
+        const file = values.photo?.[0];
+        let photoUrl: string | undefined = editingTeacher.photo;
+        
+        if(file) {
+            photoUrl = await uploadImage(file, 'teachers');
+            if(editingTeacher.photo && editingTeacher.photo.includes('firebasestorage')) {
+                await deleteImageFromUrl(editingTeacher.photo);
+            }
+        }
+
+        const teacherPayload = {
+            name: values.name,
+            email: values.email,
+            photo: photoUrl,
+        };
+
+        await updateTeacher(editingTeacher.id, teacherPayload);
+        toast({
+            title: t('teacherUpdated'),
+            description: t('teacherUpdatedDesc', { name: values.name }),
+        });
+
+      } else {
+        if (!values.password) {
+            form.setError("password", { type: "manual", message: "Password is required for new teachers." });
+            setIsSaving(false);
+            return;
+        }
+
         const file = values.photo?.[0];
         let photoUrl = "https://placehold.co/100x100.png";
 
@@ -147,8 +198,10 @@ export default function ManageTeachersPage() {
           title: t('teacherEnrolled'),
           description: t('teacherEnrolledDesc', { name: values.name }),
         });
+      }
       
       await fetchTeachers();
+      setEditingTeacher(null);
       form.reset();
 
     } catch (error) {
@@ -178,15 +231,15 @@ export default function ManageTeachersPage() {
     <div className="py-6 grid gap-10 lg:grid-cols-2">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
-          {t('enrollNewTeacher')}
+          {editingTeacher ? t('editTeacher') : t('enrollNewTeacher')}
         </h2>
         <Card>
           <CardHeader>
             <CardTitle>
-              {t('teacherDetails')}
+              {editingTeacher ? t('editingTeacher', { name: editingTeacher.name }) : t('teacherDetails')}
             </CardTitle>
             <CardDescription>
-              {t('enrollNewTeacher')}
+              {editingTeacher ? t('teacherUpdatedDesc', { name: ""}) : t('enrollNewTeacher')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -237,29 +290,43 @@ export default function ManageTeachersPage() {
                     </FormItem>
                   )}
                 />
-                 <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('temporaryPassword')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          {...field}
-                          disabled={isSaving}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                 {!editingTeacher && (
+                    <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('temporaryPassword')}</FormLabel>
+                        <FormControl>
+                            <Input
+                            type="password"
+                            {...field}
+                            disabled={isSaving}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                 )}
+                 {editingTeacher?.photo && (
+                  <div className="space-y-2">
+                    <FormLabel>{t('currentImage')}</FormLabel>
+                    <Image
+                      src={editingTeacher.photo}
+                      alt={editingTeacher.name}
+                      width={100}
+                      height={100}
+                      className="rounded-md object-cover border"
+                    />
+                  </div>
+                )}
                  <FormField
                     control={form.control}
                     name="photo"
                     render={({ field: { onChange, onBlur, name, ref } }) => (
                     <FormItem>
-                        <FormLabel>{t('teacherPhoto')}</FormLabel>
+                        <FormLabel>{editingTeacher ? t('replaceImage') : t('teacherPhoto')}</FormLabel>
                         <FormControl>
                             <Input
                             type="file"
@@ -276,9 +343,22 @@ export default function ManageTeachersPage() {
                     </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full" disabled={isSaving || !isConfigured}>
-                  {isSaving ? "Saving..." : t('enrollTeacher')}
-                </Button>
+                <div className="flex gap-2">
+                    <Button type="submit" className="w-full" disabled={isSaving || !isConfigured}>
+                        {isSaving ? "Saving..." : editingTeacher ? t('updateTeacher') : t('enrollTeacher')}
+                    </Button>
+                    {editingTeacher && (
+                        <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={handleCancelClick}
+                        disabled={isSaving}
+                        >
+                        {t('cancel')}
+                        </Button>
+                    )}
+                </div>
               </form>
             </Form>
           </CardContent>
@@ -307,7 +387,7 @@ export default function ManageTeachersPage() {
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-48" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-10" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-20" /></TableCell>
                   </TableRow>
                 ))
               ) : teachers.length === 0 ? (
@@ -331,15 +411,25 @@ export default function ManageTeachersPage() {
                     <TableCell>{teacher.email}</TableCell>
                     <TableCell><Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge></TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteClick(teacher)}
-                        disabled={teacher.role === 'admin'}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                         <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditClick(teacher)}
+                          disabled={teacher.role === 'admin'}
+                         >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteClick(teacher)}
+                            disabled={teacher.role === 'admin'}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -355,7 +445,7 @@ export default function ManageTeachersPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
               <AlertDialogDescription>
-                {t('deleteTeacherConfirm')} {t('activityDeletedDesc', { title: teacherToDelete?.name || '' })}
+                {t('deleteTeacherConfirmDesc', { name: teacherToDelete?.name || '' })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
