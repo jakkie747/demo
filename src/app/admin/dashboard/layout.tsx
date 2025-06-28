@@ -6,6 +6,8 @@ import { LogOut } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 import {
   SidebarProvider,
@@ -33,18 +35,34 @@ export default function DashboardLayout({
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // This is a prototype auth check. In a real app, you'd verify a token.
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    if (!isLoggedIn) {
-      router.replace('/admin');
-    } else {
-      setIsCheckingAuth(false);
+    if (!auth) {
+        // Firebase not configured
+        router.replace('/admin');
+        return;
     }
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in.
+        setIsCheckingAuth(false);
+      } else {
+        // User is signed out.
+        router.replace('/admin');
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [router]);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('isLoggedIn');
-    router.push('/admin');
+  const handleLogout = async () => {
+    if (!auth) return;
+    try {
+        await signOut(auth);
+        router.push('/admin');
+    } catch (error) {
+        console.error("Logout Error:", error);
+    }
   };
 
   if (isCheckingAuth) {

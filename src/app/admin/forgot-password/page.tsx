@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
+import { auth } from "@/lib/firebase";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
@@ -23,20 +25,27 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const { t } = useLanguage();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !auth) return;
     setIsLoading(true);
 
-    // In a real application, this would trigger a call to Firebase Auth
-    // or your backend to send a password reset email.
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: t('resetLinkSent'),
-        description: t('resetLinkSentDesc', { email }),
-      });
-    }, 1500);
+    try {
+        await sendPasswordResetEmail(auth, email);
+        toast({
+            title: t('resetLinkSent'),
+            description: t('resetLinkSentDesc', { email }),
+        });
+    } catch(error: any) {
+        // We don't want to tell the user if the email exists or not for security reasons
+        console.error("Password reset error:", error);
+         toast({
+            title: t('resetLinkSent'),
+            description: t('resetLinkSentDesc', { email }),
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (

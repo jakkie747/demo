@@ -17,10 +17,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
-import { getTeacherByEmail, addTeacher } from "@/services/teacherService";
-import type { Teacher } from "@/lib/types";
+import { addTeacher, getTeacherByUid } from "@/services/teacherService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -36,45 +37,43 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     setError("");
 
-    // This is a prototype login system.
-    // In a real application, never store or compare passwords in plaintext.
-    // Use a secure authentication provider like Firebase Authentication.
-    try {
-      const teacher = await getTeacherByEmail(email);
+    if (!auth) {
+        setError("Firebase is not configured. Please check your setup.");
+        setIsLoading(false);
+        return;
+    }
 
-      if (teacher && teacher.password_insecure === password) {
-         toast({
-          title: t('loginSuccess'),
-          description: t('loginRedirecting'),
-        });
-        // Store login state (insecure, for prototype only)
-        sessionStorage.setItem('isLoggedIn', 'true');
-        router.push("/admin/dashboard");
-      } else if (!teacher && email.toLowerCase() === 'admin@blinkogies.co.za') {
-        // If the admin user doesn't exist, create it on the first login attempt.
-        const adminUser: Omit<Teacher, 'id'> = {
-          name: 'Admin',
-          email: email.toLowerCase(),
-          password_insecure: 'password', // Default password
-          role: 'admin',
-        };
-        await addTeacher(adminUser);
-        setError("Admin account created. Please try logging in again with the password 'password'.");
-        toast({
-          title: "Admin Account Created",
-          description: "Please log in with the default password.",
-        });
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // On first login for a new admin user, create their Firestore document
+      const teacherProfile = await getTeacherByUid(user.uid);
+      if (!teacherProfile && user.email?.toLowerCase() === 'admin@blinkogies.co.za') {
+          await addTeacher(user.uid, {
+              name: "Admin User",
+              email: user.email,
+              role: 'admin'
+          });
       }
-      else {
-        setError("Invalid email or password.");
-      }
-    } catch (err) {
-       const errorMessage = (err as Error).message || "An error occurred during login.";
-       if (errorMessage.includes("index")) {
-           setError("A database index is required. Please check the browser console (F12) for a link to create it, then try logging in again.");
-           console.error("Firebase Index Error: Please create the required Firestore index by clicking the link in the following error message:", err);
-       } else {
-           setError(errorMessage);
+      
+      toast({
+        title: t('loginSuccess'),
+        description: t('loginRedirecting'),
+      });
+      router.push("/admin/dashboard");
+
+    } catch (err: any) {
+       switch (err.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+            setError("Invalid email or password.");
+            break;
+        default:
+            setError("An unexpected error occurred. Please try again.");
+            console.error("Login Error:", err);
+            break;
        }
     } finally {
       setIsLoading(false);
@@ -99,9 +98,9 @@ export default function AdminLoginPage() {
           <CardContent>
             <Alert variant="destructive" className="mb-4">
                 <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Prototype Login</AlertTitle>
+                <AlertTitle>Secure Login Enabled</AlertTitle>
                 <AlertDescription>
-                  Use email <strong>admin@blinkogies.co.za</strong> and password <strong>password</strong> to log in. The admin account will be created on your first login attempt.
+                  Log in with the credentials you created in the Firebase Authentication console. New teacher accounts must also be created there.
                 </AlertDescription>
             </Alert>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,6 +113,7 @@ export default function AdminLoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -124,6 +124,7 @@ export default function AdminLoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}

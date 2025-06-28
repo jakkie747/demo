@@ -1,6 +1,6 @@
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, doc, deleteDoc, query, where, limit } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, deleteDoc, query, where, getDoc, setDoc } from 'firebase/firestore';
 import type { Teacher } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
 
@@ -13,43 +13,41 @@ export const getTeachers = async (): Promise<Teacher[]> => {
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Teacher));
 };
 
-export const addTeacher = async (teacherData: Omit<Teacher, 'id'>): Promise<string> => {
+export const addTeacher = async (uid: string, teacherData: Omit<Teacher, 'id' | 'uid'>): Promise<void> => {
     if (!db) throw new Error("Firebase is not configured.");
-    const teachersCollectionRef = collection(db, 'teachers');
-    const docRef = await promiseWithTimeout(
-        addDoc(teachersCollectionRef, teacherData),
+    const teacherDocRef = doc(db, 'teachers', uid);
+    await promiseWithTimeout(
+        setDoc(teacherDocRef, { ...teacherData, uid }),
         TIMEOUT_DURATION,
         new Error("Adding teacher document timed out.")
     );
-    return docRef.id;
 };
 
-export const getTeacherByEmail = async (email: string): Promise<Teacher | null> => {
+export const getTeacherByUid = async (uid: string): Promise<Teacher | null> => {
     if (!db) return null;
-    const teachersCollectionRef = collection(db, 'teachers');
-    const q = query(teachersCollectionRef, where("email", "==", email), limit(1));
-    const snapshot = await promiseWithTimeout(
-        getDocs(q),
+    const teacherDocRef = doc(db, 'teachers', uid);
+    const docSnap = await promiseWithTimeout(
+        getDoc(teacherDocRef),
         TIMEOUT_DURATION,
-        new Error("Fetching teacher by email timed out.")
+        new Error("Fetching teacher by UID timed out.")
     );
 
-    if (snapshot.empty) {
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as Teacher;
+    } else {
         return null;
     }
-    const teacherDoc = snapshot.docs[0];
-    return { id: teacherDoc.id, ...teacherDoc.data() } as Teacher;
 };
 
 export const deleteTeacher = async (teacherId: string): Promise<void> => {
     if (!db) throw new Error("Firebase is not configured.");
-    // Note: This only deletes the Firestore record.
-    // In a real application, you would also need to delete the user from Firebase Authentication,
-    // which typically requires a Cloud Function for secure execution.
+    // This only deletes the Firestore record (name, email, photo, role).
+    // It does NOT delete the user's login credentials from Firebase Authentication.
+    // That must be done manually in the Firebase Console for security.
     const teacherDoc = doc(db, 'teachers', teacherId);
     await promiseWithTimeout(
         deleteDoc(teacherDoc),
         TIMEOUT_DURATION,
-        new Error(`Deleting teacher ${teacherId} timed out.`)
+        new Error(`Deleting teacher document ${teacherId} timed out.`)
     );
 };

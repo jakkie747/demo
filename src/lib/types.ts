@@ -40,13 +40,10 @@ export interface Activity {
 }
 
 export interface Teacher {
-  id: string;
+  id: string; // This will now be the Firebase Auth UID
+  uid: string;
   name: string;
   email: string;
-  // Storing passwords in plaintext is highly insecure. This is for prototype purposes only.
-  // In a real application, use a secure authentication provider like Firebase Authentication.
-  password_insecure: string; 
   role: 'admin' | 'teacher';
   photo?: string;
 }
-    

@@ -1,20 +1,6 @@
 
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import {
   Card,
@@ -31,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle, UserPlus } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,41 +31,21 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers, addTeacher, deleteTeacher } from "@/services/teacherService";
-import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+import { getTeachers, deleteTeacher } from "@/services/teacherService";
+import { deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured, db } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
-import { doc, updateDoc } from "firebase/firestore";
-
-const teacherFormSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters long"),
-  email: z.string().email("Please enter a valid email address."),
-  password: z.string().optional(),
-  photo: z.any().optional(),
-});
+import { Button } from "@/components/ui/button";
 
 export default function ManageTeachersPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
   const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [isConfigured, setIsConfigured] = useState(false);
-
-  const form = useForm<z.infer<typeof teacherFormSchema>>({
-    resolver: zodResolver(teacherFormSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      photo: undefined,
-    },
-  });
 
   const fetchTeachers = useCallback(async () => {
     setIsLoading(true);
@@ -104,23 +70,6 @@ export default function ManageTeachersPage() {
     }
   }, [fetchTeachers]);
 
-
-  const handleEditClick = (teacher: Teacher) => {
-    setEditingTeacher(teacher);
-    form.reset({
-      name: teacher.name,
-      email: teacher.email,
-      password: "", // Reset password to empty, validation will skip it in edit mode
-      photo: undefined,
-    });
-  };
-
-  const handleCancelClick = () => {
-    setEditingTeacher(null);
-    form.reset();
-  };
-
-
   const handleDeleteClick = (teacher: Teacher) => {
     setTeacherToDelete(teacher);
   };
@@ -140,102 +89,12 @@ export default function ManageTeachersPage() {
         });
       } catch (error) {
         const errorMessage = (error as Error).message;
-        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete teacher." });
+        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete teacher data." });
       } finally {
         setTeacherToDelete(null);
       }
     }
   };
-
-  async function onSubmit(values: z.infer<typeof teacherFormSchema>) {
-    setIsSaving(true);
-
-    // UPDATE Teacher Logic
-    if (editingTeacher) {
-      try {
-        let photoUrl = editingTeacher.photo;
-        const file = values.photo?.[0];
-
-        if (file) {
-          photoUrl = await uploadImage(file, 'teachers');
-          if (editingTeacher.photo && editingTeacher.photo.includes('firebasestorage')) {
-            await deleteImageFromUrl(editingTeacher.photo);
-          }
-        }
-
-        const updatePayload: Partial<Teacher> = {
-          name: values.name,
-          email: values.email,
-          photo: photoUrl,
-        };
-        
-        if (!db) throw new Error("Firebase is not configured.");
-        const teacherDocRef = doc(db, 'teachers', editingTeacher.id);
-        await updateDoc(teacherDocRef, updatePayload);
-
-        // Optimistically update the UI to reflect the change immediately
-        setTeachers(currentTeachers => 
-          currentTeachers.map(t => 
-            t.id === editingTeacher.id ? { ...t, ...updatePayload } : t
-          )
-        );
-
-        toast({
-          title: t('teacherUpdated'),
-          description: t('teacherUpdatedDesc', { name: values.name }),
-        });
-
-      } catch (error) {
-        const errorMessage = (error as Error).message || "An error occurred during update.";
-        toast({ variant: "destructive", title: "Error", description: errorMessage });
-      } finally {
-        setIsSaving(false);
-        setEditingTeacher(null);
-        form.reset();
-      }
-      return;
-    }
-
-    // CREATE Teacher Logic
-    try {
-      // Manual validation for password on new teacher creation
-      if (!values.password || values.password.length < 6) {
-        form.setError("password", { type: "manual", message: "Password must be at least 6 characters long." });
-        setIsSaving(false);
-        return;
-      }
-      
-      let photoUrl = "https://placehold.co/100x100.png";
-      const file = values.photo?.[0];
-      if (file) {
-        photoUrl = await uploadImage(file, 'teachers');
-      }
-
-      const newTeacher: Omit<Teacher, 'id'> = {
-        name: values.name,
-        email: values.email,
-        password_insecure: values.password,
-        role: 'teacher',
-        photo: photoUrl,
-      };
-      await addTeacher(newTeacher);
-      
-      toast({
-        title: t('teacherEnrolled'),
-        description: t('teacherEnrolledDesc', { name: values.name }),
-      });
-      
-      await fetchTeachers();
-      form.reset();
-
-    } catch (error) {
-        const errorMessage = (error as Error).message || "An error occurred during creation.";
-        toast({ variant: "destructive", title: "Error", description: errorMessage });
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
 
   if (!isConfigured) {
     return (
@@ -253,143 +112,32 @@ export default function ManageTeachersPage() {
   }
 
   return (
-    <div className="py-6 grid gap-10 lg:grid-cols-2">
-      <div>
+    <div className="py-6">
         <h2 className="text-3xl font-bold tracking-tight mb-4">
-          {editingTeacher ? t('editTeacher') : t('enrollNewTeacher')}
+          {t('manageTeachers')}
         </h2>
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {editingTeacher ? t('editingTeacher', { name: editingTeacher.name }) : t('teacherDetails')}
-            </CardTitle>
-            <CardDescription>
-              {editingTeacher ? t('teacherUpdatedDesc', { name: ""}) : t('enrollNewTeacher')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-             <Alert variant="destructive" className="mb-6">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Security Warning</AlertTitle>
-              <AlertDescription>
-                This form is for prototyping only. It stores passwords in an insecure way. In a production environment, use a secure authentication provider like Firebase Authentication.
-              </AlertDescription>
-            </Alert>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('teacherName')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={t('egJohnSmith')}
-                          {...field}
-                          disabled={isSaving}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('teacherEmail')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder={t('egEmail')}
-                          {...field}
-                          disabled={isSaving}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 {!editingTeacher && (
-                    <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>{t('temporaryPassword')}</FormLabel>
-                        <FormControl>
-                            <Input
-                            type="password"
-                            {...field}
-                            disabled={isSaving}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                 )}
-                 {editingTeacher?.photo && (
-                  <div className="space-y-2">
-                    <FormLabel>{t('currentImage')}</FormLabel>
-                    <Image
-                      src={editingTeacher.photo}
-                      alt={editingTeacher.name}
-                      width={100}
-                      height={100}
-                      className="rounded-md object-cover border"
-                    />
-                  </div>
-                )}
-                 <FormField
-                    control={form.control}
-                    name="photo"
-                    render={({ field: { onChange, onBlur, name, ref } }) => (
-                    <FormItem>
-                        <FormLabel>{editingTeacher ? t('replaceImage') : t('teacherPhoto')}</FormLabel>
-                        <FormControl>
-                            <Input
-                            type="file"
-                            accept="image/png, image/jpeg, image/gif, image/webp, image/avif"
-                            onChange={(e) => onChange(e.target.files)}
-                            onBlur={onBlur}
-                            name={name}
-                            ref={ref}
-                            disabled={isSaving}
-                            />
-                        </FormControl>
-                          <FormDescription>{t('teacherPhotoDesc')}</FormDescription>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <div className="flex gap-2">
-                    <Button type="submit" className="w-full" disabled={isSaving || !isConfigured}>
-                        {isSaving ? "Saving..." : editingTeacher ? t('updateTeacher') : t('enrollTeacher')}
+        
+         <Card className="mb-8">
+            <CardHeader>
+                <CardTitle>Important: How to Add New Teachers</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <Alert>
+                    <UserPlus className="h-4 w-4" />
+                    <AlertTitle>User management is handled in the Firebase Console.</AlertTitle>
+                    <AlertDescription>
+                        For security, new teachers must be added directly through the Firebase Authentication service. This page only displays teacher information stored in the database.
+                    </AlertDescription>
+                </Alert>
+                <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/users`} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline">
+                        Go to Firebase Console to Add Users
                     </Button>
-                    {editingTeacher && (
-                        <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={handleCancelClick}
-                        disabled={isSaving}
-                        >
-                        {t('cancel')}
-                        </Button>
-                    )}
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
-      <div>
+                </a>
+                <p className="text-sm text-muted-foreground">After adding a user in the console, their details will appear here once they log in for the first time.</p>
+            </CardContent>
+         </Card>
+
         <h2 className="text-3xl font-bold tracking-tight mb-4">
           {t('existingTeachers')}
         </h2>
@@ -437,14 +185,6 @@ export default function ManageTeachersPage() {
                     <TableCell><Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge></TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                         <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEditClick(teacher)}
-                          disabled={teacher.role === 'admin'}
-                         >
-                          <Edit className="h-4 w-4" />
-                        </Button>
                         <Button
                             variant="ghost"
                             size="icon"
@@ -470,7 +210,7 @@ export default function ManageTeachersPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
               <AlertDialogDescription>
-                {t('deleteTeacherConfirmDesc', { name: teacherToDelete?.name || '' })}
+                {t('deleteTeacherConfirmDesc', { name: teacherToDelete?.name || '' })} This will only remove their data from the app, not their ability to log in.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -481,7 +221,6 @@ export default function ManageTeachersPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
     </div>
   );
 }
