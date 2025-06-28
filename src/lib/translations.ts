@@ -9,7 +9,7 @@ export const translations = {
     language: 'Language',
 
     // Footer
-    copyright: '© 2025 Blinkogies App',
+    copyright: '© 2025 Blinkogies Family Hub',
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
     
@@ -217,7 +217,7 @@ export const translations = {
     language: 'Taal',
 
     // Footer
-    copyright: '© 2025 Blinkogies App',
+    copyright: '© 2025 Blinkogies Family Hub',
     privacyPolicy: 'Privaatheidsbeleid',
     termsOfService: 'Diensbepalings',
 
