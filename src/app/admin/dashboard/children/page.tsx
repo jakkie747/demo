@@ -556,18 +556,22 @@ export default function ChildrenPage() {
                                         className="flex flex-col space-y-1"
                                         disabled={isSaving}
                                     >
-                                        <div className="flex items-center space-x-3">
-                                            <RadioGroupItem value="yes" id="edit-preschool-yes" />
-                                            <Label htmlFor="edit-preschool-yes" className="font-normal">
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value="yes" />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">
                                                 {t('yes')}
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <RadioGroupItem value="no" id="edit-preschool-no" />
-                                            <Label htmlFor="edit-preschool-no" className="font-normal">
+                                            </FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value="no" />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">
                                                 {t('no')}
-                                            </Label>
-                                        </div>
+                                            </FormLabel>
+                                        </FormItem>
                                     </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
@@ -605,3 +609,5 @@ export default function ChildrenPage() {
     </div>
   );
 }
+
+    
