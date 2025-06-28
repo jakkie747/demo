@@ -110,6 +110,19 @@ export default function ChildrenPage() {
 
   const form = useForm<z.infer<typeof childFormSchema>>({
     resolver: zodResolver(childFormSchema),
+    defaultValues: {
+      name: "",
+      dateOfBirth: "",
+      parent: "",
+      parentEmail: "",
+      parentPhone: "",
+      address: "",
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      medicalConditions: "",
+      additionalNotes: "",
+      photo: undefined,
+    }
   });
 
   const fetchChildren = useCallback(async () => {
@@ -143,6 +156,28 @@ export default function ChildrenPage() {
       setIsLoading(false);
     }
   }, [fetchChildren]);
+
+  useEffect(() => {
+    if (editingChild) {
+      form.reset({
+        name: editingChild.name,
+        dateOfBirth: editingChild.dateOfBirth,
+        gender: editingChild.gender,
+        photo: undefined,
+        parent: editingChild.parent,
+        parentEmail: editingChild.parentEmail,
+        parentPhone: editingChild.parentPhone,
+        address: editingChild.address,
+        emergencyContactName: editingChild.emergencyContactName,
+        emergencyContactPhone: editingChild.emergencyContactPhone,
+        medicalConditions: editingChild.medicalConditions || "",
+        previousPreschool: editingChild.previousPreschool,
+        additionalNotes: editingChild.additionalNotes || "",
+      });
+    } else {
+      form.reset();
+    }
+  }, [editingChild, form]);
   
   const handleExportCSV = () => {
     if (children.length === 0) {
@@ -265,21 +300,6 @@ export default function ChildrenPage() {
 
   const handleEditClick = (child: Child) => {
     setEditingChild(child);
-    form.reset({
-      name: child.name,
-      dateOfBirth: child.dateOfBirth,
-      gender: child.gender,
-      photo: undefined,
-      parent: child.parent,
-      parentEmail: child.parentEmail,
-      parentPhone: child.parentPhone,
-      address: child.address,
-      emergencyContactName: child.emergencyContactName,
-      emergencyContactPhone: child.emergencyContactPhone,
-      medicalConditions: child.medicalConditions || "",
-      previousPreschool: child.previousPreschool,
-      additionalNotes: child.additionalNotes || "",
-    });
   };
 
   const handleDeleteClick = (child: Child) => {
@@ -575,5 +595,3 @@ export default function ChildrenPage() {
     </div>
   );
 }
-
-    
