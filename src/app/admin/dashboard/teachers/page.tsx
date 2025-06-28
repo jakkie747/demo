@@ -151,26 +151,23 @@ export default function ManageTeachersPage() {
     try {
       if (editingTeacher) {
         // Logic for UPDATING a teacher
-        let photoUrl = editingTeacher.photo; // Start with the existing photo URL
+        let photoUrl = editingTeacher.photo;
         const file = values.photo?.[0];
 
-        // If a new photo was uploaded, handle the upload and deletion of the old one
         if (file) {
           const newPhotoUrl = await uploadImage(file, 'teachers');
           if (editingTeacher.photo && editingTeacher.photo.includes('firebasestorage')) {
             await deleteImageFromUrl(editingTeacher.photo);
           }
-          photoUrl = newPhotoUrl; // Set the URL to the new one
+          photoUrl = newPhotoUrl;
         }
 
-        // Construct the payload for the Firestore update.
-        // This object only contains the fields that should be updated.
-        const teacherUpdatePayload: Partial<Omit<Teacher, 'id' | 'role' | 'password_insecure'>> = {
+        const teacherUpdatePayload: Partial<Teacher> = {
           name: values.name,
           email: values.email,
           photo: photoUrl,
         };
-        
+
         await updateTeacher(editingTeacher.id, teacherUpdatePayload);
 
         toast({
