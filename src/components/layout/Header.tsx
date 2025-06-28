@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Languages } from "lucide-react";
+import { Menu, Languages, Download } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -21,15 +21,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePwaInstall } from "@/hooks/usePwaInstall";
 
 export function Header() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleLanguage = () => {
-    setLanguage(language === "en" ? "af" : "en");
-  };
+  const { install, canInstall } = usePwaInstall();
 
   const navLinks = [
     { href: "/", label: t("home") },
@@ -78,6 +76,15 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {canInstall && (
+            <div className="hidden md:flex">
+              <Button onClick={install}>
+                <Download className="mr-2" />
+                {t("installApp")}
+              </Button>
+            </div>
+          )}
+
           <div className="hidden md:flex">
             <Button asChild variant="outline">
               <Link href="/admin">{t("adminLoginNav")}</Link>
@@ -100,10 +107,7 @@ export function Header() {
                 <Logo />
               </div>
               <nav className="flex flex-col gap-4">
-                {[
-                  ...navLinks,
-                  { href: "/admin", label: t("adminLoginNav") },
-                ].map((link) => (
+                {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -118,6 +122,34 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
+                
+                {canInstall && (
+                  <button
+                    onClick={() => {
+                      install();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                    )}
+                  >
+                    <Download className="mr-4 h-5 w-5" />
+                    {t("installApp")}
+                  </button>
+                )}
+
+                <Link
+                  href="/admin"
+                  className={cn(
+                    "text-lg font-medium transition-colors hover:text-primary",
+                    pathname.startsWith('/admin')
+                      ? "text-primary"
+                      : "text-foreground/60"
+                  )}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t("adminLoginNav")}
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>

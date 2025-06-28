@@ -7,6 +7,7 @@ export const translations = {
     eventsNav: 'Events',
     adminLoginNav: 'Admin Login',
     language: 'Language',
+    installApp: 'Install App',
 
     // Footer
     copyright: '© 2025 Blinkogies Family Hub. All rights reserved.',
@@ -215,6 +216,7 @@ export const translations = {
     eventsNav: 'Geleenthede',
     adminLoginNav: 'Admin Aanteken',
     language: 'Taal',
+    installApp: 'Installeer Toepassing',
 
     // Footer
     copyright: '© 2025 Blinkogies Family Hub. Alle regte voorbehou.',
