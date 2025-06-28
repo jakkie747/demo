@@ -80,5 +80,14 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: url('https://storage.googleapis.com/gweb-aip-web-2024-previews/us-central1/projects/blink-notify-494bf/assets/1719581023797');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image: none;
   }
 }
