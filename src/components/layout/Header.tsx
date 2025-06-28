@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Menu, Languages } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import {
 export function Header() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleLanguage = () => {
     setLanguage(language === "en" ? "af" : "en");
@@ -82,7 +84,7 @@ export function Header() {
             </Button>
           </div>
 
-          <Sheet>
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-6 w-6" />
@@ -111,6 +113,7 @@ export function Header() {
                         ? "text-primary"
                         : "text-foreground/60"
                     )}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}
                   </Link>
