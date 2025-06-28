@@ -548,18 +548,29 @@ export default function ChildrenPage() {
                         render={({ field }) => (
                           <FormItem className="space-y-3">
                             <FormLabel>{t('previousPreschool')}</FormLabel>
-                            <FormControl>
-                              <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4" disabled={isSaving}>
-                                <div className="flex items-center space-x-3">
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="flex gap-4"
+                              disabled={isSaving}
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
                                   <RadioGroupItem value="yes" id="edit-r-yes" />
-                                  <Label className="font-normal" htmlFor="edit-r-yes">{t('yes')}</Label>
-                                </div>
-                                <div className="flex items-center space-x-3">
+                                </FormControl>
+                                <FormLabel className="font-normal" htmlFor="edit-r-yes">
+                                  {t('yes')}
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
                                   <RadioGroupItem value="no" id="edit-r-no" />
-                                  <Label className="font-normal" htmlFor="edit-r-no">{t('no')}</Label>
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
+                                </FormControl>
+                                <FormLabel className="font-normal" htmlFor="edit-r-no">
+                                  {t('no')}
+                                </FormLabel>
+                              </FormItem>
+                            </RadioGroup>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -595,3 +606,5 @@ export default function ChildrenPage() {
     </div>
   );
 }
+
+    
