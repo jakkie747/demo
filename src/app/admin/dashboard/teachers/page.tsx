@@ -149,10 +149,9 @@ export default function ManageTeachersPage() {
 
   async function onSubmit(values: z.infer<typeof teacherFormSchema>) {
     setIsSaving(true);
-
-    if (editingTeacher) {
-      // UPDATE LOGIC
-      try {
+    try {
+      if (editingTeacher) {
+        // UPDATE LOGIC
         let photoUrl = editingTeacher.photo;
         const file = values.photo?.[0];
 
@@ -173,25 +172,24 @@ export default function ManageTeachersPage() {
         if (!db) throw new Error("Firebase is not configured.");
         const teacherDocRef = doc(db, 'teachers', editingTeacher.id);
         await updateDoc(teacherDocRef, updatePayload);
+        
+        // Optimistically update the UI to reflect the change immediately
+        setTeachers(currentTeachers => 
+          currentTeachers.map(t => 
+            t.id === editingTeacher.id ? { ...t, ...updatePayload } : t
+          )
+        );
 
         toast({
           title: t('teacherUpdated'),
           description: t('teacherUpdatedDesc', { name: values.name }),
         });
         
-      } catch (error) {
-        const errorMessage = (error as Error).message || "Could not update the teacher.";
-        toast({ variant: "destructive", title: "Error", description: errorMessage });
-        setIsSaving(false);
-        return; // Stop execution on error
-      }
-    } else {
-      // CREATE LOGIC
-      try {
+      } else {
+        // CREATE LOGIC
         if (!values.password) {
           form.setError("password", { type: "manual", message: "Password is required for new teachers." });
-          setIsSaving(false);
-          return;
+          throw new Error("Password is required."); // Throw to prevent success toast
         }
 
         const file = values.photo?.[0];
@@ -209,24 +207,31 @@ export default function ManageTeachersPage() {
           photo: photoUrl,
         };
         await addTeacher(newTeacher);
+        
         toast({
           title: t('teacherEnrolled'),
           description: t('teacherEnrolledDesc', { name: values.name }),
         });
-      } catch (error) {
-        const errorMessage = (error as Error).message || "Could not enroll new teacher.";
-        toast({ variant: "destructive", title: "Error", description: errorMessage });
-        setIsSaving(false);
-        return; // Stop execution on error
+        
+        // After creating, fetch all teachers to get the new one with its ID
+        await fetchTeachers();
       }
-    }
 
-    // This runs only on success for both create and update
-    await fetchTeachers();
-    setEditingTeacher(null);
-    form.reset();
-    setIsSaving(false);
+      // Reset form and state on success
+      setEditingTeacher(null);
+      form.reset();
+
+    } catch (error) {
+      // Don't toast for the password validation error, as it's shown in the form.
+      if ((error as Error).message !== "Password is required.") {
+          const errorMessage = (error as Error).message || "An error occurred.";
+          toast({ variant: "destructive", title: "Error", description: errorMessage });
+      }
+    } finally {
+      setIsSaving(false);
+    }
   }
+
 
   if (!isConfigured) {
     return (
