@@ -1,19 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
-        port: '',
-        pathname: '**',
+        hostname: 'placehold.co',
       },
       {
         protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '**',
+        hostname: 'firebasestorage.googleapis.com',
       },
     ],
   },
