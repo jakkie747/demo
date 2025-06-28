@@ -47,5 +47,6 @@ export interface Teacher {
   // In a real application, use a secure authentication provider like Firebase Authentication.
   password_insecure: string; 
   role: 'admin' | 'teacher';
+  photo?: string;
 }
     

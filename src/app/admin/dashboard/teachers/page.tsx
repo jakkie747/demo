@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -45,14 +46,17 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
 import { getTeachers, addTeacher, deleteTeacher } from "@/services/teacherService";
+import { uploadImage } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const teacherFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
   email: z.string().email("Please enter a valid email address."),
   password: z.string().min(6, "Password must be at least 6 characters long."),
+  photo: z.any().optional(),
 });
 
 export default function ManageTeachersPage() {
@@ -70,6 +74,7 @@ export default function ManageTeachersPage() {
       name: "",
       email: "",
       password: "",
+      photo: undefined,
     },
   });
 
@@ -123,11 +128,19 @@ export default function ManageTeachersPage() {
   async function onSubmit(values: z.infer<typeof teacherFormSchema>) {
     setIsSaving(true);
     try {
+        const file = values.photo?.[0];
+        let photoUrl = "https://placehold.co/100x100.png";
+
+        if (file) {
+            photoUrl = await uploadImage(file, 'teachers');
+        }
+
         const newTeacher: Omit<Teacher, 'id'> = {
             name: values.name,
             email: values.email,
             password_insecure: values.password,
-            role: 'teacher'
+            role: 'teacher',
+            photo: photoUrl,
         };
         await addTeacher(newTeacher);
         toast({
@@ -241,6 +254,28 @@ export default function ManageTeachersPage() {
                     </FormItem>
                   )}
                 />
+                 <FormField
+                    control={form.control}
+                    name="photo"
+                    render={({ field: { onChange, onBlur, name, ref } }) => (
+                    <FormItem>
+                        <FormLabel>{t('teacherPhoto')}</FormLabel>
+                        <FormControl>
+                            <Input
+                            type="file"
+                            accept="image/png, image/jpeg, image/gif, image/webp, image/avif"
+                            onChange={(e) => onChange(e.target.files)}
+                            onBlur={onBlur}
+                            name={name}
+                            ref={ref}
+                            disabled={isSaving}
+                            />
+                        </FormControl>
+                          <FormDescription>{t('teacherPhotoDesc')}</FormDescription>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
                 <Button type="submit" className="w-full" disabled={isSaving || !isConfigured}>
                   {isSaving ? "Saving..." : t('enrollTeacher')}
                 </Button>
@@ -257,6 +292,7 @@ export default function ManageTeachersPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>{t('photo')}</TableHead>
                 <TableHead>{t('teacherName')}</TableHead>
                 <TableHead>{t('teacherEmail')}</TableHead>
                 <TableHead>{t('role')}</TableHead>
@@ -267,6 +303,7 @@ export default function ManageTeachersPage() {
               {isLoading ? (
                 Array.from({ length: 2 }).map((_, i) => (
                   <TableRow key={i}>
+                    <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-48" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-16" /></TableCell>
@@ -275,13 +312,21 @@ export default function ManageTeachersPage() {
                 ))
               ) : teachers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell colSpan={5} className="h-24 text-center">
                     No teachers enrolled yet.
                   </TableCell>
                 </TableRow>
               ) : (
                 teachers.map((teacher) => (
                   <TableRow key={teacher.id}>
+                     <TableCell>
+                        <Avatar>
+                          <AvatarImage src={teacher.photo} alt={teacher.name} />
+                          <AvatarFallback>
+                            {teacher.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </TableCell>
                     <TableCell className="font-medium">{teacher.name}</TableCell>
                     <TableCell>{teacher.email}</TableCell>
                     <TableCell><Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge></TableCell>

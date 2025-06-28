@@ -200,6 +200,8 @@ export const translations = {
     teacherDeleted: 'Teacher Deleted!',
     teacherDeletedDesc: 'The profile for {name} has been deleted.',
     deleteTeacherConfirm: 'This will delete the teacher profile. The user account will need to be deleted manually from the authentication provider.',
+    teacherPhoto: "Teacher's Photo",
+    teacherPhotoDesc: "An optional profile photo for the teacher.",
   },
   af: {
     // Header
@@ -401,6 +403,8 @@ export const translations = {
     teacherDeleted: 'Onderwyser Uitgevee!',
     teacherDeletedDesc: 'Die profiel vir {name} is uitgevee.',
     deleteTeacherConfirm: 'Dit sal die onderwyser se profiel uitvee. Die gebruikerrekening moet handmatig van die stawingverskaffer verwyder word.',
+    teacherPhoto: "Onderwyser se Foto",
+    teacherPhotoDesc: "'n Opsionele profielfoto vir die onderwyser.",
   },
 };
 
