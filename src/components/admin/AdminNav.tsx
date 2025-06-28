@@ -1,7 +1,8 @@
+
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarDays, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, Sparkles, Briefcase } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -29,6 +30,11 @@ export function AdminNav() {
       href: "/admin/dashboard/activities",
       label: t('manageActivities'),
       icon: Sparkles,
+    },
+    {
+      href: "/admin/dashboard/teachers",
+      label: t('manageTeachers'),
+      icon: Briefcase,
     },
   ];
 

@@ -89,6 +89,13 @@ export const translations = {
     login: 'Login',
     loginSuccess: 'Login Successful',
     loginRedirecting: 'Redirecting to your dashboard...',
+    forgotPassword: 'Forgot Password?',
+    resetPassword: 'Reset Password',
+    resetPasswordSub: 'Enter your email to receive a password reset link.',
+    sendResetLink: 'Send Reset Link',
+    resetLinkSent: 'Reset Link Sent!',
+    resetLinkSentDesc: 'If an account exists for {email}, a password reset link has been sent.',
+    backToLogin: 'Back to Login',
     
     // Admin Dashboard Layout
     adminDashboard: 'Admin Dashboard',
@@ -99,6 +106,7 @@ export const translations = {
     childrenProfiles: 'Children Profiles',
     manageEvents: 'Manage Events',
     manageActivities: 'Manage Activities',
+    manageTeachers: 'Manage Teachers',
 
     // Admin Dashboard Page
     registeredChildren: 'Registered Children',
@@ -176,7 +184,22 @@ export const translations = {
     activityCreated: 'Activity Created!',
     activityCreatedDesc: 'The activity "{title}" has been successfully created.',
     activityDeleted: 'Activity Deleted!',
-    activityDeletedDesc: 'The activity "{title}" has been successfully deleted.'
+    activityDeletedDesc: 'The activity "{title}" has been successfully deleted.',
+
+    // Admin Teachers Page
+    enrollNewTeacher: 'Enroll New Teacher',
+    teacherDetails: 'Teacher Details',
+    teacherName: "Teacher's Name",
+    teacherEmail: 'Teacher Email',
+    temporaryPassword: 'Password',
+    enrollTeacher: 'Enroll Teacher',
+    existingTeachers: 'Existing Teachers',
+    role: 'Role',
+    teacherEnrolled: 'Teacher Enrolled!',
+    teacherEnrolledDesc: '{name} has been enrolled and can now log in.',
+    teacherDeleted: 'Teacher Deleted!',
+    teacherDeletedDesc: 'The profile for {name} has been deleted.',
+    deleteTeacherConfirm: 'This will delete the teacher profile. The user account will need to be deleted manually from the authentication provider.',
   },
   af: {
     // Header
@@ -267,6 +290,13 @@ export const translations = {
     login: 'Aanteken',
     loginSuccess: 'Suksesvol Aangeteken',
     loginRedirecting: 'Stuur jou na jou kontroleskerm...',
+    forgotPassword: 'Wagwoord Vergeet?',
+    resetPassword: 'Herstel Wagwoord',
+    resetPasswordSub: "Voer jou e-posadres in om 'n wagwoordherstel-skakel te ontvang.",
+    sendResetLink: 'Stuur Herstel Skakel',
+    resetLinkSent: 'Herstel Skakel Gestuur!',
+    resetLinkSentDesc: "As 'n rekening vir {email} bestaan, is 'n wagwoordherstel-skakel gestuur.",
+    backToLogin: 'Terug na Aanteken',
 
     // Admin Dashboard Layout
     adminDashboard: 'Admin Kontroleskerm',
@@ -277,6 +307,7 @@ export const translations = {
     childrenProfiles: 'Kinderprofiele',
     manageEvents: 'Bestuur Geleenthede',
     manageActivities: 'Bestuur Aktiwiteite',
+    manageTeachers: 'Bestuur Onderwysers',
 
     // Admin Dashboard Page
     registeredChildren: 'Geregistreerde Kinders',
@@ -354,10 +385,23 @@ export const translations = {
     activityCreated: 'Aktiwiteit Geskep!',
     activityCreatedDesc: 'Die aktiwiteit "{title}" is suksesvol geskep.',
     activityDeleted: 'Aktiwiteit Uitgevee!',
-    activityDeletedDesc: 'Die aktiwiteit "{title}" is suksesvol uitgevee.'
+    activityDeletedDesc: 'Die aktiwiteit "{title}" is suksesvol uitgevee.',
+
+    // Admin Teachers Page
+    enrollNewTeacher: 'Skryf Nuwe Onderwyser In',
+    teacherDetails: 'Onderwyser Besonderhede',
+    teacherName: "Onderwyser se Naam",
+    teacherEmail: 'Onderwyser E-pos',
+    temporaryPassword: 'Wagwoord',
+    enrollTeacher: 'Skryf Onderwyser In',
+    existingTeachers: 'Bestaande Onderwysers',
+    role: 'Rol',
+    teacherEnrolled: 'Onderwyser Ingeskryf!',
+    teacherEnrolledDesc: '{name} is ingeskryf en kan nou aanteken.',
+    teacherDeleted: 'Onderwyser Uitgevee!',
+    teacherDeletedDesc: 'Die profiel vir {name} is uitgevee.',
+    deleteTeacherConfirm: 'Dit sal die onderwyser se profiel uitvee. Die gebruikerrekening moet handmatig van die stawingverskaffer verwyder word.',
   },
 };
 
 export type TranslationKey = keyof typeof translations.en;
-
-    
