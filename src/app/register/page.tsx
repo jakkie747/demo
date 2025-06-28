@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle } from "lucide-react";
+import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle, HeartPulse, Shield, FileText, Calendar } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import { addChild } from "@/services/childrenService";
@@ -42,16 +44,23 @@ import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
-  childAge: z.coerce
-    .number()
-    .min(1, "Age must be at least 1")
-    .max(6, "Age must be at most 6"),
+  dateOfBirth: z.string().refine((dob) => !isNaN(new Date(dob).getTime()), {
+    message: "Please enter a valid date of birth.",
+  }),
   childGender: z.enum(["male", "female", "other"]),
-  address: z.string().min(10, "Please enter a valid address"),
+  childPhoto: z.any().optional(),
+  
   parentName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
   parentEmail: z.string().email("Invalid email address"),
   parentPhone: z.string().min(10, "Please enter a valid phone number"),
-  childPhoto: z.any().optional(),
+  address: z.string().min(10, "Please enter a valid address"),
+
+  emergencyContactName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
+  emergencyContactPhone: z.string().min(10, "Please enter a valid phone number"),
+  
+  medicalConditions: z.string().optional(),
+  previousPreschool: z.enum(["yes", "no"]),
+  additionalNotes: z.string().optional(),
 });
 
 
@@ -70,12 +79,16 @@ export default function RegisterPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       childName: "",
-      childAge: "" as any,
+      dateOfBirth: "",
       address: "",
       parentName: "",
       parentEmail: "",
       parentPhone: "",
       childPhoto: undefined,
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      medicalConditions: "",
+      additionalNotes: "",
     },
   });
 
@@ -100,11 +113,18 @@ export default function RegisterPage() {
 
       const newChildData: Omit<Child, "id"> = {
         name: values.childName,
-        age: values.childAge,
+        dateOfBirth: values.dateOfBirth,
+        gender: values.childGender,
+        address: values.address,
         parent: values.parentName,
         parentEmail: values.parentEmail,
         parentPhone: values.parentPhone,
         photo: photoUrl,
+        medicalConditions: values.medicalConditions,
+        emergencyContactName: values.emergencyContactName,
+        emergencyContactPhone: values.emergencyContactPhone,
+        previousPreschool: values.previousPreschool,
+        additionalNotes: values.additionalNotes,
       };
 
       await addChild(newChildData);
@@ -270,193 +290,301 @@ export default function RegisterPage() {
           )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <h3 className="text-xl font-headline text-primary/80">
-                {t('childInfo')}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField
-                  control={form.control}
-                  name="childName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('fullName')}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Baby className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input
+              {/* Child's Information */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2">
+                  <Baby /> {t('childInfo')}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                    control={form.control}
+                    name="childName"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('fullName')}</FormLabel>
+                        <FormControl>
+                            <Input
                             placeholder={t('egJaneDoe')}
                             {...field}
-                            className="pl-10"
                             disabled={isSubmitting}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="childAge"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('age')}</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder={t('eg3')} {...field} disabled={isSubmitting}/>
+                            />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
+                        </FormItem>
                     )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="childGender"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('gender')}</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          disabled={isSubmitting}
-                        >
+                    />
+                    <FormField
+                      control={form.control}
+                      name="dateOfBirth"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>{t('dateOfBirth')}</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t('selectGender')} />
-                            </SelectTrigger>
+                               <Input
+                                type="date"
+                                {...field}
+                                disabled={isSubmitting}
+                               />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="male">{t('male')}</SelectItem>
-                            <SelectItem value="female">{t('female')}</SelectItem>
-                            <SelectItem value="other">{t('other')}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                    />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                        control={form.control}
+                        name="childGender"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{t('gender')}</FormLabel>
+                            <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={isSubmitting}
+                            >
+                            <FormControl>
+                                <SelectTrigger>
+                                <SelectValue placeholder={t('selectGender')} />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="male">{t('male')}</SelectItem>
+                                <SelectItem value="female">{t('female')}</SelectItem>
+                                <SelectItem value="other">{t('other')}</SelectItem>
+                            </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="childPhoto"
+                        render={({ field: { onChange, onBlur, name, ref } }) => (
+                        <FormItem>
+                            <FormLabel>{t('childPhoto')}</FormLabel>
+                            <FormControl>
+                                <Input
+                                type="file"
+                                accept="image/png, image/jpeg, image/gif, image/webp, image/avif"
+                                onChange={(e) => onChange(e.target.files)}
+                                onBlur={onBlur}
+                                name={name}
+                                ref={ref}
+                                disabled={isSubmitting}
+                                />
+                            </FormControl>
+                             <FormDescription>{t('childPhotoDesc')}</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
                 </div>
               </div>
-              <FormField
-                control={form.control}
-                name="childPhoto"
-                render={({ field: { onChange, onBlur, name, ref } }) => (
-                  <FormItem>
-                    <FormLabel>{t('childPhoto')}</FormLabel>
-                     <FormControl>
-                      <div className="relative">
-                        <Upload className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                          type="file"
-                          accept="image/png, image/jpeg, image/gif, image/webp, image/avif"
-                          onChange={(e) => onChange(e.target.files)}
-                          onBlur={onBlur}
-                          name={name}
-                          ref={ref}
-                          className="pl-10"
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      {t('childPhotoDesc')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <h3 className="text-xl font-headline text-primary/80 pt-4">
-                {t('parentInfo')}
-              </h3>
-              <FormField
-                control={form.control}
-                name="parentName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('fullName')}</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                          placeholder={t('egJohnSmith')}
-                          {...field}
-                          className="pl-10"
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              
+              {/* Parent Information */}
+               <div className="space-y-4 pt-4">
+                <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2">
+                   <User /> {t('parentInfo')}
+                </h3>
                 <FormField
-                  control={form.control}
-                  name="parentEmail"
-                  render={({ field }) => (
+                    control={form.control}
+                    name="parentName"
+                    render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('emailAddress')}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input
+                        <FormLabel>{t('fullName')}</FormLabel>
+                        <FormControl>
+                            <Input
+                            placeholder={t('egJohnSmith')}
+                            {...field}
+                            disabled={isSubmitting}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                    control={form.control}
+                    name="parentEmail"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('emailAddress')}</FormLabel>
+                        <FormControl>
+                           <Input
                             type="email"
                             placeholder={t('egEmail')}
                             {...field}
-                            className="pl-10"
                             disabled={isSubmitting}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="parentPhone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('phoneNumber')}</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="parentPhone"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('phoneNumber')}</FormLabel>
+                        <FormControl>
+                           <Input
                             type="tel"
                             placeholder={t('egPhone')}
                             {...field}
-                            className="pl-10"
                             disabled={isSubmitting}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{t('physicalAddress')}</FormLabel>
+                        <FormControl>
+                           <Textarea
+                            placeholder={t('egAddress')}
+                            {...field}
+                            disabled={isSubmitting}
+                            />
+                        </FormControl>
+                        <FormMessage />
                     </FormItem>
-                  )}
+                    )}
                 />
               </div>
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('physicalAddress')}</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Home className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                        <Textarea
-                          placeholder={t('egAddress')}
-                          {...field}
-                          className="pl-10"
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
+               {/* Emergency & Medical Information */}
+               <div className="space-y-4 pt-4">
+                 <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2">
+                   <HeartPulse /> {t('emergencyMedicalInfo')}
+                </h3>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                        control={form.control}
+                        name="emergencyContactName"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{t('emergencyContactName')}</FormLabel>
+                            <FormControl>
+                                <Input
+                                placeholder={t('egEmergencyContact')}
+                                {...field}
+                                disabled={isSubmitting}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="emergencyContactPhone"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{t('emergencyContactPhone')}</FormLabel>
+                            <FormControl>
+                                <Input
+                                type="tel"
+                                placeholder={t('egEmergencyPhone')}
+                                {...field}
+                                disabled={isSubmitting}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                 </div>
+                 <FormField
+                    control={form.control}
+                    name="medicalConditions"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('medicalConditions')}</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder={t('egMedical')}
+                            {...field}
+                            disabled={isSubmitting}
+                            />
+                        </FormControl>
+                         <FormDescription>{t('medicalConditionsDesc')}</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+              </div>
+
+              {/* Other Information */}
+               <div className="space-y-4 pt-4">
+                 <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2">
+                   <FileText /> {t('otherInfo')}
+                </h3>
+                 <FormField
+                    control={form.control}
+                    name="previousPreschool"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                            <FormLabel>{t('previousPreschool')}</FormLabel>
+                             <FormDescription>{t('previousPreschoolDesc')}</FormDescription>
+                            <FormControl>
+                                <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                                disabled={isSubmitting}
+                                >
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                    <RadioGroupItem value="yes" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                    {t('yes')}
+                                    </FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                    <RadioGroupItem value="no" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                    {t('no')}
+                                    </FormLabel>
+                                </FormItem>
+                                </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                 />
+                 <FormField
+                    control={form.control}
+                    name="additionalNotes"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('additionalNotes')}</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder={t('egNotes')}
+                            {...field}
+                            disabled={isSubmitting}
+                            />
+                        </FormControl>
+                         <FormDescription>{t('additionalNotesDesc')}</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+              </div>
+
               <Button type="submit" size="lg" className="w-full font-semibold" disabled={isSubmitting || !isConfigured}>
                  {isSubmitting ? "Submitting..." : t('submitRegistration')}
               </Button>
@@ -476,3 +604,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+    

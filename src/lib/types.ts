@@ -1,13 +1,21 @@
+
 import type { TranslationKey } from "@/lib/translations";
 
 export interface Child {
   id: string;
   name: string;
-  age: number;
+  dateOfBirth: string;
+  gender: 'male' | 'female' | 'other';
+  address: string;
   parent: string;
   parentEmail: string;
   parentPhone: string;
   photo: string;
+  medicalConditions?: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  previousPreschool: 'yes' | 'no';
+  additionalNotes?: string;
 }
 
 export interface Event {
@@ -30,3 +38,5 @@ export interface Activity {
   updatedAt?: any; // For Firestore timestamp
   aiHint?: string;
 }
+
+    

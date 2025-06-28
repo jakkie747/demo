@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -27,6 +28,18 @@ export default function ChildrenPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isConfigured, setIsConfigured] = useState(false);
+
+  const calculateAge = (dobString: string): number | string => {
+    if (!dobString || isNaN(new Date(dobString).getTime())) return "N/A";
+    const dob = new Date(dobString);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const fetchChildren = useCallback(async () => {
     setIsLoading(true);
@@ -78,7 +91,7 @@ export default function ChildrenPage() {
               <TableHead>{t('photo')}</TableHead>
               <TableHead>{t('profileNo')}</TableHead>
               <TableHead>{t('childsName')}</TableHead>
-              <TableHead>{t('age')}</TableHead>
+              <TableHead>{t('ageInTable')}</TableHead>
               <TableHead>{t('parentsName')}</TableHead>
               <TableHead>{t('parentEmail')}</TableHead>
               <TableHead>{t('parentPhone')}</TableHead>
@@ -132,7 +145,9 @@ export default function ChildrenPage() {
                     <Badge variant="outline">{child.id.substring(0, 8)}...</Badge>
                   </TableCell>
                   <TableCell className="font-medium">{child.name}</TableCell>
-                  <TableCell>{child.age}</TableCell>
+                  <TableCell>
+                    {child.dateOfBirth ? calculateAge(child.dateOfBirth) : (child as any).age || "N/A"}
+                  </TableCell>
                   <TableCell>{child.parent}</TableCell>
                   <TableCell>{child.parentEmail}</TableCell>
                   <TableCell>{child.parentPhone}</TableCell>
@@ -145,3 +160,5 @@ export default function ChildrenPage() {
     </div>
   );
 }
+
+    
