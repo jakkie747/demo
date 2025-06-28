@@ -113,6 +113,7 @@ export default function ChildrenPage() {
     defaultValues: {
       name: "",
       dateOfBirth: "",
+      gender: "other",
       parent: "",
       parentEmail: "",
       parentPhone: "",
@@ -120,6 +121,7 @@ export default function ChildrenPage() {
       emergencyContactName: "",
       emergencyContactPhone: "",
       medicalConditions: "",
+      previousPreschool: "no",
       additionalNotes: "",
       photo: undefined,
     }
@@ -555,22 +557,18 @@ export default function ChildrenPage() {
                                 className="flex gap-4"
                                 disabled={isSaving}
                                 >
-                                <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
+                                <div className="flex items-center space-x-3 space-y-0">
                                     <RadioGroupItem value="yes" id="edit-r-yes" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal" htmlFor="edit-r-yes">
+                                    <Label className="font-normal" htmlFor="edit-r-yes">
                                     {t('yes')}
-                                    </FormLabel>
-                                </FormItem>
-                                <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
+                                    </Label>
+                                </div>
+                                <div className="flex items-center space-x-3 space-y-0">
                                     <RadioGroupItem value="no" id="edit-r-no" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal" htmlFor="edit-r-no">
+                                    <Label className="font-normal" htmlFor="edit-r-no">
                                     {t('no')}
-                                    </FormLabel>
-                                </FormItem>
+                                    </Label>
+                                </div>
                                 </RadioGroup>
                             </FormControl>
                             <FormMessage />
@@ -608,7 +606,5 @@ export default function ChildrenPage() {
     </div>
   );
 }
-
-    
 
     
