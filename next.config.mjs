@@ -1,5 +1,11 @@
-
 import withPWAInit from '@ducanh2912/next-pwa';
+
+const withPWA = withPWAInit({
+  dest: 'public',
+  disable: false,
+  register: true,
+  skipWaiting: true,
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,15 +22,5 @@ const nextConfig = {
     ],
   },
 };
-
-const withPWA = withPWAInit({
-  dest: 'public',
-  disable: false, // This forces PWA features on in development
-  register: true,
-  skipWaiting: true,
-  fallbacks: {
-    document: '/offline',
-  },
-});
 
 export default withPWA(nextConfig);
