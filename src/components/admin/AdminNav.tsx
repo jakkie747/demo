@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarDays, Sparkles, Briefcase } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, Sparkles, Briefcase, Bell } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -35,6 +35,11 @@ export function AdminNav() {
       href: "/admin/dashboard/teachers",
       label: t('manageTeachers'),
       icon: Briefcase,
+    },
+    {
+      href: "/admin/dashboard/notifications",
+      label: t('sendNotifications'),
+      icon: Bell,
     },
   ];
 

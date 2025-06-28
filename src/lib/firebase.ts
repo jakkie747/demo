@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 import { getAuth, type Auth } from "firebase/auth";
+import { getMessaging, type Messaging } from "firebase/messaging";
 
 // =================================================================================
 // CRITICAL: COMPLETE YOUR FIREBASE CONFIGURATION
@@ -33,6 +34,7 @@ let app: FirebaseApp | null = null;
 let db: any | null = null;
 let storage: FirebaseStorage | any | null = null;
 let auth: Auth | null = null;
+let messaging: Messaging | null = null;
 
 // Helper to check if the config is populated, so we can show a nice error.
 export const isFirebaseConfigured = () => {
@@ -48,6 +50,10 @@ if (isFirebaseConfigured()) {
     db = getFirestore(app);
     storage = getStorage(app);
     auth = getAuth(app);
+    
+    if (typeof window !== 'undefined') {
+        messaging = getMessaging(app);
+    }
 }
 
-export { app, db, storage, auth };
+export { app, db, storage, auth, messaging };

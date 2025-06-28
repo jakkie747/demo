@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Languages, Download } from "lucide-react";
+import { Menu, Languages, Download, BellRing } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -16,12 +16,14 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
+import { useFcmToken } from "@/hooks/useFcmToken";
 
 export function Header() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const { permission, requestPermission, isRequesting } = useFcmToken();
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -92,6 +94,15 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          {permission === 'default' && (
+            <div className="hidden md:flex">
+              <Button onClick={requestPermission} disabled={isRequesting} variant="outline">
+                <BellRing className="mr-2" />
+                {isRequesting ? t('enabling') : t('enableNotifications')}
+              </Button>
+            </div>
+          )}
+
           <div className="hidden md:flex">
              <Button variant="outline" onClick={handleLanguageToggle}>
               {language === 'en' ? 'Afrikaans' : 'English'}
@@ -146,6 +157,23 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
+                
+                {permission === 'default' && (
+                  <button
+                    onClick={() => {
+                      requestPermission();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    disabled={isRequesting}
+                    className={cn(
+                      "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60",
+                      isRequesting && "opacity-50"
+                    )}
+                  >
+                    <BellRing className="mr-4 h-5 w-5" />
+                    {isRequesting ? t('enabling') : t('enableNotifications')}
+                  </button>
+                )}
                 
                 {!!installPrompt && (
                   <button
