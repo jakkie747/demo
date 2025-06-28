@@ -124,32 +124,104 @@ export default function RegisterPage() {
         setSubmissionError({
           title: errorTitle,
           description: (
-             <div className="space-y-4 text-sm">
-                <p className="font-bold text-base">The error <code className="text-destructive bg-destructive/10 px-1 py-0.5 rounded">NotFoundException: 404 The specified bucket does not exist</code> means Firebase Storage must be enabled first.</p>
+            <div className="space-y-4 text-sm">
+                <p className="font-bold text-base">
+                  The error{' '}
+                  <code className="text-destructive bg-destructive/10 px-1 py-0.5 rounded">
+                    NotFoundException: 404 The specified bucket does not exist
+                  </code>{' '}
+                  means one of two things:
+                </p>
+                <ul className="list-disc list-inside space-y-1 pl-2">
+                    <li>Firebase Storage has not been enabled for your project yet.</li>
+                    <li>The `storageBucket` value in your `src/lib/firebase.ts` file is incorrect.</li>
+                </ul>
 
-                <div className="font-bold text-lg mt-4">Fix: Enable Storage & Apply Rules</div>
+
+                <div className="font-bold text-lg mt-4">Fix: Enable & Verify Storage</div>
                 <ol className="list-decimal list-inside space-y-3 pl-2">
                   <li>
                     <strong className="text-destructive">CRITICAL FIRST STEP: Enable Firebase Storage.</strong>
                     <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
-                        <li>Go to your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">Firebase Console Storage section</a>.</li>
-                        <li>If you see a "Get Started" screen, click through the prompts to enable it.</li>
-                        <li><strong>You must do this before the other steps.</strong></li>
+                      <li>
+                        Go to your{' '}
+                        <a
+                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline font-semibold"
+                        >
+                          Firebase Console Storage section
+                        </a>
+                        .
+                      </li>
+                      <li>
+                        If you see a "Get Started" screen, click through the prompts to enable it.
+                      </li>
+                      <li>
+                        <strong>You must do this before the other steps.</strong>
+                      </li>
+                    </ul>
+                  </li>
+                   <li>
+                    <strong>Verify your Storage Bucket name.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
+                        <li>
+                            In the Firebase Console Storage section, at the top of the 'Files' tab, you will see your bucket URL. It will look like `gs://your-project-id.appspot.com`.
+                        </li>
+                        <li>
+                            Open the file `src/lib/firebase.ts` in your project.
+                        </li>
+                         <li>
+                            Confirm that the `storageBucket` value in the file **exactly matches** the bucket name from the Firebase Console (without the `gs://` prefix).
+                        </li>
+                        <li>If it does not match, update `storageBucket` in `firebase.ts` now.</li>
                     </ul>
                   </li>
                   <li>
                     <strong>Update Storage Rules.</strong>
-                     <ul className="list-disc list-inside pl-4 mt-1">
-                        <li>Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage Rules</a>.</li>
-                        <li>Replace the existing rules with the content from the <strong>storage.rules</strong> file in your project, then click <strong>Publish</strong>.</li>
+                    <ul className="list-disc list-inside pl-4 mt-1">
+                      <li>
+                        Open your{' '}
+                        <a
+                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          Firebase Console Storage Rules
+                        </a>
+                        .
+                      </li>
+                      <li>
+                        Replace the existing rules with the content from the{' '}
+                        <strong>storage.rules</strong> file in your project, then click{' '}
+                        <strong>Publish</strong>.
+                      </li>
                     </ul>
                   </li>
                   <li>
                     <strong>Apply CORS Policy in Cloud Shell.</strong>
                     <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
-                      <li>Open the <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Shell</a>. This may take a moment to load.</li>
-                      <li>Run these two commands exactly as shown:
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2">{"echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json"}</pre>
+                      <li>
+                        Open the{' '}
+                        <a
+                          href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          Google Cloud Shell
+                        </a>
+                        . This may take a moment to load.
+                      </li>
+                      <li>
+                        Run these two commands exactly as shown:
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2">
+                          {
+                            "echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json"
+                          }
+                        </pre>
                         <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
                       </li>
                     </ul>
