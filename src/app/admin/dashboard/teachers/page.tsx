@@ -34,7 +34,7 @@ import type { Teacher } from "@/lib/types";
 import { getTeachers, deleteTeacher } from "@/services/teacherService";
 import { deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
+import { auth, isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,7 @@ export default function ManageTeachersPage() {
   const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConfigured, setIsConfigured] = useState(false);
+  const currentUser = auth?.currentUser;
 
   const fetchTeachers = useCallback(async () => {
     setIsLoading(true);
@@ -190,7 +191,7 @@ export default function ManageTeachersPage() {
                             size="icon"
                             className="text-destructive hover:text-destructive"
                             onClick={() => handleDeleteClick(teacher)}
-                            disabled={teacher.role === 'admin'}
+                            disabled={teacher.id === currentUser?.uid}
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>
