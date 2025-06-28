@@ -502,17 +502,17 @@ export default function ChildrenPage() {
                     <FormField
                       control={form.control}
                       name="photo"
-                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                      render={({ field }) => (
                         <FormItem>
                           <FormLabel>{t('childPhoto')}</FormLabel>
                           <FormControl>
                             <Input
                               type="file"
                               accept="image/*"
-                              onBlur={onBlur}
-                              name={name}
-                              ref={ref}
-                              onChange={(e) => onChange(e.target.files)}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                              ref={field.ref}
+                              onChange={(e) => field.onChange(e.target.files)}
                               disabled={isSaving}
                             />
                           </FormControl>
@@ -545,36 +545,36 @@ export default function ChildrenPage() {
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">{t('otherInfo')}</h3>
                      <FormField
-                        control={form.control}
-                        name="previousPreschool"
-                        render={({ field }) => (
-                          <FormItem className="space-y-3">
-                            <FormLabel>{t('previousPreschool')}</FormLabel>
-                            <FormControl>
-                                <RadioGroup
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                className="flex gap-4"
-                                disabled={isSaving}
-                                >
-                                <div className="flex items-center space-x-3 space-y-0">
-                                    <RadioGroupItem value="yes" id="edit-r-yes" />
-                                    <Label className="font-normal" htmlFor="edit-r-yes">
-                                    {t('yes')}
-                                    </Label>
-                                </div>
-                                <div className="flex items-center space-x-3 space-y-0">
-                                    <RadioGroupItem value="no" id="edit-r-no" />
-                                    <Label className="font-normal" htmlFor="edit-r-no">
-                                    {t('no')}
-                                    </Label>
-                                </div>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      control={form.control}
+                      name="previousPreschool"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel>{t('previousPreschool')}</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="flex flex-col space-y-1"
+                              disabled={isSaving}
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="yes" />
+                                </FormControl>
+                                <FormLabel className="font-normal">{t('yes')}</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="no" />
+                                </FormControl>
+                                <FormLabel className="font-normal">{t('no')}</FormLabel>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                      <FormField control={form.control} name="additionalNotes" render={({ field }) => ( <FormItem> <FormLabel>{t('additionalNotes')}</FormLabel> <FormControl> <Textarea {...field} disabled={isSaving} /> </FormControl> <FormMessage /> </FormItem> )} />
                   </div>
                 </div>
@@ -606,5 +606,3 @@ export default function ChildrenPage() {
     </div>
   );
 }
-
-    
