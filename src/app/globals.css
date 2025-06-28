@@ -79,7 +79,7 @@
     @apply border-border;
   }
   body {
-    @apply text-foreground;
+    @apply text-foreground bg-transparent;
   }
   
   .dark body {
