@@ -88,23 +88,26 @@ define(['./workbox-1e54d6fe'], (function (workbox) { 'use strict';
   workbox.registerRoute("/", new workbox.NetworkFirst({
     "cacheName": "start-url",
     plugins: [{
-      cacheWillUpdate: function (_) {
-        return _ref.apply(this, arguments);
-      }
+      cacheWillUpdate: async ({
+        response: e
+      }) => e && "opaqueredirect" === e.type ? new Response(e.body, {
+        status: 200,
+        statusText: "OK",
+        headers: e.headers
+      }) : e
     }, {
-      handlerDidError: function (_) {
-        return _ref.apply(this, arguments);
-      }
+      handlerDidError: async ({
+        request: e
+      }) => "undefined" != typeof self ? self.fallback(e) : Response.error()
     }]
   }), 'GET');
   workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
     "cacheName": "dev",
     plugins: [{
-      handlerDidError: function (_) {
-        return _ref.apply(this, arguments);
-      }
+      handlerDidError: async ({
+        request: e
+      }) => "undefined" != typeof self ? self.fallback(e) : Response.error()
     }]
   }), 'GET');
-  self.__WB_DISABLE_DEV_LOGS = true;
 
 }));

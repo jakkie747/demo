@@ -31,6 +31,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <meta name="theme-color" content="#59ABEF" />
+        <link rel="apple-touch-icon" href="https://placehold.co/180x180.png" />
       </head>
       <body className={cn("min-h-screen bg-background font-body antialiased")}>
         <LanguageProvider>
