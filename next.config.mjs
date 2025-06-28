@@ -1,32 +1,30 @@
 
-import withPWA from "@ducanh2912/next-pwa";
-
-const pwaConfig = withPWA({
-  dest: "public",
-  disable: false,
-  register: true,
-  skipWaiting: true,
-  cacheOnFrontEndNav: true,
-  reloadOnOnline: true,
-  fallbacks: {
-    document: "/offline",
-  },
-});
+import withPWAInit from '@ducanh2912/next-pwa';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "firebasestorage.googleapis.com",
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
       },
       {
-        protocol: "https",
-        hostname: "placehold.co",
+        protocol: 'https',
+        hostname: 'placehold.co',
       },
     ],
   },
 };
 
-export default pwaConfig(nextConfig);
+const withPWA = withPWAInit({
+  dest: 'public',
+  disable: false, // This forces PWA features on in development
+  register: true,
+  skipWaiting: true,
+  fallbacks: {
+    document: '/offline',
+  },
+});
+
+export default withPWA(nextConfig);
