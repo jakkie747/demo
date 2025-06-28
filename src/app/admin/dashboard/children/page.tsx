@@ -22,24 +22,38 @@ import { useToast } from "@/hooks/use-toast";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { AlertTriangle } from "lucide-react";
 
+const ChildAge = ({ dobString }: { dobString: string }) => {
+  const [age, setAge] = useState<number | string>('');
+
+  useEffect(() => {
+    if (!dobString || isNaN(new Date(dobString).getTime())) {
+      setAge("N/A");
+      return;
+    }
+    // This logic is now safe inside useEffect, as it only runs on the client
+    const dob = new Date(dobString);
+    const today = new Date();
+    let calculatedAge = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      calculatedAge--;
+    }
+    setAge(calculatedAge >= 0 ? calculatedAge : "N/A");
+  }, [dobString]);
+
+  if (age === '') {
+    return <Skeleton className="h-4 w-10" />;
+  }
+
+  return <>{age}</>;
+};
+
 export default function ChildrenPage() {
   const [children, setChildren] = useState<Child[]>([]);
   const { t } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isConfigured, setIsConfigured] = useState(false);
-
-  const calculateAge = (dobString: string): number | string => {
-    if (!dobString || isNaN(new Date(dobString).getTime())) return "N/A";
-    const dob = new Date(dobString);
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const monthDiff = today.getMonth() - dob.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-      age--;
-    }
-    return age;
-  };
 
   const fetchChildren = useCallback(async () => {
     setIsLoading(true);
@@ -146,7 +160,7 @@ export default function ChildrenPage() {
                   </TableCell>
                   <TableCell className="font-medium">{child.name}</TableCell>
                   <TableCell>
-                    {child.dateOfBirth ? calculateAge(child.dateOfBirth) : (child as any).age || "N/A"}
+                    {child.dateOfBirth ? <ChildAge dobString={child.dateOfBirth} /> : (child as any).age || "N/A"}
                   </TableCell>
                   <TableCell>{child.parent}</TableCell>
                   <TableCell>{child.parentEmail}</TableCell>
@@ -160,5 +174,3 @@ export default function ChildrenPage() {
     </div>
   );
 }
-
-    

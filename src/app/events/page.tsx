@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -18,6 +19,29 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { isFirebaseConfigured } from "@/lib/firebase";
+
+const FormattedEventDate = ({ date, language }: { date: string; language: string; }) => {
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    // This logic is now safe inside useEffect, as it only runs on the client
+    setFormattedDate(
+      new Date(date).toLocaleDateString(language, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      })
+    );
+  }, [date, language]);
+
+  if (!formattedDate) {
+    return <Skeleton className="h-4 w-32" />;
+  }
+  
+  return <span>{formattedDate}</span>;
+};
+
 
 export default function EventsPage() {
   const { t, language } = useLanguage();
@@ -129,14 +153,7 @@ export default function EventsPage() {
               <CardFooter className="p-6 pt-0">
                 <div className="flex items-center text-muted-foreground">
                   <Calendar className="mr-2 h-4 w-4" />
-                  <span>
-                    {new Date(event.date).toLocaleDateString(language, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      timeZone: "UTC",
-                    })}
-                  </span>
+                  <FormattedEventDate date={event.date} language={language} />
                 </div>
               </CardFooter>
             </Card>
