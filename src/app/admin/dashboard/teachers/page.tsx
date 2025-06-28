@@ -149,9 +149,10 @@ export default function ManageTeachersPage() {
 
   async function onSubmit(values: z.infer<typeof teacherFormSchema>) {
     setIsSaving(true);
-    try {
-      if (editingTeacher) {
-        // Logic for UPDATING a teacher
+
+    if (editingTeacher) {
+      // UPDATE LOGIC
+      try {
         let photoUrl = editingTeacher.photo;
         const file = values.photo?.[0];
 
@@ -163,60 +164,68 @@ export default function ManageTeachersPage() {
           photoUrl = newPhotoUrl;
         }
 
-        const teacherUpdatePayload = {
+        const updatePayload = {
           name: values.name,
           email: values.email,
           photo: photoUrl,
         };
-        
+
         if (!db) throw new Error("Firebase is not configured.");
-        const teacherDoc = doc(db, 'teachers', editingTeacher.id);
-        await updateDoc(teacherDoc, teacherUpdatePayload);
+        const teacherDocRef = doc(db, 'teachers', editingTeacher.id);
+        await updateDoc(teacherDocRef, updatePayload);
 
         toast({
           title: t('teacherUpdated'),
           description: t('teacherUpdatedDesc', { name: values.name }),
         });
-
-      } else {
-        // Logic for CREATING a new teacher
+        
+      } catch (error) {
+        const errorMessage = (error as Error).message || "Could not update the teacher.";
+        toast({ variant: "destructive", title: "Error", description: errorMessage });
+        setIsSaving(false);
+        return; // Stop execution on error
+      }
+    } else {
+      // CREATE LOGIC
+      try {
         if (!values.password) {
-            form.setError("password", { type: "manual", message: "Password is required for new teachers." });
-            setIsSaving(false);
-            return;
+          form.setError("password", { type: "manual", message: "Password is required for new teachers." });
+          setIsSaving(false);
+          return;
         }
 
         const file = values.photo?.[0];
         let photoUrl = "https://placehold.co/100x100.png";
 
         if (file) {
-            photoUrl = await uploadImage(file, 'teachers');
+          photoUrl = await uploadImage(file, 'teachers');
         }
 
         const newTeacher: Omit<Teacher, 'id'> = {
-            name: values.name,
-            email: values.email,
-            password_insecure: values.password,
-            role: 'teacher',
-            photo: photoUrl,
+          name: values.name,
+          email: values.email,
+          password_insecure: values.password,
+          role: 'teacher',
+          photo: photoUrl,
         };
         await addTeacher(newTeacher);
         toast({
           title: t('teacherEnrolled'),
           description: t('teacherEnrolledDesc', { name: values.name }),
         });
+      } catch (error) {
+        const errorMessage = (error as Error).message || "Could not enroll new teacher.";
+        toast({ variant: "destructive", title: "Error", description: errorMessage });
+        setIsSaving(false);
+        return; // Stop execution on error
       }
-      
-      await fetchTeachers();
-      setEditingTeacher(null);
-      form.reset();
-
-    } catch (error) {
-      const errorMessage = (error as Error).message || "Could not save the teacher.";
-      toast({ variant: "destructive", title: "Error", description: errorMessage });
-    } finally {
-      setIsSaving(false);
     }
+
+    // This runs only on success for both create and update
+    await fetchTeachers();
+    setEditingTeacher(null);
+    form.reset();
+    setIsSaving(false);
   }
 
   if (!isConfigured) {
@@ -467,5 +476,3 @@ export default function ManageTeachersPage() {
     </div>
   );
 }
-
-    
