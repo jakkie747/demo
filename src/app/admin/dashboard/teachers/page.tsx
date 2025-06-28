@@ -162,7 +162,7 @@ export default function ManageTeachersPage() {
           photoUrl = newPhotoUrl;
         }
 
-        const teacherUpdatePayload: Partial<Teacher> = {
+        const teacherUpdatePayload = {
           name: values.name,
           email: values.email,
           photo: photoUrl,
