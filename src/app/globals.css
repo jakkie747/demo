@@ -79,7 +79,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+  }
+  
+  .dark body {
+    @apply bg-background;
   }
 
   .with-bg-image::before {
@@ -91,6 +95,7 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    opacity: 0.15;
   }
 
   .dark .with-bg-image::before {

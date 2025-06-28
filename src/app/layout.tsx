@@ -38,10 +38,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#59ABEF" />
         <link rel="apple-touch-icon" href="https://placehold.co/180x180.png" />
       </head>
-      <body className={cn("min-h-screen font-body antialiased")}>
+      <body className={cn("min-h-screen font-body antialiased with-bg-image")}>
         <LanguageProvider>
           <PwaRegistry />
-          <div className="relative isolate flex min-h-dvh flex-col with-bg-image">
+          <div className="relative isolate flex min-h-dvh flex-col bg-background/80">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
