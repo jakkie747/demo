@@ -1,6 +1,6 @@
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, doc, deleteDoc, query, where, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import type { Teacher } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
 
