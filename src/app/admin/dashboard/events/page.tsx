@@ -210,17 +210,25 @@ export default function ManageEventsPage() {
           setSubmissionError({
             title: errorTitle,
             description: (
-              <div className="space-y-2 text-sm">
+              <div className="space-y-3 text-sm">
                   <p>This is a common Firebase setup issue related to security rules. It can be fixed by allowing public access for development.</p>
-                  <p className="font-bold mt-2">To Fix Firestore (Database) Rules:</p>
-                  <p>1. Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Firestore Rules</a>.</p>
-                  <p>2. Replace the existing rules with the content from the <strong>firestore.rules</strong> file in your project.</p>
-                  <p className="font-bold mt-2">To Fix Storage (File Upload) Rules & CORS:</p>
-                  <p>1. Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage Rules</a>.</p>
-                  <p>2. Replace the existing rules with the content from the <strong>storage.rules</strong> file in your project.</p>
-                  <p className="mt-2">If uploads still fail, apply the CORS policy using Google Cloud Shell:</p>
-                  <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto">{"echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json"}</pre>
-                  <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+                  
+                  <div className="font-bold">Step 1: Update Firestore (Database) Rules</div>
+                  <ol className="list-decimal list-inside space-y-1 pl-2">
+                      <li>Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Firestore Rules</a>.</li>
+                      <li>Replace the existing rules with the content from the <strong>firestore.rules</strong> file in your project, then click <strong>Publish</strong>.</li>
+                  </ol>
+
+                  <div className="font-bold">Step 2: Update Storage (File Upload) Rules & CORS</div>
+                   <ol className="list-decimal list-inside space-y-1 pl-2">
+                      <li>Go to your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage section</a>. If you see a "Get Started" button, click it to enable and create your default storage bucket. This is required.</li>
+                      <li>Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage Rules</a>.</li>
+                      <li>Replace the existing rules with the content from the <strong>storage.rules</strong> file in your project, then click <strong>Publish</strong>.</li>
+                      <li>Apply the CORS policy by running these commands in the <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Shell</a>:</li>
+                  </ol>
+                  <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto ml-2">{"echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json"}</pre>
+                  <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 ml-2">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+                  <p className="text-xs text-muted-foreground ml-2">If you get a "bucket does not exist" error, it means Storage was not enabled in step 2.1.</p>
               </div>
             )
           });
