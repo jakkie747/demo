@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { PwaRegistry } from "@/components/PwaRegistry";
 
 export const metadata: Metadata = {
   title: "Blinkogies Family Hub",
@@ -39,6 +40,7 @@ export default function RootLayout({
       </head>
       <body className={cn("min-h-screen bg-background font-body antialiased")}>
         <LanguageProvider>
+          <PwaRegistry />
           <div className="relative flex min-h-dvh flex-col">
             <Header />
             <main className="flex-1">{children}</main>

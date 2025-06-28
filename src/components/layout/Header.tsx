@@ -22,18 +22,47 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePwaInstall } from "@/hooks/usePwaInstall";
 
 export function Header() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { install, canInstall } = usePwaInstall();
-  const [isClient, setIsClient] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
 
   useEffect(() => {
-    setIsClient(true);
+    const handleBeforeInstallPrompt = (event: Event) => {
+      // Prevent the default browser install prompt
+      event.preventDefault();
+      // Stash the event so it can be triggered later.
+      console.log("PWA: 'beforeinstallprompt' event fired.");
+      setInstallPrompt(event);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    console.log("PWA: 'beforeinstallprompt' event listener added.");
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
+      console.log("PWA: 'beforeinstallprompt' event listener removed.");
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!installPrompt) {
+      return;
+    }
+    await installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") {
+      console.log("PWA: User accepted the install prompt");
+    } else {
+      console.log("PWA: User dismissed the install prompt");
+    }
+    setInstallPrompt(null);
+  };
 
   const navLinks = [
     { href: "/", label: t("home") },
@@ -82,9 +111,9 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {isClient && canInstall && (
+          {!!installPrompt && (
             <div className="hidden md:flex">
-              <Button onClick={install}>
+              <Button onClick={handleInstallClick}>
                 <Download className="mr-2" />
                 {t("installApp")}
               </Button>
@@ -131,10 +160,10 @@ export function Header() {
                   </Link>
                 ))}
                 
-                {isClient && canInstall && (
+                {!!installPrompt && (
                   <button
                     onClick={() => {
-                      install();
+                      handleInstallClick();
                       setIsMobileMenuOpen(false);
                     }}
                     className={cn(
