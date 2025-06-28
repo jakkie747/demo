@@ -1,11 +1,14 @@
+
 {
   "name": "Blinkogies Family Hub",
   "short_name": "Blinkogies",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#E5F6FE",
-  "theme_color": "#59ABEF",
   "description": "A family hub for Blinkogies Pre-school",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F0F9FF",
+  "theme_color": "#59ABEF",
   "icons": [
     {
       "src": "https://placehold.co/192x192.png",

@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
@@ -10,6 +11,9 @@ export const metadata: Metadata = {
   title: "Blinkogies Family Hub",
   description: "A family hub for Blinkogies Pre-school",
   manifest: "/manifest.json",
+  icons: {
+    apple: "https://placehold.co/180x180.png",
+  },
 };
 
 export default function RootLayout({
@@ -32,7 +36,6 @@ export default function RootLayout({
         />
         <meta name="theme-color" content="#59ABEF" />
         <link rel="apple-touch-icon" href="https://placehold.co/180x180.png" />
-        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={cn("min-h-screen bg-background font-body antialiased")}>
         <LanguageProvider>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -17,7 +18,10 @@ export const usePwaInstall = () => {
   const [installPrompt, setInstallPrompt] = useState<CustomBeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
+    console.log("usePwaInstall: Hook is active, adding event listener.");
+
     const handleBeforeInstallPrompt = (event: Event) => {
+      console.log("usePwaInstall: 'beforeinstallprompt' event has been fired!");
       // Prevent the mini-infobar from appearing on mobile
       event.preventDefault();
       // Stash the event so it can be triggered later.
@@ -28,12 +32,14 @@ export const usePwaInstall = () => {
 
     // Clean up the event listener
     return () => {
+      console.log("usePwaInstall: Hook is cleaning up, removing event listener.");
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
 
   const install = async () => {
     if (!installPrompt) {
+      console.error("usePwaInstall: Install was called but no install prompt is available.");
       return;
     }
     // Show the browser's install prompt

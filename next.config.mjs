@@ -1,14 +1,9 @@
-import withPWAInit from '@ducanh2912/next-pwa';
 
-const withPWA = withPWAInit({
-  dest: 'public',
-  disable: false,
-  register: true,
-  skipWaiting: true,
-});
+import withPWA from '@ducanh2912/next-pwa';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Your regular Next.js config
   images: {
     remotePatterns: [
       {
@@ -23,4 +18,15 @@ const nextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+const withPWAConfig = withPWA({
+  dest: 'public',
+  // This is the crucial change. By default, PWA features are disabled in development.
+  // Setting this to false forces them to be enabled.
+  disable: false, 
+  register: true,
+  skipWaiting: true,
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+});
+
+export default withPWAConfig(nextConfig);
