@@ -6,7 +6,12 @@ import { usePathname } from "next/navigation";
 
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import {
@@ -88,6 +93,7 @@ export function Header() {
               side="left"
               className="w-full max-w-xs bg-background p-6"
             >
+              <SheetTitle className="sr-only">Menu</SheetTitle>
               <div className="mb-8">
                 <Logo />
               </div>
