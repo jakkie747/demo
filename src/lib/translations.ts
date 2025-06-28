@@ -153,6 +153,9 @@ export const translations = {
     childDeleted: 'Child Profile Deleted!',
     childDeletedDesc: "The profile for {name} has been permanently deleted.",
     areYouSureDeleteChild: 'This will permanently delete the profile for {name}.',
+    parentDetails: 'Parent Details',
+    emergencyContact: 'Emergency Contact',
+    medicalNotes: 'Medical Notes',
 
     // Admin Events Page
     editEvent: 'Edit Event',
@@ -382,6 +385,9 @@ export const translations = {
     childDeleted: 'Kinderprofiel Uitgevee!',
     childDeletedDesc: "Die profiel vir {name} is permanent uitgevee.",
     areYouSureDeleteChild: 'Dit sal die profiel vir {name} permanent uitvee.',
+    parentDetails: 'Ouerbesonderhede',
+    emergencyContact: 'Noodkontak',
+    medicalNotes: 'Mediese Notas',
 
 
     // Admin Events Page
@@ -462,3 +468,5 @@ export const translations = {
 };
 
 export type TranslationKey = keyof typeof translations.en;
+
+    

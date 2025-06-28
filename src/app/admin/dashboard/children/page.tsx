@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { isFirebaseConfigured } from "@/lib/firebase";
-import { AlertTriangle, FileDown, FileUp, Trash2 } from "lucide-react";
+import { AlertTriangle, FileDown, FileUp, Trash2, HeartPulse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,6 +33,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 
 const ChildAge = ({ dobString }: { dobString: string }) => {
@@ -301,8 +302,10 @@ export default function ChildrenPage() {
                 <TableHead>{t('photo')}</TableHead>
                 <TableHead>{t('childsName')}</TableHead>
                 <TableHead>{t('ageInTable')}</TableHead>
-                <TableHead>{t('parentsName')}</TableHead>
-                <TableHead>{t('parentPhone')}</TableHead>
+                <TableHead>{t('gender')}</TableHead>
+                <TableHead>{t('parentDetails')}</TableHead>
+                <TableHead>{t('emergencyContact')}</TableHead>
+                <TableHead>{t('medicalNotes')}</TableHead>
                 <TableHead>{t('actions')}</TableHead>
               </TableRow>
             </TableHeader>
@@ -313,19 +316,22 @@ export default function ChildrenPage() {
                     <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-10" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-12 w-40" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-40" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-6" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-10" /></TableCell>
                   </TableRow>
                 ))
               ) : children.length === 0 ? (
                   <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
+                      <TableCell colSpan={8} className="h-24 text-center">
                           No children registered yet.
                       </TableCell>
                   </TableRow>
               ) : (
-                children.map((child) => (
+                <TooltipProvider>
+                {children.map((child) => (
                   <TableRow key={child.id}>
                     <TableCell>
                       <Avatar>
@@ -339,8 +345,34 @@ export default function ChildrenPage() {
                     <TableCell>
                       {child.dateOfBirth ? <ChildAge dobString={child.dateOfBirth} /> : "N/A"}
                     </TableCell>
-                    <TableCell>{child.parent}</TableCell>
-                    <TableCell>{child.parentPhone}</TableCell>
+                    <TableCell className="capitalize">{child.gender}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col text-sm">
+                        <span className="font-medium">{child.parent}</span>
+                        <span className="text-muted-foreground">{child.parentEmail}</span>
+                        <span className="text-muted-foreground">{child.parentPhone}</span>
+                      </div>
+                    </TableCell>
+                     <TableCell>
+                        <div className="flex flex-col text-sm">
+                          <span className="font-medium">{child.emergencyContactName}</span>
+                          <span className="text-muted-foreground">{child.emergencyContactPhone}</span>
+                        </div>
+                    </TableCell>
+                    <TableCell>
+                      {child.medicalConditions && child.medicalConditions.trim() !== '' ? (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HeartPulse className="h-5 w-5 text-destructive" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-[300px] whitespace-pre-wrap">{child.medicalConditions}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                         <div className="flex gap-2">
                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}>
@@ -349,7 +381,8 @@ export default function ChildrenPage() {
                         </div>
                     </TableCell>
                   </TableRow>
-                ))
+                ))}
+                </TooltipProvider>
               )}
             </TableBody>
           </Table>
@@ -374,3 +407,5 @@ export default function ChildrenPage() {
     </div>
   );
 }
+
+    
