@@ -150,29 +150,36 @@ export default function ManageTeachersPage() {
     setIsSaving(true);
     try {
       if (editingTeacher) {
+        // Logic for UPDATING a teacher
+        let photoUrl = editingTeacher.photo; // Start with the existing photo URL
         const file = values.photo?.[0];
-        let photoUrl: string | undefined = editingTeacher.photo;
-        
-        if(file) {
-            photoUrl = await uploadImage(file, 'teachers');
-            if(editingTeacher.photo && editingTeacher.photo.includes('firebasestorage')) {
-                await deleteImageFromUrl(editingTeacher.photo);
-            }
+
+        // If a new photo was uploaded, handle the upload and deletion of the old one
+        if (file) {
+          const newPhotoUrl = await uploadImage(file, 'teachers');
+          if (editingTeacher.photo && editingTeacher.photo.includes('firebasestorage')) {
+            await deleteImageFromUrl(editingTeacher.photo);
+          }
+          photoUrl = newPhotoUrl; // Set the URL to the new one
         }
 
-        const teacherPayload = {
-            name: values.name,
-            email: values.email,
-            photo: photoUrl,
+        // Construct the payload for the Firestore update.
+        // This object only contains the fields that should be updated.
+        const teacherUpdatePayload: Partial<Omit<Teacher, 'id' | 'role' | 'password_insecure'>> = {
+          name: values.name,
+          email: values.email,
+          photo: photoUrl,
         };
+        
+        await updateTeacher(editingTeacher.id, teacherUpdatePayload);
 
-        await updateTeacher(editingTeacher.id, teacherPayload);
         toast({
-            title: t('teacherUpdated'),
-            description: t('teacherUpdatedDesc', { name: values.name }),
+          title: t('teacherUpdated'),
+          description: t('teacherUpdatedDesc', { name: values.name }),
         });
 
       } else {
+        // Logic for CREATING a new teacher
         if (!values.password) {
             form.setError("password", { type: "manual", message: "Password is required for new teachers." });
             setIsSaving(false);
