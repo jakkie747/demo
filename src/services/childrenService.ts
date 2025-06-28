@@ -1,7 +1,8 @@
 import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, writeBatch, doc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, writeBatch, doc, query, orderBy, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import type { Child } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
+import { deleteImageFromUrl } from './storageService';
 
 const TIMEOUT_DURATION = 15000; // 15 seconds
 
@@ -50,5 +51,38 @@ export const addMultipleChildren = async (childrenData: Omit<Child, 'id'>[]): Pr
         batch.commit(),
         TIMEOUT_DURATION * 3, // Allow more time for batch writes
         new Error("Batch adding children timed out.")
+    );
+};
+
+export const updateChild = async (childId: string, childData: Partial<Omit<Child, 'id'>>): Promise<void> => {
+    if (!db) throw new Error("Firebase is not configured.");
+    const childDoc = doc(db, 'children', childId);
+    await promiseWithTimeout(
+        updateDoc(childDoc, childData),
+        TIMEOUT_DURATION,
+        new Error(`Updating child ${childId} timed out.`)
+    );
+};
+
+export const deleteChild = async (childId: string): Promise<void> => {
+    if (!db) throw new Error("Firebase is not configured.");
+    const childDocRef = doc(db, 'children', childId);
+
+    try {
+        const docSnap = await getDoc(childDocRef);
+        if (docSnap.exists()) {
+            const childData = docSnap.data() as Child;
+            if (childData.photo) {
+                await deleteImageFromUrl(childData.photo);
+            }
+        }
+    } catch (error) {
+        console.error("Could not fetch child doc for photo deletion, but proceeding with Firestore delete.", error);
+    }
+    
+    await promiseWithTimeout(
+        deleteDoc(childDocRef),
+        TIMEOUT_DURATION,
+        new Error(`Deleting child ${childId} timed out.`)
     );
 };

@@ -145,6 +145,14 @@ export const translations = {
     importErrorDesc: 'There was an error importing the file. Please check the console for details.',
     noFileSelected: 'No file selected.',
     fileParseError: 'Could not parse the file. Please ensure it is a valid CSV.',
+    editChild: 'Edit Child Profile',
+    updateChild: 'Update Profile',
+    deleteChild: 'Delete Profile',
+    childUpdated: 'Child Profile Updated!',
+    childUpdatedDesc: "The profile for {name} has been successfully updated.",
+    childDeleted: 'Child Profile Deleted!',
+    childDeletedDesc: "The profile for {name} has been permanently deleted.",
+    areYouSureDeleteChild: 'This will permanently delete the profile for {name}.',
 
     // Admin Events Page
     editEvent: 'Edit Event',
@@ -366,6 +374,15 @@ export const translations = {
     importErrorDesc: "Daar was 'n fout met die invoer van die lêer. Gaan asseblief die konsole na vir besonderhede.",
     noFileSelected: 'Geen lêer gekies nie.',
     fileParseError: "Kon nie die lêer ontleed nie. Maak seker dit is 'n geldige CSV.",
+    editChild: 'Wysig Kinderprofiel',
+    updateChild: 'Dateer Profiel op',
+    deleteChild: 'Vee Profiel uit',
+    childUpdated: 'Kinderprofiel Opgedateer!',
+    childUpdatedDesc: "Die profiel vir {name} is suksesvol opgedateer.",
+    childDeleted: 'Kinderprofiel Uitgevee!',
+    childDeletedDesc: "Die profiel vir {name} is permanent uitgevee.",
+    areYouSureDeleteChild: 'Dit sal die profiel vir {name} permanent uitvee.',
+
 
     // Admin Events Page
     editEvent: 'Wysig Geleentheid',
