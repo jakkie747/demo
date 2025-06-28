@@ -477,7 +477,28 @@ export default function ChildrenPage() {
                       <FormField control={form.control} name="gender" render={({ field }) => ( <FormItem> <FormLabel>{t('gender')}</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSaving}> <FormControl> <SelectTrigger><SelectValue /></SelectTrigger> </FormControl> <SelectContent> <SelectItem value="male">{t('male')}</SelectItem> <SelectItem value="female">{t('female')}</SelectItem> <SelectItem value="other">{t('other')}</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )} />
                     </div>
                     {editingChild?.photo && (<div className="space-y-2"><Label>{t('currentImage')}</Label><Image src={editingChild.photo} alt={editingChild.name} width={80} height={80} className="rounded-md border object-cover"/></div>)}
-                    <FormField control={form.control} name="photo" render={({ field: { onChange, value, ...rest }}) => ( <FormItem> <FormLabel>{t('childPhoto')}</FormLabel> <FormControl> <Input type="file" accept="image/*" onChange={(e) => onChange(e.target.files)} disabled={isSaving} /> </FormControl> <FormDescription>{t('replaceImage')}</FormDescription> <FormMessage /> </FormItem>)} />
+                    <FormField
+                      control={form.control}
+                      name="photo"
+                      render={({ field: { onChange, onBlur, name, ref } }) => (
+                        <FormItem>
+                          <FormLabel>{t('childPhoto')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onBlur={onBlur}
+                              name={name}
+                              ref={ref}
+                              onChange={(e) => onChange(e.target.files)}
+                              disabled={isSaving}
+                            />
+                          </FormControl>
+                          <FormDescription>{t('replaceImage')}</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                   {/* Parent Information */}
                   <div className="space-y-4">
