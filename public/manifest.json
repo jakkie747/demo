@@ -1,11 +1,6 @@
 {
   "name": "Blinkogies Family Hub",
   "short_name": "Blinkogies",
-  "description": "A family hub for Blinkogies Pre-school",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#f5fafd",
-  "theme_color": "#03BA60",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -17,5 +12,11 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "theme_color": "#59ABEF",
+  "background_color": "#E5F6FE",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/"
 }
