@@ -556,22 +556,18 @@ export default function ChildrenPage() {
                                         className="flex flex-col space-y-1"
                                         disabled={isSaving}
                                     >
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl>
-                                                <RadioGroupItem value="yes" />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">
+                                        <div className="flex items-center space-x-3 space-y-0">
+                                            <RadioGroupItem value="yes" id="edit-preschool-yes" />
+                                            <Label htmlFor="edit-preschool-yes" className="font-normal">
                                                 {t('yes')}
-                                            </FormLabel>
-                                        </FormItem>
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl>
-                                                <RadioGroupItem value="no" />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-3 space-y-0">
+                                            <RadioGroupItem value="no" id="edit-preschool-no" />
+                                            <Label htmlFor="edit-preschool-no" className="font-normal">
                                                 {t('no')}
-                                            </FormLabel>
-                                        </FormItem>
+                                            </Label>
+                                        </div>
                                     </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
