@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { getChildren, addMultipleChildren, updateChild, deleteChild } from "@/services/childrenService";
-import { uploadImage } from "@/services/storageService";
+import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import type { Child } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -176,6 +176,8 @@ export default function ChildrenPage() {
         previousPreschool: editingChild.previousPreschool,
         additionalNotes: editingChild.additionalNotes || "",
       });
+    } else {
+      form.reset();
     }
   }, [editingChild, form]);
   
@@ -330,6 +332,10 @@ export default function ChildrenPage() {
       let photoUrl = editingChild.photo;
       const file = values.photo?.[0];
       if (file) {
+        // Delete old photo only if it's a real one from storage
+        if (editingChild.photo && editingChild.photo.includes('firebasestorage')) {
+            await deleteImageFromUrl(editingChild.photo);
+        }
         photoUrl = await uploadImage(file, 'children');
       }
 
@@ -478,7 +484,7 @@ export default function ChildrenPage() {
       </Card>
 
       {/* Edit Child Dialog */}
-      <Dialog open={!!editingChild} onOpenChange={(open) => !open && setEditingChild(null)}>
+      <Dialog open={!!editingChild} onOpenChange={(open) => { if (!open) setEditingChild(null) }}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{t('editChild')}</DialogTitle>
@@ -500,17 +506,15 @@ export default function ChildrenPage() {
                     <FormField
                       control={form.control}
                       name="photo"
-                      render={({ field }) => (
+                      render={({ field: { onChange, ...fieldProps } }) => (
                         <FormItem>
                           <FormLabel>{t('childPhoto')}</FormLabel>
                           <FormControl>
                             <Input
                               type="file"
                               accept="image/*"
-                              onBlur={field.onBlur}
-                              name={field.name}
-                              ref={field.ref}
-                              onChange={(e) => field.onChange(e.target.files)}
+                              onChange={(e) => onChange(e.target.files)}
+                              {...fieldProps}
                               disabled={isSaving}
                             />
                           </FormControl>
@@ -556,18 +560,22 @@ export default function ChildrenPage() {
                                         className="flex flex-col space-y-1"
                                         disabled={isSaving}
                                     >
-                                        <div className="flex items-center space-x-3 space-y-0">
-                                            <RadioGroupItem value="yes" id="edit-preschool-yes" />
-                                            <Label htmlFor="edit-preschool-yes" className="font-normal">
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value="yes" id="edit-preschool-yes"/>
+                                            </FormControl>
+                                            <FormLabel htmlFor="edit-preschool-yes" className="font-normal">
                                                 {t('yes')}
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center space-x-3 space-y-0">
-                                            <RadioGroupItem value="no" id="edit-preschool-no" />
-                                            <Label htmlFor="edit-preschool-no" className="font-normal">
+                                            </FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl>
+                                                <RadioGroupItem value="no" id="edit-preschool-no"/>
+                                            </FormControl>
+                                            <FormLabel htmlFor="edit-preschool-no" className="font-normal">
                                                 {t('no')}
-                                            </Label>
-                                        </div>
+                                            </FormLabel>
+                                        </FormItem>
                                     </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
@@ -588,7 +596,7 @@ export default function ChildrenPage() {
       </Dialog>
       
       {/* Delete Child Alert Dialog */}
-      <AlertDialog open={!!deletingChild} onOpenChange={(open) => !open && setDeletingChild(null)}>
+      <AlertDialog open={!!deletingChild} onOpenChange={(open) => { if (!open) setDeletingChild(null) }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
@@ -605,5 +613,3 @@ export default function ChildrenPage() {
     </div>
   );
 }
-
-    
