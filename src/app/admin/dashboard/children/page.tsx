@@ -474,7 +474,7 @@ export default function ChildrenPage() {
                     <FormField control={form.control} name="name" render={({ field }) => ( <FormItem> <FormLabel>{t('fullName')}</FormLabel> <FormControl> <Input {...field} disabled={isSaving} /> </FormControl> <FormMessage /> </FormItem> )} />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField control={form.control} name="dateOfBirth" render={({ field }) => ( <FormItem> <FormLabel>{t('dateOfBirth')}</FormLabel> <FormControl> <Input type="date" {...field} disabled={isSaving} /> </FormControl> <FormMessage /> </FormItem> )} />
-                      <FormField control={form.control} name="gender" render={({ field }) => ( <FormItem> <FormLabel>{t('gender')}</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSaving}> <FormControl> <SelectTrigger><SelectValue /></SelectTrigger> </FormControl> <SelectContent> <SelectItem value="male">{t('male')}</SelectItem> <SelectItem value="female">{t('female')}</SelectItem> <SelectItem value="other">{t('other')}</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )} />
+                      <FormField control={form.control} name="gender" render={({ field }) => ( <FormItem> <FormLabel>{t('gender')}</FormLabel> <Select onValueChange={field.onChange} value={field.value} disabled={isSaving}> <FormControl> <SelectTrigger><SelectValue /></SelectTrigger> </FormControl> <SelectContent> <SelectItem value="male">{t('male')}</SelectItem> <SelectItem value="female">{t('female')}</SelectItem> <SelectItem value="other">{t('other')}</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )} />
                     </div>
                     {editingChild?.photo && (<div className="space-y-2"><Label>{t('currentImage')}</Label><Image src={editingChild.photo} alt={editingChild.name} width={80} height={80} className="rounded-md border object-cover"/></div>)}
                     <FormField
@@ -529,7 +529,7 @@ export default function ChildrenPage() {
                           <FormItem className="space-y-3">
                             <FormLabel>{t('previousPreschool')}</FormLabel>
                             <FormControl>
-                              <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4" disabled={isSaving}>
+                              <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4" disabled={isSaving}>
                                 <div className="flex items-center space-x-3">
                                   <RadioGroupItem value="yes" id="edit-r-yes" />
                                   <Label className="font-normal" htmlFor="edit-r-yes">{t('yes')}</Label>
@@ -575,3 +575,5 @@ export default function ChildrenPage() {
     </div>
   );
 }
+
+    
