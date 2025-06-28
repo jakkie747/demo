@@ -45,13 +45,14 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers, addTeacher, updateTeacher, deleteTeacher } from "@/services/teacherService";
+import { getTeachers, addTeacher, deleteTeacher } from "@/services/teacherService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, db } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import { doc, updateDoc } from "firebase/firestore";
 
 const teacherFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
@@ -167,8 +168,10 @@ export default function ManageTeachersPage() {
           email: values.email,
           photo: photoUrl,
         };
-
-        await updateTeacher(editingTeacher.id, teacherUpdatePayload);
+        
+        if (!db) throw new Error("Firebase is not configured.");
+        const teacherDoc = doc(db, 'teachers', editingTeacher.id);
+        await updateDoc(teacherDoc, teacherUpdatePayload);
 
         toast({
           title: t('teacherUpdated'),
@@ -464,3 +467,5 @@ export default function ManageTeachersPage() {
     </div>
   );
 }
+
+    
