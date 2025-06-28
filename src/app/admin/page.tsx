@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -31,30 +31,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    // On first load, check if the admin user exists. If not, create it.
-    // This is a one-time setup for the prototype.
-    const setupAdmin = async () => {
-      const adminEmail = 'admin@blinkogies.co.za';
-      const adminExists = await getTeacherByEmail(adminEmail);
-      if (!adminExists) {
-        const adminUser: Omit<Teacher, 'id'> = {
-          name: 'Admin',
-          email: adminEmail,
-          password_insecure: 'password', // Default password
-          role: 'admin',
-        };
-        try {
-          await addTeacher(adminUser);
-          console.log('Default admin user created.');
-        } catch (error) {
-          console.error('Failed to create default admin user:', error);
-        }
-      }
-    };
-    setupAdmin();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -74,11 +50,32 @@ export default function AdminLoginPage() {
         // Store login state (insecure, for prototype only)
         sessionStorage.setItem('isLoggedIn', 'true');
         router.push("/admin/dashboard");
-      } else {
+      } else if (!teacher && email.toLowerCase() === 'admin@blinkogies.co.za') {
+        // If the admin user doesn't exist, create it on the first login attempt.
+        const adminUser: Omit<Teacher, 'id'> = {
+          name: 'Admin',
+          email: email.toLowerCase(),
+          password_insecure: 'password', // Default password
+          role: 'admin',
+        };
+        await addTeacher(adminUser);
+        setError("Admin account created. Please try logging in again with the password 'password'.");
+        toast({
+          title: "Admin Account Created",
+          description: "Please log in with the default password.",
+        });
+      }
+      else {
         setError("Invalid email or password.");
       }
     } catch (err) {
-      setError("An error occurred during login. Please try again.");
+       const errorMessage = (err as Error).message || "An error occurred during login.";
+       if (errorMessage.includes("index")) {
+           setError("A database index is required. Please check the browser console (F12) for a link to create it, then try logging in again.");
+           console.error("Firebase Index Error: Please create the required Firestore index by clicking the link in the following error message:", err);
+       } else {
+           setError(errorMessage);
+       }
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +101,7 @@ export default function AdminLoginPage() {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Prototype Login</AlertTitle>
                 <AlertDescription>
-                  This login is for demonstration only. Use email <strong>admin@blinkogies.co.za</strong> and password <strong>password</strong> to log in.
+                  Use email <strong>admin@blinkogies.co.za</strong> and password <strong>password</strong> to log in. The admin account will be created on your first login attempt.
                 </AlertDescription>
             </Alert>
             <form onSubmit={handleSubmit} className="space-y-4">
