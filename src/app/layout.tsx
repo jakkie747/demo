@@ -9,6 +9,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 export const metadata: Metadata = {
   title: "Blinkogies Family Hub",
   description: "A family hub for Blinkogies Pre-school",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -29,6 +30,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Poppins:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <meta name="theme-color" content="#03BA60" />
       </head>
       <body className={cn("min-h-screen bg-background font-body antialiased")}>
         <LanguageProvider>
