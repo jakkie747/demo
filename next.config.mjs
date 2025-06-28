@@ -1,32 +1,32 @@
-
-import withPWA from '@ducanh2912/next-pwa';
-
 /** @type {import('next').NextConfig} */
+import withPWAInit from "@ducanh2912/next-pwa";
+import runtimeCaching from "next-pwa/cache";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  // Explicitly enable PWA and service worker generation in development
+  disable: false,
+  // Add standard caching rules to enable offline functionality
+  runtimeCaching,
+  fallbacks: {
+    document: "/offline", // Fallback page for when offline
+  },
+});
+
 const nextConfig = {
-  // Your regular Next.js config
+  reactStrictMode: true,
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
       },
       {
-        protocol: 'https',
-        hostname: 'placehold.co',
+        protocol: "https",
+        hostname: "placehold.co",
       },
     ],
   },
 };
 
-const withPWAConfig = withPWA({
-  dest: 'public',
-  // This is the crucial change. By default, PWA features are disabled in development.
-  // Setting this to false forces them to be enabled.
-  disable: false, 
-  register: true,
-  skipWaiting: true,
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-});
-
-export default withPWAConfig(nextConfig);
+export default withPWA(nextConfig);
