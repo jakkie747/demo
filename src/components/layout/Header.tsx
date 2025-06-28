@@ -1,9 +1,10 @@
+
 "use client";
 
 import Link from "next/link";
 import { Menu, Languages, Download } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,11 @@ export function Header() {
   const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { install, canInstall } = usePwaInstall();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const navLinks = [
     { href: "/", label: t("home") },
@@ -76,7 +82,7 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {canInstall && (
+          {isClient && canInstall && (
             <div className="hidden md:flex">
               <Button onClick={install}>
                 <Download className="mr-2" />
@@ -102,7 +108,9 @@ export function Header() {
               side="left"
               className="w-full max-w-xs bg-background p-6"
             >
-              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <SheetTitle>
+                <div className="sr-only">Menu</div>
+              </SheetTitle>
               <div className="mb-8">
                 <Logo />
               </div>
@@ -123,7 +131,7 @@ export function Header() {
                   </Link>
                 ))}
                 
-                {canInstall && (
+                {isClient && canInstall && (
                   <button
                     onClick={() => {
                       install();
