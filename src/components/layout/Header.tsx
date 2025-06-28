@@ -16,12 +16,6 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const pathname = usePathname();
@@ -49,6 +43,10 @@ export function Header() {
       console.log("PWA: 'beforeinstallprompt' event listener removed.");
     };
   }, []);
+
+  const handleLanguageToggle = () => {
+    setLanguage(language === 'en' ? 'af' : 'en');
+  };
 
   const handleInstallClick = async () => {
     if (!installPrompt) {
@@ -94,22 +92,11 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Languages className="h-[1.2rem] w-[1.2rem]" />
-                <span className="sr-only">{t("language")}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setLanguage("en")}>
-                English
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLanguage("af")}>
-                Afrikaans
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="hidden md:flex">
+             <Button variant="outline" onClick={handleLanguageToggle}>
+              {language === 'en' ? 'Afrikaans' : 'English'}
+            </Button>
+          </div>
 
           {!!installPrompt && (
             <div className="hidden md:flex">
@@ -174,6 +161,19 @@ export function Header() {
                     {t("installApp")}
                   </button>
                 )}
+
+                 <button
+                  onClick={() => {
+                    handleLanguageToggle();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={cn(
+                      "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                  )}
+                >
+                  <Languages className="mr-4 h-5 w-5" />
+                  <span>{language === 'en' ? 'Switch to Afrikaans' : 'Switch to English'}</span>
+                </button>
 
                 <Link
                   href="/admin"
