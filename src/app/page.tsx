@@ -24,7 +24,7 @@ export default function Home() {
     setIsLoading(true);
     try {
       const fetchedActivities = await getActivities();
-      setActivities(fetchedActivities.slice(0, 3));
+      setActivities(fetchedActivities);
     } catch (error: any) {
       toast({ variant: "destructive", title: "Error", description: error.message || "Could not load activities." });
       setActivities([]);
@@ -77,7 +77,7 @@ export default function Home() {
       return <p className="col-span-3 text-center text-muted-foreground">No recent activities to show.</p>;
     }
 
-    return activities.map((activity) => (
+    return activities.slice(0, 3).map((activity) => (
       <Card key={activity.id} className="hover:shadow-lg transition-shadow">
         <CardHeader>
           <CardTitle>{activity.title}</CardTitle>
@@ -125,14 +125,19 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <Image
-              src="https://placehold.co/600x600.png"
-              alt="Children drawing at a table"
-              width={600}
-              height={600}
-              className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
-              data-ai-hint="children drawing"
-            />
+            {isLoading ? (
+              <Skeleton className="mx-auto aspect-square w-full max-w-[600px] rounded-full object-cover lg:order-last" />
+            ) : (
+              <Image
+                src={activities[0]?.image || "https://placehold.co/600x600.png"}
+                alt={activities[0]?.title || "Children drawing at a table"}
+                width={600}
+                height={600}
+                className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
+                data-ai-hint={activities[0]?.aiHint || "children drawing"}
+                priority
+              />
+            )}
           </div>
         </div>
       </section>
