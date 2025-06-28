@@ -220,33 +220,45 @@ export default function ManageActivitiesPage() {
         setSubmissionError({
           title: errorTitle,
           description: (
-            <div className="space-y-4 text-sm">
-                <p>This is a common Firebase setup issue. Please follow these steps carefully.</p>
-                
-                <div className="font-bold">Step 1: Update Firestore (Database) Rules</div>
-                <ol className="list-decimal list-inside space-y-1 pl-2">
-                    <li>Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Firestore Rules</a>.</li>
-                    <li>Replace the existing rules with the content from the <strong>firestore.rules</strong> file in your project, then click <strong>Publish</strong>.</li>
-                </ol>
+             <div className="space-y-4 text-sm">
+                <p className="font-bold text-base">The error <code className="text-destructive bg-destructive/10 px-1 py-0.5 rounded">NotFoundException: 404 The specified bucket does not exist</code> means Firebase Storage must be enabled first.</p>
 
-                <div className="font-bold">Step 2: Enable Storage & Update Rules</div>
-                 <ol className="list-decimal list-inside space-y-2 pl-2">
-                    <li>
-                        <strong>CRITICAL: Enable Firebase Storage.</strong> Go to your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage section</a>. If you see a "Get Started" screen, follow the prompts to enable Storage. <strong>This must be done before the next steps.</strong>
-                    </li>
-                    <li>
-                        Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage Rules</a>.
-                    </li>
-                    <li>
-                        Replace the existing rules with the content from the <strong>storage.rules</strong> file in your project, then click <strong>Publish</strong>.
-                    </li>
-                    <li>
-                        Apply the CORS policy by running these commands in the <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Shell</a>. The "bucket does not exist" error will happen if Step 2.1 was skipped.
+                <div className="font-bold text-lg mt-4">Fix: Enable Storage & Apply Rules</div>
+                <ol className="list-decimal list-inside space-y-3 pl-2">
+                  <li>
+                    <strong className="text-destructive">CRITICAL FIRST STEP: Enable Firebase Storage.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
+                        <li>Go to your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">Firebase Console Storage section</a>.</li>
+                        <li>If you see a "Get Started" screen, click through the prompts to enable it.</li>
+                        <li><strong>You must do this before the other steps.</strong></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>Update Storage Rules.</strong>
+                     <ul className="list-disc list-inside pl-4 mt-1">
+                        <li>Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage Rules</a>.</li>
+                        <li>Replace the existing rules with the content from the <strong>storage.rules</strong> file in your project, then click <strong>Publish</strong>.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>Apply CORS Policy in Cloud Shell.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
+                      <li>Open the <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Shell</a>. This may take a moment to load.</li>
+                      <li>Run these two commands exactly as shown:
                         <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2">{"echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json"}</pre>
                         <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
-                    </li>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                      <strong>Update Firestore Rules.</strong>
+                       <ul className="list-disc list-inside pl-4 mt-1">
+                          <li>Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Firestore Rules</a>.</li>
+                          <li>Replace the existing rules with the content from the <strong>firestore.rules</strong> file in your project, then click <strong>Publish</strong>.</li>
+                      </ul>
+                  </li>
                 </ol>
-            </div>
+              </div>
           )
         });
       } else {
