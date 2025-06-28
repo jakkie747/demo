@@ -21,7 +21,7 @@ export const firebaseConfig = {
   // These values are correct for your project. Do not change them.
   authDomain: "blink-notify-494bf.firebaseapp.com",
   projectId: "blink-notify-494bf",
-  storageBucket: "blink-notify-494bf.appspot.com",
+  storageBucket: "blink-notify-494bf.firebasestorage.app",
   messagingSenderId: "450079883039",
 
   // PASTE YOUR WEB APP'S APP ID HERE
