@@ -68,6 +68,7 @@ export default function ManageActivitiesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfigured, setIsConfigured] = useState(false);
+  const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
 
   const form = useForm<z.infer<typeof activityFormSchema>>({
     resolver: zodResolver(activityFormSchema),
@@ -117,6 +118,7 @@ export default function ManageActivitiesPage() {
 
   const handleEditClick = (activity: Activity) => {
     setEditingActivity(activity);
+    setSubmissionError(null);
     form.reset({
       title: activity.title,
       description: activity.description,
@@ -126,6 +128,7 @@ export default function ManageActivitiesPage() {
 
   const handleCancelClick = () => {
     setEditingActivity(null);
+    setSubmissionError(null);
     form.reset();
   };
 
@@ -156,9 +159,9 @@ export default function ManageActivitiesPage() {
   };
 
   async function onSubmit(values: z.infer<typeof activityFormSchema>) {
+    setSubmissionError(null);
     if (!isConfigured) {
-      toast({
-        variant: "destructive",
+       setSubmissionError({
         title: "Firebase Not Configured",
         description: "Please configure your Firebase credentials in src/lib/firebase.ts before saving.",
       });
@@ -173,7 +176,10 @@ export default function ManageActivitiesPage() {
       if (file) {
         const newImageUrl = await uploadImage(file, 'activities');
         if (editingActivity?.image) {
-          await deleteImageFromUrl(editingActivity.image);
+          // Avoid deleting placeholder images
+          if (editingActivity.image.includes('firebasestorage')) {
+            await deleteImageFromUrl(editingActivity.image);
+          }
         }
         imageUrl = newImageUrl;
       }
@@ -206,30 +212,31 @@ export default function ManageActivitiesPage() {
       form.reset();
 
     } catch (error) {
-      let errorMessage = (error as Error).message || "Could not save the activity. Check the console for more details.";
+      const errorMessage = (error as Error).message || "Could not save the activity.";
       let errorTitle = "Error Saving Activity";
 
       if (errorMessage.includes("timed out")) {
-        errorTitle = "Image Upload Timed Out (CORS Issue)";
-        errorMessage = "This is a common Firebase setup issue. Please check the developer console for instructions on how to fix it."
-        console.group("Firebase CORS Configuration Instructions");
-        console.log("The timeout during image upload is caused by a security setting on your Firebase project that blocks requests from your web app.");
-        console.log("To fix this, you need to apply a new CORS policy to your Firebase Storage bucket. This is a one-time setup.");
-        console.log("1. Open Cloud Shell: Go to the Google Cloud Console (https://console.cloud.google.com/) for your project (" + firebaseConfig.projectId + "). In the top-right corner, click the 'Activate Cloud Shell' button (it looks like a >_ terminal icon).");
-        console.log("2. Create Configuration File: A terminal will open. Copy and paste the following command into it and press Enter:");
-        console.log("echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json");
-        console.log("3. Apply the Policy: Now, copy and paste the following command, then press Enter. This tells Firebase Storage to use your new policy.");
-        console.log("gsutil cors set cors.json gs://" + firebaseConfig.storageBucket);
-        console.log("After running the final command, try uploading your image again. It should now work immediately.");
-        console.groupEnd();
+        errorTitle = "Image Upload Timed Out (Firebase Security Rules)";
+        setSubmissionError({
+          title: errorTitle,
+          description: (
+            <div className="space-y-2 text-sm">
+                <p>This is a common Firebase setup issue related to security rules. It can be fixed by allowing public access for development.</p>
+                <p className="font-bold mt-2">To Fix Firestore (Database) Rules:</p>
+                <p>1. Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Firestore Rules</a>.</p>
+                <p>2. Replace the existing rules with the content from the <strong>firestore.rules</strong> file in your project.</p>
+                <p className="font-bold mt-2">To Fix Storage (File Upload) Rules & CORS:</p>
+                <p>1. Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Storage Rules</a>.</p>
+                <p>2. Replace the existing rules with the content from the <strong>storage.rules</strong> file in your project.</p>
+                <p className="mt-2">If uploads still fail, apply the CORS policy using Google Cloud Shell:</p>
+                <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto">{"echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json"}</pre>
+                <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+            </div>
+          )
+        });
+      } else {
+        setSubmissionError({ title: errorTitle, description: errorMessage });
       }
-      
-      toast({ 
-        variant: "destructive", 
-        title: errorTitle, 
-        description: errorMessage,
-        duration: 15000,
-      });
 
     } finally {
       setIsSaving(false);
@@ -366,6 +373,15 @@ export default function ManageActivitiesPage() {
                 </div>
               </form>
             </Form>
+             {submissionError && (
+              <Alert variant="destructive" className="mt-6">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>{submissionError.title}</AlertTitle>
+                <AlertDescription>
+                  {submissionError.description}
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
       </div>

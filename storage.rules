@@ -1,10 +1,10 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Allow read/write access to all paths for development.
+    // This also resolves the CORS issue for uploads.
+    // WARNING: This is insecure for production.
     match /{allPaths=**} {
-      // Allow read and write access to all files for this demo.
-      // In a production app, you would implement more restrictive rules
-      // based on user authentication.
       allow read, write: if true;
     }
   }
