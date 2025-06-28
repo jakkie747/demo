@@ -57,7 +57,7 @@ import { doc, updateDoc } from "firebase/firestore";
 const teacherFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
   email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(6, "Password must be at least 6 characters long.").optional(),
+  password: z.string().optional(),
   photo: z.any().optional(),
 });
 
@@ -110,7 +110,7 @@ export default function ManageTeachersPage() {
     form.reset({
       name: teacher.name,
       email: teacher.email,
-      password: "",
+      password: "", // Reset password to empty, validation will skip it in edit mode
       photo: undefined,
     });
   };
@@ -149,7 +149,7 @@ export default function ManageTeachersPage() {
 
   async function onSubmit(values: z.infer<typeof teacherFormSchema>) {
     setIsSaving(true);
-    
+
     // UPDATE Teacher Logic
     if (editingTeacher) {
       try {
@@ -157,23 +157,22 @@ export default function ManageTeachersPage() {
         const file = values.photo?.[0];
 
         if (file) {
-          const newPhotoUrl = await uploadImage(file, 'teachers');
+          photoUrl = await uploadImage(file, 'teachers');
           if (editingTeacher.photo && editingTeacher.photo.includes('firebasestorage')) {
             await deleteImageFromUrl(editingTeacher.photo);
           }
-          photoUrl = newPhotoUrl;
         }
 
-        const updatePayload = {
+        const updatePayload: Partial<Teacher> = {
           name: values.name,
           email: values.email,
           photo: photoUrl,
         };
-
+        
         if (!db) throw new Error("Firebase is not configured.");
         const teacherDocRef = doc(db, 'teachers', editingTeacher.id);
         await updateDoc(teacherDocRef, updatePayload);
-        
+
         // Optimistically update the UI to reflect the change immediately
         setTeachers(currentTeachers => 
           currentTeachers.map(t => 
@@ -185,30 +184,29 @@ export default function ManageTeachersPage() {
           title: t('teacherUpdated'),
           description: t('teacherUpdatedDesc', { name: values.name }),
         });
-        
-        setEditingTeacher(null);
-        form.reset();
 
       } catch (error) {
         const errorMessage = (error as Error).message || "An error occurred during update.";
         toast({ variant: "destructive", title: "Error", description: errorMessage });
       } finally {
         setIsSaving(false);
+        setEditingTeacher(null);
+        form.reset();
       }
       return;
     }
 
     // CREATE Teacher Logic
     try {
-      if (!values.password) {
-        form.setError("password", { type: "manual", message: "Password is required for new teachers." });
+      // Manual validation for password on new teacher creation
+      if (!values.password || values.password.length < 6) {
+        form.setError("password", { type: "manual", message: "Password must be at least 6 characters long." });
         setIsSaving(false);
         return;
       }
-
-      const file = values.photo?.[0];
+      
       let photoUrl = "https://placehold.co/100x100.png";
-
+      const file = values.photo?.[0];
       if (file) {
         photoUrl = await uploadImage(file, 'teachers');
       }
@@ -231,10 +229,8 @@ export default function ManageTeachersPage() {
       form.reset();
 
     } catch (error) {
-      if ((error as Error).message !== "Password is required for new teachers.") {
-          const errorMessage = (error as Error).message || "An error occurred during creation.";
-          toast({ variant: "destructive", title: "Error", description: errorMessage });
-      }
+        const errorMessage = (error as Error).message || "An error occurred during creation.";
+        toast({ variant: "destructive", title: "Error", description: errorMessage });
     } finally {
       setIsSaving(false);
     }
