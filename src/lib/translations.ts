@@ -14,7 +14,7 @@ export const translations = {
     termsOfService: 'Terms of Service',
     
     // Home Page
-    welcome: 'Welcome to Blinkogies Family Hub!',
+    welcome: 'Welcome to Blinkogies App',
     welcomeSub: "Your one-stop place for all school-related updates, events, and your child's journey with us. Let's make learning fun, together!",
     registerYourChild: 'Register Your Child',
     viewUpcomingEvents: 'View Upcoming Events',
@@ -175,7 +175,7 @@ export const translations = {
     termsOfService: 'Diensbepalings',
 
     // Home Page
-    welcome: 'Welkom by Blinkogies Familie Hub!',
+    welcome: 'Welkom by Blinkogies App',
     welcomeSub: 'Jou een-stop plek vir alle skoolverwante opdaterings, geleenthede, en jou kind se reis saam met ons. Kom ons maak leer pret, saam!',
     registerYourChild: 'Registreer Jou Kind',
     viewUpcomingEvents: 'Sien Komende Geleenthede',
