@@ -196,6 +196,19 @@ export function Header() {
                   </Link>
                 ))}
                 
+                {/* --- Mobile Notification Status --- */}
+                {permission === 'granted' && (
+                  <div className="flex items-center text-lg font-medium text-green-600 dark:text-green-500">
+                    <Bell className="mr-4 h-5 w-5" />
+                    <span>{t('notificationsEnabled')}</span>
+                  </div>
+                )}
+                {permission === 'denied' && (
+                  <div className="flex items-center text-lg font-medium text-destructive">
+                    <BellOff className="mr-4 h-5 w-5" />
+                    <span>{t('notificationsDenied')}</span>
+                  </div>
+                )}
                 {permission === 'default' && (
                   <button
                     onClick={() => {
