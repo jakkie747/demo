@@ -19,7 +19,7 @@ import { useLanguage } from '@/context/LanguageContext';
 // 3. Click "Generate key pair".
 // 4. Copy the long string and paste it here, replacing the placeholder.
 // =================================================================================
-const VAPID_KEY = 'PASTE_YOUR_VAPID_KEY_HERE';
+const VAPID_KEY = 'BDBpliiwzX0pRo9p5pL6TjZzT5p_y_H9ZzY8n_V2bXo_iWw9eX6vDqCfSjUuN1hA7rKkLgJmCgE';
 
 export const useFcmToken = () => {
   const { toast } = useToast();
