@@ -8,7 +8,20 @@ import { messaging, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useToast } from './use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 
-const VAPID_KEY = 'BOUJSqwdfKSQu3PW4owhcTLFDWINF9LyPofndBgV1J-E4_kJ1aviHYpyH0RSyOb7tH9RCN9p5yLopw5e0TmUYdE';
+// =================================================================
+// =================================================================
+//
+//   ACTION REQUIRED: Please generate and add your VAPID key below.
+//
+//   1. Open Firebase Console: https://console.firebase.google.com/
+//   2. Go to your project settings (click the ⚙️ icon).
+//   3. Click the "Cloud Messaging" tab.
+//   4. Under "Web configuration", click "Generate key pair".
+//   5. Copy the key and paste it here, replacing the placeholder.
+//
+// =================================================================
+// =================================================================
+const VAPID_KEY = 'PASTE_YOUR_GENERATED_VAPID_KEY_HERE';
 
 export const useFcmToken = () => {
   const { toast } = useToast();
@@ -66,9 +79,9 @@ export const useFcmToken = () => {
         console.error("Firebase Messaging is not configured.");
         return null;
     }
-    if (VAPID_KEY.length < 50) {
-        console.error("VAPID key is not set in src/hooks/useFcmToken.ts");
-        toast({ variant: "destructive", title: "Configuration Error", description: "VAPID key for push notifications is not set."});
+    if (VAPID_KEY === 'PASTE_YOUR_GENERATED_VAPID_KEY_HERE') {
+        console.error("VAPID key is not set in src/hooks/useFcmToken.ts. Please follow the instructions in the file to generate and add your key.");
+        toast({ variant: "destructive", title: "Configuration Error", description: "VAPID key for push notifications is not set. See console for details."});
         return null;
     }
 
@@ -84,17 +97,25 @@ export const useFcmToken = () => {
       }
     } catch (err) {
       console.error('An error occurred while retrieving token.', err);
-      toast({
-        variant: 'destructive',
-        title: t('notificationError'),
-        description: t('couldNotGetToken'),
-      });
+      const fcmError = err as { code?: string };
+      if (fcmError.code === 'messaging/token-subscribe-failed') {
+        toast({
+          variant: 'destructive',
+          title: 'Invalid VAPID Key',
+          description: 'The VAPID key in src/hooks/useFcmToken.ts is incorrect or missing. Please follow the instructions in that file to fix it.',
+          duration: 10000,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t('notificationError'),
+          description: t('couldNotGetToken'),
+        });
+      }
       return null;
     }
   }, [saveTokenToFirestore, t, toast]);
-
-  // This is the new key part of the fix.
-  // It ensures the token is retrieved whenever permission is granted.
+  
   useEffect(() => {
     if (permission === 'granted') {
       retrieveToken();
@@ -110,8 +131,6 @@ export const useFcmToken = () => {
     setIsRequesting(true);
     try {
       const status = await Notification.requestPermission();
-      // The useEffect with navigator.permissions.query will handle the state update automatically,
-      // but we can set it here for immediate feedback if needed.
       setPermission(status);
 
       if (status === 'granted') {
