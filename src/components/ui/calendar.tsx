@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -53,7 +54,7 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-       components={{
+      components={{
         IconLeft: ChevronLeft,
         IconRight: ChevronRight,
       }}

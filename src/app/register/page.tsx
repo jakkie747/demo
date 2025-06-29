@@ -317,7 +317,8 @@ export default function RegisterPage() {
                           <FormLabel>{t('dateOfBirth')}</FormLabel>
                            <FormControl>
                               <Input 
-                                type="date" 
+                                type="text" 
+                                placeholder={t('egDob')}
                                 {...field} 
                                 disabled={isSubmitting}
                                 className="w-full"
