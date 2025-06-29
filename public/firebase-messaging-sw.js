@@ -1,11 +1,12 @@
-// This file is required for Firebase Cloud Messaging.
 
-// Scripts for Firebase v9+
-importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
+// public/firebase-messaging-sw.js
+// This script runs in the background to receive push notifications.
 
-// Your web app's Firebase configuration.
-// This must be copied from src/lib/firebase.ts and cannot be imported.
+// Import the Firebase scripts that are needed
+importScripts('https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.3/firebase-messaging-compat.js');
+
+// IMPORTANT: This configuration object must match the one in your app.
 const firebaseConfig = {
   apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
   authDomain: "blink-notify-494bf.firebaseapp.com",
@@ -15,24 +16,24 @@ const firebaseConfig = {
   appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
 };
 
+// Initialize the Firebase app in the service worker
+firebase.initializeApp(firebaseConfig);
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging(app);
+// Retrieve an instance of Firebase Messaging so that it can handle background messages.
+const messaging = firebase.messaging();
 
-// This handler will be called when a notification is received
-// while the app is in the background.
+// If you want to customize the behavior of background notifications, you can
+// listen for them here. For simple notifications sent from a Cloud Function
+// with a "notification" payload, the browser will often handle displaying
+// them automatically without this listener.
 messaging.onBackgroundMessage((payload) => {
-  console.log(
-    "[firebase-messaging-sw.js] Received background message ",
-    payload
-  );
+  console.log('[firebase-messaging-sw.js] Received background message: ', payload);
 
-  // Customize the notification here
+  // You can customize the notification that is displayed here.
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: 'https://placehold.co/192x192.png'
+    icon: payload.notification.icon || "https://placehold.co/192x192.png",
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

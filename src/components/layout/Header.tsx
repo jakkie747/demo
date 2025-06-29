@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import { useFcmToken } from "@/hooks/useFcmToken";
+import { useFcmListener } from "@/hooks/useFcmListener";
 import { Badge } from "@/components/ui/badge";
 
 export function Header() {
@@ -31,6 +32,9 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const { permission, requestPermission, isRequesting } = useFcmToken();
+
+  // Listen for foreground notifications
+  useFcmListener();
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
