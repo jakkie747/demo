@@ -73,16 +73,19 @@ export default function ComposeMessagePage() {
     },
   });
 
-  const handleComposeEmail = () => {
-    const { subject, body } = form.getValues();
-     if (!form.formState.isValid) {
+  const handleComposeEmail = async () => {
+    const isValid = await form.trigger();
+    if (!isValid) {
       toast({
         variant: "destructive",
         title: "Form Incomplete",
-        description: "Please fill out a subject and body for your message.",
+        description:
+          "Please make sure the subject and body meet the minimum length requirements.",
       });
       return;
     }
+
+    const { subject, body } = form.getValues();
     if (emails.length === 0) {
       toast({
         variant: "destructive",
@@ -92,25 +95,31 @@ export default function ComposeMessagePage() {
       return;
     }
 
-    const bcc = emails.join(',');
-    const mailtoLink = `mailto:?bcc=${encodeURIComponent(bcc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const bcc = emails.join(",");
+    const mailtoLink = `mailto:?bcc=${encodeURIComponent(
+      bcc
+    )}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
   };
 
-  const handleComposeWhatsapp = () => {
-    const { subject, body } = form.getValues();
-     if (!form.formState.isValid) {
+  const handleComposeWhatsapp = async () => {
+    const isValid = await form.trigger();
+    if (!isValid) {
       toast({
         variant: "destructive",
         title: "Form Incomplete",
-        description: "Please fill out a subject and body for your message.",
+        description:
+          "Please make sure the subject and body meet the minimum length requirements.",
       });
       return;
     }
 
+    const { subject, body } = form.getValues();
     const message = `*${subject}*\n\n${body}`;
-    const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    window.open(whatsappLink, '_blank');
+    const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(whatsappLink, "_blank");
   };
 
   return (
@@ -124,10 +133,14 @@ export default function ComposeMessagePage() {
           <AlertTitle>How This Works</AlertTitle>
           <AlertDescription>
             <p>
-              Use this form to draft a message. Then, click one of the buttons below to open the message in your default email client or WhatsApp.
+              Use this form to draft a message. Then, click one of the buttons
+              below to open the message in your default email client or
+              WhatsApp.
             </p>
             <p className="mt-2">
-              For email, all registered parent emails will be automatically added to the BCC field for privacy. For WhatsApp, you can copy the message and paste it into your parent groups.
+              For email, all registered parent emails will be automatically
+              added to the BCC field for privacy. For WhatsApp, you can copy the
+              message and paste it into your parent groups.
             </p>
           </AlertDescription>
         </Alert>
@@ -150,7 +163,10 @@ export default function ComposeMessagePage() {
                   <FormItem>
                     <FormLabel>Subject</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Important Update: School Concert" {...field} />
+                      <Input
+                        placeholder="e.g. Important Update: School Concert"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -175,27 +191,33 @@ export default function ComposeMessagePage() {
               />
             </form>
           </Form>
-           <div className="mt-6 border-t pt-6">
+          <div className="mt-6 border-t pt-6">
             <h3 className="text-lg font-medium mb-2">Recipients</h3>
             {isLoading ? (
-                <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-6 w-48" />
             ) : (
-                 <p className="text-sm text-muted-foreground">
-                    This message will be prepared for{' '}
-                    <strong className="text-foreground">{emails.length} unique parent emails</strong>.
-                </p>
+              <p className="text-sm text-muted-foreground">
+                This message will be prepared for{" "}
+                <strong className="text-foreground">
+                  {emails.length} unique parent emails
+                </strong>
+                .
+              </p>
             )}
             <div className="mt-4 flex flex-col sm:flex-row gap-4">
-                <Button onClick={handleComposeEmail} disabled={emails.length === 0 || isLoading}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Compose for Email
-                </Button>
-                <Button onClick={handleComposeWhatsapp} variant="secondary">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Compose for WhatsApp
-                </Button>
+              <Button
+                onClick={handleComposeEmail}
+                disabled={emails.length === 0 || isLoading}
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Compose for Email
+              </Button>
+              <Button onClick={handleComposeWhatsapp} variant="secondary">
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Compose for WhatsApp
+              </Button>
             </div>
-           </div>
+          </div>
         </CardContent>
       </Card>
     </div>
