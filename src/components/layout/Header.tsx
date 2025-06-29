@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Languages, Download, BellRing } from "lucide-react";
+import { Menu, Languages, Download, BellRing, Bell, BellOff } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import { useFcmToken } from "@/hooks/useFcmToken";
+import { Badge } from "@/components/ui/badge";
 
 export function Header() {
   const pathname = usePathname();
@@ -27,9 +28,7 @@ export function Header() {
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
-      // Prevent the default browser install prompt
       event.preventDefault();
-      // Stash the event so it can be triggered later.
       console.log("PWA: 'beforeinstallprompt' event fired.");
       setInstallPrompt(event);
     };
@@ -70,6 +69,36 @@ export function Header() {
     { href: "/events", label: t("eventsNav") },
   ];
 
+  const NotificationStatus = () => {
+    if (permission === 'granted') {
+        return (
+            <Badge variant="secondary" className="hidden md:flex items-center gap-2 border-green-500/50 text-green-700 dark:text-green-400">
+                <Bell className="h-4 w-4"/>
+                <span>{t('notificationsEnabled')}</span>
+            </Badge>
+        );
+    }
+    if (permission === 'denied') {
+        return (
+            <Badge variant="destructive" className="hidden md:flex items-center gap-2">
+                <BellOff className="h-4 w-4"/>
+                <span>{t('notificationsDenied')}</span>
+            </Badge>
+        )
+    }
+    if (permission === 'default') {
+        return (
+             <div className="hidden md:flex">
+              <Button onClick={requestPermission} disabled={isRequesting} variant="outline">
+                <BellRing className="mr-2" />
+                {isRequesting ? t('enabling') : t('enableNotifications')}
+              </Button>
+            </div>
+        )
+    }
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-20 items-center justify-between">
@@ -94,14 +123,8 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          {permission === 'default' && (
-            <div className="hidden md:flex">
-              <Button onClick={requestPermission} disabled={isRequesting} variant="outline">
-                <BellRing className="mr-2" />
-                {isRequesting ? t('enabling') : t('enableNotifications')}
-              </Button>
-            </div>
-          )}
+          
+          <NotificationStatus />
 
           <div className="hidden md:flex">
              <Button variant="outline" onClick={handleLanguageToggle}>
