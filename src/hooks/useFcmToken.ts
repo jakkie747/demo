@@ -46,13 +46,17 @@ export const useFcmToken = () => {
     try {
       const tokenDocRef = doc(db, 'fcmTokens', fcmToken);
       await setDoc(tokenDocRef, { createdAt: serverTimestamp() });
-      console.log('FCM token saved to Firestore.');
+      console.log('FCM token saved successfully to Firestore.');
+      toast({
+        title: "Device Registered!",
+        description: "This device can now receive push notifications.",
+      });
     } catch (error) {
       console.error('Error saving FCM token:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: t('couldNotSaveToken'),
+        title: 'Error Saving Token',
+        description: (error as Error).message || t('couldNotSaveToken'),
       });
     }
   }, [t, toast]);
@@ -111,8 +115,7 @@ export const useFcmToken = () => {
       setPermission(status);
 
       if (status === 'granted') {
-        toast({ title: t('notificationsEnabled'), description: t('youWillReceiveUpdates') });
-        await retrieveToken();
+        // The useEffect above will now automatically handle retrieving the token.
       } else {
         toast({ variant: 'destructive', title: t('notificationsDenied'), description: t('youCanEnableLater') });
       }

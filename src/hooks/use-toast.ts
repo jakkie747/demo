@@ -1,3 +1,4 @@
+
 "use client"
 
 // Inspired by react-hot-toast library
@@ -77,9 +78,13 @@ const addToRemoveQueue = (toastId: string) => {
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST":
+      // Remove any existing toasts before adding a new one
+      state.toasts.forEach(toast => {
+        addToRemoveQueue(toast.id)
+      })
       return {
         ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
+        toasts: [action.toast],
       }
 
     case "UPDATE_TOAST":
