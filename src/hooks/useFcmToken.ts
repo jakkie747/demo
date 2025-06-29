@@ -3,22 +3,10 @@
 import { useState, useEffect } from 'react';
 import { getToken } from 'firebase/messaging';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { messaging, db, isFirebaseConfigured } from '@/lib/firebase';
+import { messaging, db, isFirebaseConfigured, firebaseConfig } from '@/lib/firebase';
 import { useToast } from './use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 
-// =================================================================================
-// CRITICAL: GENERATE YOUR VAPID KEY
-// =================================================================================
-// Push notifications will not work without a VAPID key.
-//
-// How to generate your key:
-// 1. Go to your Firebase project settings:
-//    https://console.firebase.google.com/project/blink-notify-494bf/settings/cloudmessaging
-// 2. Under the "Web configuration" section, find "Web Push certificates".
-// 3. Click "Generate key pair".
-// 4. Copy the long string and paste it here, replacing the placeholder.
-// =================================================================================
 const VAPID_KEY = 'BOUJSqwdfKSQu3PW4owhcTLFDWINF9LyPofndBgV1J-E4_kJ1aviHYpyH0RSyOb7tH9RCN9p5yLopw5e0TmUYdE';
 
 export const useFcmToken = () => {
@@ -29,7 +17,25 @@ export const useFcmToken = () => {
   const [isRequesting, setIsRequesting] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
+    // This effect uses the modern Permissions API to get and watch the notification permission state.
+    if (typeof window !== 'undefined' && navigator.permissions) {
+      const handlePermissionChange = (status: PermissionStatus) => {
+        setPermission(status.state);
+      };
+
+      navigator.permissions.query({ name: 'notifications' }).then((status) => {
+        setPermission(status.state);
+        status.onchange = () => handlePermissionChange(status);
+      });
+
+      // Cleanup function to remove the event listener
+      return () => {
+        navigator.permissions.query({ name: 'notifications' }).then((status) => {
+          status.onchange = null;
+        });
+      };
+    } else if (typeof window !== 'undefined' && 'Notification' in window) {
+      // Fallback for older browsers that don't support navigator.permissions
       setPermission(Notification.permission);
     }
   }, []);
@@ -55,7 +61,7 @@ export const useFcmToken = () => {
         console.error("Firebase Messaging is not configured.");
         return null;
     }
-    if (VAPID_KEY === 'PASTE_YOUR_VAPID_KEY_HERE') {
+    if (VAPID_KEY.length < 50) {
         console.error("VAPID key is not set in src/hooks/useFcmToken.ts");
         toast({ variant: "destructive", title: "Configuration Error", description: "VAPID key for push notifications is not set."});
         return null;
@@ -91,6 +97,8 @@ export const useFcmToken = () => {
     setIsRequesting(true);
     try {
       const status = await Notification.requestPermission();
+      // The useEffect with navigator.permissions.query will handle the state update automatically,
+      // but we can set it here for immediate feedback if needed.
       setPermission(status);
 
       if (status === 'granted') {

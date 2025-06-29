@@ -79,14 +79,19 @@ exports.sendPushNotification = functions.firestore
             body,
         },
         webpush: {
+            notification: {
+                icon: "https://placehold.co/192x192.png",
+                // This tag makes new notifications with the same tag replace old ones.
+                tag: `blinkogies-general-update`
+            },
             fcmOptions: {
                 // This URL will be opened when the user clicks the notification.
-                link: url || `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
+                link: url || `https://blink-notify-494bf.firebaseapp.com`,
             },
-            notification: {
-                // A default icon for your notifications
-                icon: "https://placehold.co/192x192.png",
-            },
+        },
+        data: {
+            // We pass the URL in the data payload for the foreground listener to use.
+            url: url || `https://blink-notify-494bf.firebaseapp.com`,
         },
         tokens,
     };
