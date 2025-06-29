@@ -67,7 +67,7 @@ export default function ChildrenPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
   
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -98,14 +98,12 @@ export default function ChildrenPage() {
   }, [toast]);
 
   useEffect(() => {
-    const configured = isFirebaseConfigured();
-    setIsConfigured(configured);
-    if (configured) {
+    if (isConfigured) {
       fetchChildren();
     } else {
       setIsLoading(false);
     }
-  }, [fetchChildren]);
+  }, [isConfigured, fetchChildren]);
   
   const handleExportCSV = () => {
     if (children.length === 0) {

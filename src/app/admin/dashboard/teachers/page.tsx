@@ -45,7 +45,7 @@ export default function ManageTeachersPage() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
   const currentUser = auth?.currentUser;
 
   const fetchTeachers = useCallback(async () => {
@@ -62,14 +62,12 @@ export default function ManageTeachersPage() {
   }, [toast]);
 
   useEffect(() => {
-    const configured = isFirebaseConfigured();
-    setIsConfigured(configured);
-    if (configured) {
+    if (isConfigured) {
       fetchTeachers();
     } else {
       setIsLoading(false);
     }
-  }, [fetchTeachers]);
+  }, [isConfigured, fetchTeachers]);
 
   const handleDeleteClick = (teacher: Teacher) => {
     setTeacherToDelete(teacher);

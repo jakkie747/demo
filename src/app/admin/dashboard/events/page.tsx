@@ -69,7 +69,7 @@ export default function ManageEventsPage() {
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
   const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -96,14 +96,12 @@ export default function ManageEventsPage() {
   }, [toast]);
 
   useEffect(() => {
-    const configured = isFirebaseConfigured();
-    setIsConfigured(configured);
-    if (configured) {
+    if (isConfigured) {
       fetchEvents();
     } else {
       setIsLoading(false);
     }
-  }, [fetchEvents]);
+  }, [isConfigured, fetchEvents]);
 
   const handleEditClick = (event: Event) => {
     setEditingEvent(event);

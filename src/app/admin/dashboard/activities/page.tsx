@@ -68,7 +68,7 @@ export default function ManageActivitiesPage() {
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
   const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
 
   const form = useForm<z.infer<typeof activityFormSchema>>({
@@ -108,14 +108,12 @@ export default function ManageActivitiesPage() {
   }, [toast]);
 
   useEffect(() => {
-    const configured = isFirebaseConfigured();
-    setIsConfigured(configured);
-    if (configured) {
+    if (isConfigured) {
       fetchActivities();
     } else {
       setIsLoading(false);
     }
-  }, [fetchActivities]);
+  }, [isConfigured, fetchActivities]);
 
   const handleEditClick = (activity: Activity) => {
     setEditingActivity(activity);

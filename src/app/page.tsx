@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -18,7 +19,7 @@ export default function Home() {
   const { toast } = useToast();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
 
   const fetchActivities = useCallback(async () => {
     setIsLoading(true);
@@ -34,14 +35,12 @@ export default function Home() {
   }, [toast]);
 
   useEffect(() => {
-    const configured = isFirebaseConfigured();
-    setIsConfigured(configured);
-    if (configured) {
+    if (isConfigured) {
       fetchActivities();
     } else {
       setIsLoading(false);
     }
-  }, [fetchActivities]);
+  }, [isConfigured, fetchActivities]);
 
   const renderRecentActivities = () => {
     if (isLoading) {

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -25,7 +26,7 @@ export default function DashboardPage() {
   const [childrenCount, setChildrenCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -46,14 +47,12 @@ export default function DashboardPage() {
   }, [toast]);
 
   useEffect(() => {
-    const configured = isFirebaseConfigured();
-    setIsConfigured(configured);
-    if (configured) {
+    if (isConfigured) {
       fetchData();
     } else {
       setIsLoading(false);
     }
-  }, [fetchData]);
+  }, [isConfigured, fetchData]);
 
   if (!isConfigured) {
     return (

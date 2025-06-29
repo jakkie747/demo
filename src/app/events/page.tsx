@@ -48,7 +48,7 @@ export default function EventsPage() {
   const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
 
   const loadEvents = useCallback(async () => {
     setIsLoading(true);
@@ -68,14 +68,12 @@ export default function EventsPage() {
   }, [toast]);
 
   useEffect(() => {
-    const configured = isFirebaseConfigured();
-    setIsConfigured(configured);
-    if (configured) {
+    if (isConfigured) {
       loadEvents();
     } else {
       setIsLoading(false);
     }
-  }, [loadEvents]);
+  }, [isConfigured, loadEvents]);
 
   if (!isConfigured) {
     return (
