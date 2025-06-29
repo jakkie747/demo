@@ -1,10 +1,11 @@
-// This file must be in the public folder.
+// This file is required for Firebase Cloud Messaging.
 
-// Import the Firebase app and messaging scripts
-importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+// Scripts for Firebase v9+
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
 
-// This configuration is automatically populated from your src/lib/firebase.ts
+// Your web app's Firebase configuration.
+// This must be copied from src/lib/firebase.ts and cannot be imported.
 const firebaseConfig = {
   apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
   authDomain: "blink-notify-494bf.firebaseapp.com",
@@ -15,24 +16,23 @@ const firebaseConfig = {
 };
 
 
-// Initialize the Firebase app in the service worker
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging(app);
 
-// Retrieve an instance of Firebase Messaging so that it can handle background messages.
-const messaging = firebase.messaging();
-
+// This handler will be called when a notification is received
+// while the app is in the background.
 messaging.onBackgroundMessage((payload) => {
   console.log(
-    '[firebase-messaging-sw.js] Received background message ',
+    "[firebase-messaging-sw.js] Received background message ",
     payload
   );
 
+  // Customize the notification here
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: 'https://placehold.co/192x192.png', // A default icon
+    icon: 'https://placehold.co/192x192.png'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

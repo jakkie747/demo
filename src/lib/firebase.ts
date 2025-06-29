@@ -5,28 +5,14 @@ import { getAuth, type Auth } from "firebase/auth";
 import { getMessaging, type Messaging } from "firebase/messaging";
 
 // =================================================================================
-// CRITICAL: COMPLETE YOUR FIREBASE CONFIGURATION
-// =================================================================================
-// Your app is not connected to Firebase. Please complete the configuration below.
-//
-// How to find your Web App's Firebase config:
-// 1. Go to your Firebase project settings:
-//    https://console.firebase.google.com/project/blink-notify-494bf/settings/general
-// 2. In the "Your apps" section, find your Web App (it has a </> icon).
-// 3. In the "SDK setup and configuration" section, select "Config".
-// 4. Copy the `apiKey` and `appId` values and paste them into the empty strings below.
+// Your Web App's Firebase configuration
 // =================================================================================
 export const firebaseConfig = {
-  // PASTE YOUR WEB APP'S API KEY HERE
   apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
-
-  // These values are correct for your project. Do not change them.
   authDomain: "blink-notify-494bf.firebaseapp.com",
   projectId: "blink-notify-494bf",
   storageBucket: "blink-notify-494bf.firebasestorage.app",
   messagingSenderId: "450079883039",
-
-  // PASTE YOUR WEB APP'S APP ID HERE
   appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
 };
 
