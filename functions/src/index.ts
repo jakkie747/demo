@@ -59,8 +59,8 @@ export const sendPushNotification = functions.firestore
           link: url || `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com`,
         },
         notification: {
-            // You can add a default icon for your notifications here
-            // icon: "https://your-domain.com/icon.png",
+            // A default icon for your notifications
+            icon: "https://placehold.co/192x192.png",
         },
       },
       tokens,
