@@ -3,6 +3,7 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 import { getAuth, type Auth } from "firebase/auth";
 import { getMessaging, type Messaging } from "firebase/messaging";
+import { getFunctions, type Functions } from "firebase/functions";
 
 // =================================================================================
 // Your Web App's Firebase configuration
@@ -21,6 +22,7 @@ let db: any | null = null;
 let storage: FirebaseStorage | any | null = null;
 let auth: Auth | null = null;
 let messaging: Messaging | null = null;
+let functions: Functions | null = null;
 
 // Helper to check if the config is populated, so we can show a nice error.
 export const isFirebaseConfigured = () => {
@@ -36,10 +38,11 @@ if (isFirebaseConfigured()) {
     db = getFirestore(app);
     storage = getStorage(app);
     auth = getAuth(app);
+    functions = getFunctions(app);
     
     if (typeof window !== 'undefined') {
         messaging = getMessaging(app);
     }
 }
 
-export { app, db, storage, auth, messaging };
+export { app, db, storage, auth, messaging, functions };

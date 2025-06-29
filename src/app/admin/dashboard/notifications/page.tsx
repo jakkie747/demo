@@ -27,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Bell, Info } from "lucide-react";
-import { queueNotificationForSending } from '@/services/notificationService';
+import { sendNotificationDirectly } from '@/services/notificationService';
 
 const notificationFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long."),
@@ -52,22 +52,32 @@ export default function NotificationsPage() {
   async function onSubmit(values: z.infer<typeof notificationFormSchema>) {
     setIsSending(true);
     try {
-      await queueNotificationForSending({
+      const result = await sendNotificationDirectly({
         title: values.title,
         body: values.body,
         url: values.url || "/",
       });
-      toast({
-        title: "Notification Queued",
-        description: "Your notification is being prepared and will be sent shortly.",
-      });
+
+      if (result.failureCount > 0) {
+        toast({
+          variant: "destructive",
+          title: "Some Notifications Failed",
+          description: `Successfully sent to ${result.successCount} devices. Failed to send to ${result.failureCount}.`,
+        });
+      } else {
+         toast({
+          title: "Notifications Sent!",
+          description: `Successfully sent to ${result.successCount} devices.`,
+        });
+      }
+
       form.reset();
     } catch (error) {
-      console.error("Error queuing notification:", error);
+      console.error("Error sending notification:", error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: (error as Error).message || "Could not queue the notification.",
+        title: "Error Sending Notification",
+        description: (error as Error).message,
       });
     } finally {
       setIsSending(false);
@@ -83,10 +93,10 @@ export default function NotificationsPage() {
           <AlertTitle>How This Works</AlertTitle>
           <AlertDescription>
             <p>
-              This form adds your message to a queue in the database. A secure backend process (a Firebase Cloud Function, which must be deployed separately) will then read from this queue and send the notification to all registered parents.
+              This form directly calls a secure backend function to send a push notification to all parents who have enabled them. You will get immediate feedback on whether the send was successful.
             </p>
             <p className="mt-2 font-bold">
-              You will need to deploy a Cloud Function to your Firebase project for notifications to be sent.
+              You must deploy the Cloud Function to your Firebase project for this to work.
             </p>
           </AlertDescription>
         </Alert>
@@ -146,7 +156,7 @@ export default function NotificationsPage() {
               />
               <Button type="submit" disabled={isSending}>
                 <Bell className="mr-2 h-4 w-4" />
-                {isSending ? "Queueing..." : "Queue Notification for Sending"}
+                {isSending ? "Sending..." : "Send Notification Now"}
               </Button>
             </form>
           </Form>

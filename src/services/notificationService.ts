@@ -1,35 +1,34 @@
-'use server';
-
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { functions } from '@/lib/firebase';
+import { httpsCallable } from 'firebase/functions';
 import { promiseWithTimeout } from '@/lib/utils';
 import type { NotificationPayload } from '@/lib/types';
 
-const TIMEOUT_DURATION = 15000;
+const TIMEOUT_DURATION = 30000; // 30 seconds for a callable function
 
 /**
- * Adds a notification to a Firestore collection to be processed by a backend worker.
- * THIS DOES NOT SEND THE NOTIFICATION DIRECTLY.
- * A separate backend process (e.g., a Firebase Cloud Function) must be set up
- * to listen for new documents in the 'notificationQueue' collection and send them.
+ * Directly calls the 'sendPushNotification' Cloud Function to send a message
+ * to all registered devices.
+ * @param payload The notification content (title, body, url).
+ * @returns An object with the status and counts of success/failure.
  */
-export const queueNotificationForSending = async (payload: NotificationPayload) => {
-  if (!db) {
-    throw new Error('Firebase is not configured. Cannot queue notification.');
+export const sendNotificationDirectly = async (payload: NotificationPayload) => {
+  if (!functions) {
+    throw new Error('Firebase Functions is not configured.');
   }
 
   try {
-    const queueCollection = collection(db, 'notificationQueue');
-    await promiseWithTimeout(
-      addDoc(queueCollection, {
-        ...payload,
-        createdAt: serverTimestamp(),
-      }),
+    const sendPushNotification = httpsCallable(functions, 'sendPushNotification');
+    
+    const result = await promiseWithTimeout(
+      sendPushNotification(payload),
       TIMEOUT_DURATION,
-      new Error('Request to queue notification timed out.')
+      new Error('Request to send notification timed out. The function may still be running.')
     );
+    
+    return result.data as { status: string; successCount: number; failureCount: number };
   } catch (error) {
-    console.error('Error queuing notification for sending:', error);
-    throw new Error('Failed to add notification to the send queue.');
+    console.error('Error calling sendPushNotification function:', error);
+    const httpsError = error as any;
+    throw new Error(httpsError.message || 'Failed to send notification.');
   }
 };
