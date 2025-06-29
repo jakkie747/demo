@@ -29,6 +29,11 @@ export const sendNotificationDirectly = async (payload: NotificationPayload) => 
   } catch (error) {
     console.error('Error calling sendBulkNotification function:', error);
     const httpsError = error as any;
+
+    if (httpsError.code === 'internal') {
+      throw new Error('An internal server error occurred. Please check the Cloud Function logs in the Firebase Console for more details.');
+    }
+    
     throw new Error(httpsError.message || 'Failed to send notification.');
   }
 };
