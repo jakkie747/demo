@@ -14,6 +14,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import { useFcmToken } from "@/hooks/useFcmToken";
@@ -80,10 +86,19 @@ export function Header() {
     }
     if (permission === 'denied') {
         return (
-            <Badge variant="destructive" className="hidden md:flex items-center gap-2">
-                <BellOff className="h-4 w-4"/>
-                <span>{t('notificationsDenied')}</span>
-            </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="destructive" className="hidden md:flex items-center gap-2 cursor-help">
+                    <BellOff className="h-4 w-4"/>
+                    <span>{t('notificationsDenied')}</span>
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                  <p>{t('youCanEnableLater')}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )
     }
     if (permission === 'default') {
