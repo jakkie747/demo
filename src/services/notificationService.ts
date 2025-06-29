@@ -19,6 +19,7 @@ export const sendNotificationDirectly = async (payload: NotificationPayload) => 
   try {
     const sendBulkNotification = httpsCallable(functions, 'sendBulkNotification');
     
+    // The payload is passed directly. The Functions SDK handles wrapping it.
     const result = await promiseWithTimeout(
       sendBulkNotification(payload),
       TIMEOUT_DURATION,
