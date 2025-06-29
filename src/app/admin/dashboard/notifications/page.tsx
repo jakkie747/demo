@@ -26,9 +26,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Mail, MessageCircle, Info } from "lucide-react";
+import { Mail, AlertTriangle } from "lucide-react";
 import { getChildren } from "@/services/childrenService";
 import { Skeleton } from "@/components/ui/skeleton";
+import { sendBulkEmail } from "@/services/emailService";
+import { isFirebaseConfigured } from "@/lib/firebase";
+
 
 const messageFormSchema = z.object({
   subject: z.string().min(5, "Subject must be at least 5 characters long."),
@@ -40,8 +43,14 @@ export default function ComposeMessagePage() {
   const { t } = useLanguage();
   const [emails, setEmails] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const [isConfigured] = useState(isFirebaseConfigured());
 
   useEffect(() => {
+    if (!isConfigured) {
+        setIsLoading(false);
+        return;
+    }
     const fetchParentEmails = async () => {
       setIsLoading(true);
       try {
@@ -63,7 +72,7 @@ export default function ComposeMessagePage() {
       }
     };
     fetchParentEmails();
-  }, [toast]);
+  }, [toast, isConfigured]);
 
   const form = useForm<z.infer<typeof messageFormSchema>>({
     resolver: zodResolver(messageFormSchema),
@@ -73,7 +82,7 @@ export default function ComposeMessagePage() {
     },
   });
 
-  const handleComposeEmail = async () => {
+  const handleSendEmail = async () => {
     const isValid = await form.trigger();
     if (!isValid) {
       toast({
@@ -85,41 +94,34 @@ export default function ComposeMessagePage() {
       return;
     }
 
-    const { subject, body } = form.getValues();
     if (emails.length === 0) {
       toast({
         variant: "destructive",
         title: "No Recipients",
-        description: "There are no parent emails registered in the system.",
+        description: "There are no parent emails registered to send to.",
       });
       return;
     }
-
-    const bcc = emails.join(",");
-    const mailtoLink = `mailto:?bcc=${encodeURIComponent(
-      bcc
-    )}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoLink;
-  };
-
-  const handleComposeWhatsapp = async () => {
-    const isValid = await form.trigger();
-    if (!isValid) {
-      toast({
-        variant: "destructive",
-        title: "Form Incomplete",
-        description:
-          "Please make sure the subject and body meet the minimum length requirements.",
-      });
-      return;
-    }
-
+    
+    setIsSending(true);
     const { subject, body } = form.getValues();
-    const message = `*${subject}*\n\n${body}`;
-    const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(whatsappLink, "_blank");
+    
+    try {
+        await sendBulkEmail(subject, body, emails);
+        toast({
+            title: "Email Queued for Sending",
+            description: "Your message will be sent shortly via the Trigger Email extension.",
+        });
+        form.reset();
+    } catch(error) {
+        toast({
+            variant: "destructive",
+            title: "Error Queuing Email",
+            description: (error as Error).message || "Could not queue the email. Ensure the 'Trigger Email' extension is configured.",
+        });
+    } finally {
+        setIsSending(false);
+    }
   };
 
   return (
@@ -129,18 +131,14 @@ export default function ComposeMessagePage() {
           Compose Message
         </h2>
         <Alert>
-          <Info className="h-4 w-4" />
-          <AlertTitle>How This Works</AlertTitle>
+          <Mail className="h-4 w-4" />
+          <AlertTitle>Send Email to All Parents</AlertTitle>
           <AlertDescription>
             <p>
-              Use this form to draft a message. Then, click one of the buttons
-              below to open the message in your default email client or
-              WhatsApp.
+                Use this form to draft and send an email directly to all registered parents.
             </p>
-            <p className="mt-2">
-              For email, all registered parent emails will be automatically
-              added to the BCC field for privacy. For WhatsApp, you can copy the
-              message and paste it into your parent groups.
+            <p className="mt-2 font-bold">
+                For this to work, you must install and configure the "Trigger Email" Firebase Extension from the Firebase Console. Set it to watch the `mail` collection.
             </p>
           </AlertDescription>
         </Alert>
@@ -150,7 +148,7 @@ export default function ComposeMessagePage() {
         <CardHeader>
           <CardTitle>Message Details</CardTitle>
           <CardDescription>
-            Write the subject and body of your message here.
+            Write the subject and body of your message here. The message will be sent to all parents who have provided an email address.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -166,6 +164,7 @@ export default function ComposeMessagePage() {
                       <Input
                         placeholder="e.g. Important Update: School Concert"
                         {...field}
+                        disabled={isSending}
                       />
                     </FormControl>
                     <FormMessage />
@@ -183,6 +182,7 @@ export default function ComposeMessagePage() {
                         placeholder="e.g. Dear parents, please remember the concert is this Friday at 6 PM..."
                         {...field}
                         rows={8}
+                        disabled={isSending}
                       />
                     </FormControl>
                     <FormMessage />
@@ -197,7 +197,7 @@ export default function ComposeMessagePage() {
               <Skeleton className="h-6 w-48" />
             ) : (
               <p className="text-sm text-muted-foreground">
-                This message will be prepared for{" "}
+                This email will be sent to{" "}
                 <strong className="text-foreground">
                   {emails.length} unique parent emails
                 </strong>
@@ -206,17 +206,26 @@ export default function ComposeMessagePage() {
             )}
             <div className="mt-4 flex flex-col sm:flex-row gap-4">
               <Button
-                onClick={handleComposeEmail}
-                disabled={emails.length === 0 || isLoading}
+                onClick={handleSendEmail}
+                disabled={!isConfigured || emails.length === 0 || isLoading || isSending}
               >
-                <Mail className="mr-2 h-4 w-4" />
-                Compose for Email
-              </Button>
-              <Button onClick={handleComposeWhatsapp} variant="secondary">
-                <MessageCircle className="mr-2 h-4 w-4" />
-                Compose for WhatsApp
+                {isSending ? "Queuing Email..." : (
+                    <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Send Email to All Parents
+                    </>
+                )}
               </Button>
             </div>
+             {!isConfigured && (
+                <Alert variant="destructive" className="mt-4">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Firebase Not Configured</AlertTitle>
+                    <AlertDescription>
+                        Please configure your Firebase credentials in <code>src/lib/firebase.ts</code> to enable this feature.
+                    </AlertDescription>
+                </Alert>
+             )}
           </div>
         </CardContent>
       </Card>
