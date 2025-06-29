@@ -44,7 +44,7 @@ import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
-  dateOfBirth: z.string().refine((dob) => !isNaN(new Date(dob).getTime()), {
+  dateOfBirth: z.string().refine((dob) => dob && !isNaN(new Date(dob).getTime()), {
     message: "Please enter a valid date of birth.",
   }),
   childGender: z.enum(["male", "female", "other"]),
@@ -315,13 +315,14 @@ export default function RegisterPage() {
                       render={({ field }) => (
                           <FormItem>
                           <FormLabel>{t('dateOfBirth')}</FormLabel>
-                          <FormControl>
-                               <Input
-                                type="date"
-                                {...field}
+                           <FormControl>
+                              <Input 
+                                type="date" 
+                                {...field} 
                                 disabled={isSubmitting}
-                               />
-                          </FormControl>
+                                className="w-full"
+                              />
+                            </FormControl>
                           <FormMessage />
                           </FormItem>
                       )}
@@ -600,5 +601,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-    
