@@ -47,9 +47,3 @@ export interface Teacher {
   role: 'admin' | 'teacher';
   photo?: string;
 }
-
-export interface NotificationPayload {
-  title: string;
-  body: string;
-  url?: string;
-}

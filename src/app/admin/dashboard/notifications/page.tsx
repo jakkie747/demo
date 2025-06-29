@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -14,7 +15,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,77 +26,108 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Bell, Info } from "lucide-react";
-import { sendNotificationDirectly } from '@/services/notificationService';
+import { Mail, MessageCircle, Info } from "lucide-react";
+import { getChildren } from "@/services/childrenService";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const notificationFormSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters long."),
+const messageFormSchema = z.object({
+  subject: z.string().min(5, "Subject must be at least 5 characters long."),
   body: z.string().min(10, "Body must be at least 10 characters long."),
-  url: z.string().url("Please enter a valid URL (e.g., https://example.com/events).").optional().or(z.literal('')),
 });
 
-export default function NotificationsPage() {
+export default function ComposeMessagePage() {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const [isSending, setIsSending] = useState(false);
+  const [emails, setEmails] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const form = useForm<z.infer<typeof notificationFormSchema>>({
-    resolver: zodResolver(notificationFormSchema),
+  useEffect(() => {
+    const fetchParentEmails = async () => {
+      setIsLoading(true);
+      try {
+        const children = await getChildren();
+        const parentEmails = children
+          .map((child) => child.parentEmail)
+          .filter((email) => !!email);
+        const uniqueEmails = [...new Set(parentEmails)];
+        setEmails(uniqueEmails);
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching parent emails",
+          description:
+            "Could not load parent emails from the children list. Please try again.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchParentEmails();
+  }, [toast]);
+
+  const form = useForm<z.infer<typeof messageFormSchema>>({
+    resolver: zodResolver(messageFormSchema),
     defaultValues: {
-      title: "",
+      subject: "",
       body: "",
-      url: "/events",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof notificationFormSchema>) {
-    setIsSending(true);
-    try {
-      const result = await sendNotificationDirectly({
-        title: values.title,
-        body: values.body,
-        url: values.url || "/",
-      });
-
-      if (result.failureCount > 0) {
-        toast({
-          variant: "destructive",
-          title: "Some Notifications Failed",
-          description: `Successfully sent to ${result.successCount} devices. Failed to send to ${result.failureCount}.`,
-        });
-      } else {
-         toast({
-          title: "Notifications Sent!",
-          description: `Successfully sent to ${result.successCount} devices.`,
-        });
-      }
-
-      form.reset();
-    } catch (error) {
-      console.error("Error sending notification:", error);
+  const handleComposeEmail = () => {
+    const { subject, body } = form.getValues();
+     if (!form.formState.isValid) {
       toast({
         variant: "destructive",
-        title: "Error Sending Notification",
-        description: (error as Error).message,
+        title: "Form Incomplete",
+        description: "Please fill out a subject and body for your message.",
       });
-    } finally {
-      setIsSending(false);
+      return;
     }
-  }
+    if (emails.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "No Recipients",
+        description: "There are no parent emails registered in the system.",
+      });
+      return;
+    }
+
+    const bcc = emails.join(',');
+    const mailtoLink = `mailto:?bcc=${encodeURIComponent(bcc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+  };
+
+  const handleComposeWhatsapp = () => {
+    const { subject, body } = form.getValues();
+     if (!form.formState.isValid) {
+      toast({
+        variant: "destructive",
+        title: "Form Incomplete",
+        description: "Please fill out a subject and body for your message.",
+      });
+      return;
+    }
+
+    const message = `*${subject}*\n\n${body}`;
+    const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(whatsappLink, '_blank');
+  };
 
   return (
     <div className="py-6 space-y-8">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight mb-4">Send Push Notification</h2>
+        <h2 className="text-3xl font-bold tracking-tight mb-4">
+          Compose Message
+        </h2>
         <Alert>
           <Info className="h-4 w-4" />
           <AlertTitle>How This Works</AlertTitle>
           <AlertDescription>
             <p>
-              This form directly calls a secure backend function to send a push notification to all parents who have enabled them. You will get immediate feedback on whether the send was successful.
+              Use this form to draft a message. Then, click one of the buttons below to open the message in your default email client or WhatsApp.
             </p>
-            <p className="mt-2 font-bold">
-              You must deploy the Cloud Function to your Firebase project for this to work.
+            <p className="mt-2">
+              For email, all registered parent emails will be automatically added to the BCC field for privacy. For WhatsApp, you can copy the message and paste it into your parent groups.
             </p>
           </AlertDescription>
         </Alert>
@@ -104,22 +135,22 @@ export default function NotificationsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Compose Message</CardTitle>
+          <CardTitle>Message Details</CardTitle>
           <CardDescription>
-            Create a message to send to all parents who have enabled notifications.
+            Write the subject and body of your message here.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form className="space-y-6">
               <FormField
                 control={form.control}
-                name="title"
+                name="subject"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notification Title</FormLabel>
+                    <FormLabel>Subject</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. School Concert Reminder" {...field} disabled={isSending} />
+                      <Input placeholder="e.g. Important Update: School Concert" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -130,36 +161,41 @@ export default function NotificationsPage() {
                 name="body"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notification Body</FormLabel>
+                    <FormLabel>Body</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="e.g. Don't forget the concert is this Friday at 6 PM!" {...field} disabled={isSending}/>
+                      <Textarea
+                        placeholder="e.g. Dear parents, please remember the concert is this Friday at 6 PM..."
+                        {...field}
+                        rows={8}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link URL (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="/events" {...field} disabled={isSending} />
-                    </FormControl>
-                    <FormDescription>
-                      When a user clicks the notification, they will be taken to this page. Starts with a '/'.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isSending}>
-                <Bell className="mr-2 h-4 w-4" />
-                {isSending ? "Sending..." : "Send Notification Now"}
-              </Button>
             </form>
           </Form>
+           <div className="mt-6 border-t pt-6">
+            <h3 className="text-lg font-medium mb-2">Recipients</h3>
+            {isLoading ? (
+                <Skeleton className="h-6 w-48" />
+            ) : (
+                 <p className="text-sm text-muted-foreground">
+                    This message will be prepared for{' '}
+                    <strong className="text-foreground">{emails.length} unique parent emails</strong>.
+                </p>
+            )}
+            <div className="mt-4 flex flex-col sm:flex-row gap-4">
+                <Button onClick={handleComposeEmail} disabled={emails.length === 0 || isLoading}>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Compose for Email
+                </Button>
+                <Button onClick={handleComposeWhatsapp} variant="secondary">
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Compose for WhatsApp
+                </Button>
+            </div>
+           </div>
         </CardContent>
       </Card>
     </div>

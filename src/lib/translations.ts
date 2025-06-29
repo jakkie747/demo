@@ -8,8 +8,6 @@ export const translations = {
     adminLoginNav: 'Admin Login',
     language: 'Language',
     installApp: 'Install App',
-    enableNotifications: 'Enable Notifications',
-    enabling: 'Enabling...',
 
     // Footer
     copyright: '© 2025 Blinkogies Family Hub. All rights reserved.',
@@ -110,7 +108,7 @@ export const translations = {
     manageEvents: 'Manage Events',
     manageActivities: 'Manage Activities',
     manageTeachers: 'Manage Teachers',
-    sendNotifications: 'Send Notifications',
+    composeMessage: 'Compose Message',
 
     // Admin Dashboard Page
     registeredChildren: 'Registered Children',
@@ -234,17 +232,6 @@ export const translations = {
     deleteTeacherConfirmDesc: 'This action cannot be undone. This will permanently delete the teacher profile for {name}. Because this is a prototype, the user account will need to be deleted manually from your authentication provider.',
     teacherPhoto: "Teacher's Photo",
     teacherPhotoDesc: "An optional profile photo for the teacher.",
-
-    // Notifications
-    notificationsNotSupported: 'Notifications not supported on this device.',
-    couldNotSaveToken: 'Could not save notification token.',
-    notificationError: 'Notification Error',
-    couldNotGetToken: 'Could not get notification token. Please ensure cookies are not blocked.',
-    notificationsEnabled: 'Notifications Enabled',
-    youWillReceiveUpdates: 'You will now receive updates.',
-    notificationsDenied: 'Notifications Blocked',
-    youCanEnableLater: 'You can enable them in your browser settings later.',
-    couldNotRequestPermission: 'Could not request notification permission.',
   },
   af: {
     // Header
@@ -254,8 +241,6 @@ export const translations = {
     adminLoginNav: 'Admin Aanteken',
     language: 'Taal',
     installApp: 'Installeer Toepassing',
-    enableNotifications: 'Aktiveer Kennisgewings',
-    enabling: 'Aktiveer...',
 
     // Footer
     copyright: '© 2025 Blinkogies Family Hub. Alle regte voorbehou.',
@@ -356,7 +341,7 @@ export const translations = {
     manageEvents: 'Bestuur Geleenthede',
     manageActivities: 'Bestuur Aktiwiteite',
     manageTeachers: 'Bestuur Onderwysers',
-    sendNotifications: 'Stuur Kennisgewings',
+    composeMessage: 'Stel Boodskap Op',
 
     // Admin Dashboard Page
     registeredChildren: 'Geregistreerde Kinders',
@@ -481,17 +466,6 @@ export const translations = {
     deleteTeacherConfirmDesc: 'Hierdie aksie kan nie ongedaan gemaak word nie. Dit sal die onderwyserprofiel vir {name} permanent uitvee. Omdat dit \'n prototipe is, sal die gebruikersrekening handmatig van u stawingverskaffer verwyder moet word.',
     teacherPhoto: "Onderwyser se Foto",
     teacherPhotoDesc: "'n Opsionele profielfoto vir die onderwyser.",
-    
-    // Notifications
-    notificationsNotSupported: 'Kennisgewings word nie op hierdie toestel ondersteun nie.',
-    couldNotSaveToken: 'Kon nie kennisgewing-token stoor nie.',
-    notificationError: 'Kennisgewing Fout',
-    couldNotGetToken: 'Kon nie kennisgewing-token kry nie. Maak asseblief seker dat koekies nie geblokkeer word nie.',
-    notificationsEnabled: 'Kennisgewings Geaktiveer',
-    youWillReceiveUpdates: 'U sal nou opdaterings ontvang.',
-    notificationsDenied: 'Kennisgewings Geblokkeer',
-    youCanEnableLater: 'U kan dit later in u blaaierinstellings aktiveer.',
-    couldNotRequestPermission: 'Kon nie kennisgewingstoestemming versoek nie.',
   },
 };
 
