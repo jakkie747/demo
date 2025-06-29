@@ -41,34 +41,32 @@ admin.initializeApp();
 const db = admin.firestore();
 const messaging = admin.messaging();
 /**
- * Sends a push notification when a new document is added to the notificationQueue.
+ * A callable Cloud Function to send a push notification to all subscribed devices.
  *
- * This function is triggered when a new document is created in the
- * `notificationQueue` collection. It fetches all FCM tokens from the `fcmTokens`
- * collection and sends the notification to each device. It also handles cleanup
- * of invalid or outdated tokens.
+ * This function is invoked directly from the client-side application.
+ * It fetches all FCM tokens from the `fcmTokens` collection, sends the
+ * notification to each device, and handles cleanup of invalid or outdated tokens.
  */
-exports.sendPushNotification = functions.firestore
-    .document("notificationQueue/{notificationId}")
-    .onCreate(async (snapshot) => {
-    const notificationData = snapshot.data();
-    if (!notificationData) {
-        functions.logger.log("No data in notification document.");
-        return;
-    }
-    const { title, body, url } = notificationData;
+exports.sendPushNotification = functions.https.onCall(async (data, context) => {
+    functions.logger.log("sendPushNotification function triggered.");
+    // For a real app, you would want to check for authentication
+    // if (!context.auth) {
+    //   throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    // }
+    // const userRole = context.auth.token.role;
+    // if (userRole !== 'admin') {
+    //   throw new functions.https.HttpsError('permission-denied', 'Only admins can send notifications.');
+    // }
+    const { title, body, url } = data;
     if (!title || !body) {
-        functions.logger.error("Notification missing title or body:", notificationData);
-        return;
+        throw new functions.https.HttpsError("invalid-argument", 'The function must be called with "title" and "body" arguments.');
     }
     functions.logger.log(`Processing notification: ${title}`);
     // 1. Get all FCM tokens from the 'fcmTokens' collection.
     const tokensSnapshot = await db.collection("fcmTokens").get();
     if (tokensSnapshot.empty) {
         functions.logger.log("No FCM tokens found. No notifications sent.");
-        // Delete the processed notification from the queue.
-        await snapshot.ref.delete();
-        return;
+        return { status: "no-tokens", successCount: 0, failureCount: 0 };
     }
     const tokens = tokensSnapshot.docs.map((doc) => doc.id);
     functions.logger.log(`Found ${tokens.length} tokens to send to.`);
@@ -81,8 +79,7 @@ exports.sendPushNotification = functions.firestore
         webpush: {
             notification: {
                 icon: "https://placehold.co/192x192.png",
-                // This tag makes new notifications with the same tag replace old ones.
-                tag: `blinkogies-general-update`
+                tag: `blinkogies-general-update`, // This tag makes new notifications with the same tag replace old ones.
             },
             fcmOptions: {
                 // This URL will be opened when the user clicks the notification.
@@ -118,8 +115,11 @@ exports.sendPushNotification = functions.firestore
         }
     });
     await Promise.all(tokensToDelete);
-    // 5. Delete the processed notification from the queue.
-    await snapshot.ref.delete();
-    functions.logger.log(`Notification processed and deleted from queue.`);
+    functions.logger.log("Notification process complete.");
+    return {
+        status: "success",
+        successCount: batchResponse.successCount,
+        failureCount: batchResponse.failureCount,
+    };
 });
 //# sourceMappingURL=index.js.map
