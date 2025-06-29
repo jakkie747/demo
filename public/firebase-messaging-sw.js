@@ -1,8 +1,9 @@
-// This file needs to be in the public directory.
+// This service worker is required to receive and display web push notifications.
+// It must be located in the public directory.
 
-// Import the Firebase scripts that are needed
-import { initializeApp } from "firebase/app";
-import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
+// Scripts for Firebase and Firebase Messaging
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js");
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,21 +17,29 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+if (firebase.apps.length === 0) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-onBackgroundMessage(messaging, (payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  
-  if (!payload.notification) {
-    console.log("No notification payload, skipping display.");
-    return;
-  }
+// Retrieve an instance of Firebase Messaging so that it can handle background
+// messages.
+const messaging = firebase.messaging();
 
-  const notificationTitle = payload.notification.title || "New Notification";
+// The onBackgroundMessage handler is used for custom logic when a data message
+// is received. For simple notifications sent from the backend, Firebase
+// handles displaying the notification automatically, so this can be left empty
+// or customized later if needed.
+messaging.onBackgroundMessage((payload) => {
+  console.log(
+    "[firebase-messaging-sw.js] Received background message ",
+    payload
+  );
+
+  // Customize notification here
+  const notificationTitle = payload.notification?.title || "Blinkogies Update";
   const notificationOptions = {
-    body: payload.notification.body || "You have a new message.",
-    icon: payload.notification.image || "https://placehold.co/192x192.png"
+    body: payload.notification?.body,
+    icon: payload.notification?.image || "https://placehold.co/192x192.png",
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
