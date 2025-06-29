@@ -15,7 +15,7 @@ const messaging = admin.messaging();
  * It fetches all FCM tokens from the `fcmTokens` collection, sends the
  * notification to each device in batches, and handles cleanup of invalid tokens.
  */
-export const sendBulkNotification = functions.https.onCall(async (data, context) => {
+export const sendBulkNotification = functions.https.onCall(async (data: any, context) => {
   functions.logger.log("sendBulkNotification function triggered.");
 
   // For a real app, you would want to add authentication checks here.
