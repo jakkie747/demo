@@ -21,7 +21,7 @@ import { useLanguage } from '@/context/LanguageContext';
 //
 // =================================================================
 // =================================================================
-const VAPID_KEY = 'PASTE_YOUR_GENERATED_VAPID_KEY_HERE';
+const VAPID_KEY = 'BOUJSqwdfKSQu3PW4owhcTLFDWINF9LyPofndBgV1J-E4_kJ1aviHYpyH0RSyOb7tH9RCN9p5yLopw5e0TmUYdE';
 
 export const useFcmToken = () => {
   const { toast } = useToast();
@@ -101,9 +101,9 @@ export const useFcmToken = () => {
       if (fcmError.code === 'messaging/token-subscribe-failed') {
         toast({
           variant: 'destructive',
-          title: 'Invalid VAPID Key',
-          description: 'The VAPID key in src/hooks/useFcmToken.ts is incorrect or missing. Please follow the instructions in that file to fix it.',
-          duration: 10000,
+          title: 'Browser Security Error',
+          description: 'Could not get notification token. This is often caused by your browser blocking cookies or site data. Please check your browser settings for this site.',
+          duration: 15000,
         });
       } else {
         toast({
