@@ -1,6 +1,8 @@
-// Scripts for firebase and firebase messaging
-importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+// This file needs to be in the public directory.
+
+// Import the Firebase scripts that are needed
+import { initializeApp } from "firebase/app";
+import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -12,50 +14,24 @@ const firebaseConfig = {
   appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
 };
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+onBackgroundMessage(messaging, (payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
-  const notificationTitle = payload.notification.title;
+  if (!payload.notification) {
+    console.log("No notification payload, skipping display.");
+    return;
+  }
+
+  const notificationTitle = payload.notification.title || "New Notification";
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: payload.notification.icon || 'https://placehold.co/192x192.png',
-    data: {
-      url: payload.fcmOptions.link
-    }
+    body: payload.notification.body || "You have a new message.",
+    icon: payload.notification.image || "https://placehold.co/192x192.png"
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-// Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
-  console.log('[firebase-messaging-sw.js] Notification click Received.', event.notification);
-  
-  event.notification.close();
-
-  // This looks at the data we passed in when showing the notification
-  const urlToOpen = event.notification.data.url || '/';
-
-  event.waitUntil(
-    clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    }).then((clientList) => {
-      // Check if the page is already open
-      for (const client of clientList) {
-        // Use a more lenient check for the URL
-        if (client.url.includes(urlToOpen) && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // If not, open a new window
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
-      }
-    })
-  );
 });
