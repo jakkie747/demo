@@ -1,9 +1,10 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getToken } from 'firebase/messaging';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { messaging, db, isFirebaseConfigured, firebaseConfig } from '@/lib/firebase';
+import { messaging, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useToast } from './use-toast';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -40,7 +41,7 @@ export const useFcmToken = () => {
     }
   }, []);
 
-  const saveTokenToFirestore = async (fcmToken: string) => {
+  const saveTokenToFirestore = useCallback(async (fcmToken: string) => {
     if (!db) return;
     try {
       const tokenDocRef = doc(db, 'fcmTokens', fcmToken);
@@ -54,9 +55,9 @@ export const useFcmToken = () => {
         description: t('couldNotSaveToken'),
       });
     }
-  };
+  }, [t, toast]);
 
-  const retrieveToken = async () => {
+  const retrieveToken = useCallback(async () => {
     if (!isFirebaseConfigured() || !messaging) {
         console.error("Firebase Messaging is not configured.");
         return null;
@@ -86,7 +87,15 @@ export const useFcmToken = () => {
       });
       return null;
     }
-  };
+  }, [saveTokenToFirestore, t, toast]);
+
+  // This is the new key part of the fix.
+  // It ensures the token is retrieved whenever permission is granted.
+  useEffect(() => {
+    if (permission === 'granted') {
+      retrieveToken();
+    }
+  }, [permission, retrieveToken]);
 
   const requestPermission = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
