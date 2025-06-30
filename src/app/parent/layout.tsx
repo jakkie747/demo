@@ -52,7 +52,7 @@ export default function ParentLayout({
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-16 items-center justify-between">
                 <Link href="/parent/dashboard" className="flex items-center gap-2 font-semibold">
-                    <Logo />
+                    <Logo href={null} />
                     <span className="hidden md:inline">Parent Dashboard</span>
                 </Link>
                 <Button onClick={handleLogout} variant="outline">
