@@ -100,9 +100,9 @@ export default function TermsOfServicePage() {
             </p>
             <div className="p-4 bg-muted/50 rounded-md">
               <strong>Blinkogies Pre-School</strong><br />
-              Email: [Your School's Email Address]<br />
-              Phone: [Your School's Phone Number]<br />
-              Address: [Your School's Physical Address]
+              Email: admin@blinkogies.co.za<br />
+              Phone: 072 595 3421<br />
+              Address: C/O Chris Hougaard and Ockert st, Wierdapark, Centurion
             </div>
           </section>
         </div>
