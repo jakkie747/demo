@@ -163,14 +163,19 @@ export default function ManageReportsPage() {
     setSubmissionError(null);
     try {
       let photoUrl = editingReport?.photoUrl;
-      if (values.photo?.[0]) {
-        if (editingReport?.photoUrl) {
+      const file = values.photo?.[0];
+
+      if (file) {
+        if (editingReport?.photoUrl && editingReport.photoUrl.includes('firebasestorage')) {
           await deleteImageFromUrl(editingReport.photoUrl);
         }
-        photoUrl = await uploadImage(values.photo[0], 'reports');
+        photoUrl = await uploadImage(file, 'reports');
       }
 
-      const reportData = { ...values, photoUrl, childId };
+      // Destructure `photo` from values to prevent it from being sent to Firestore
+      const { photo, ...reportContent } = values;
+
+      const reportData = { ...reportContent, photoUrl, childId };
       
       if (editingReport) {
         await updateReport(editingReport.id, reportData);
