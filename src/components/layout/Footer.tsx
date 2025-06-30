@@ -22,7 +22,7 @@ export function Footer() {
             {t('privacyPolicy')}
           </Link>
           <Link
-            href="#"
+            href="/terms-of-service"
             className="text-sm text-muted-foreground hover:text-primary"
             prefetch={false}
           >
