@@ -1,0 +1,124 @@
+
+# Blinkogies Family Hub - User Manual
+
+Welcome to the Blinkogies Family Hub! This application is designed to be a central place for all communication between the school and our families. This guide will walk you through all the features available to you.
+
+---
+
+## Part 1: For Parents & Guardians
+
+This section covers the features available to all parents and guardians.
+
+### How to Register Your Child
+
+Enrolling your child is the first step to getting connected.
+
+1.  From the app's homepage, click the **"Register Your Child"** button or navigate to the **"Register Child"** link in the header.
+2.  You will see a detailed registration form. Please fill out each section carefully:
+    *   **Child's Information:** Provide your child's full name, date of birth, and gender. You can also optionally upload a recent photo for their profile.
+    *   **Parent/Guardian Information:** Enter your full name, email address, phone number, and physical address.
+    *   **Emergency & Medical Information:** This is crucial. Please provide an emergency contact person and their phone number. Also, list any medical conditions or allergies your child has.
+    *   **Other Information:** Let us know if your child has attended preschool before and add any other notes that might be helpful for our teachers.
+3.  Once the form is complete, click the **"Register Child"** button at the bottom. You will see a success message confirming your registration.
+
+### How to View Upcoming Events
+
+Stay up-to-date with all the fun and important dates on our school calendar.
+
+1.  Click on the **"Events"** link in the header.
+2.  This page will display a list of all upcoming events, such as Sports Day, Pajama Day, or school concerts.
+3.  Each event card shows the event's title, a description, an image, and the date.
+
+### How to Install the App on Your Device
+
+For easy access, you can install the Blinkogies Family Hub app directly to your phone or computer's home screen.
+
+1.  Look for the **"Install App"** button in the header of the website.
+2.  Click the button. Your device will prompt you to confirm the installation.
+3.  Once installed, you can launch the app just like any other app on your device.
+
+### How to Switch Languages
+
+The app is available in English and Afrikaans.
+
+1.  In the header, click the button that shows the other language (e.g., it will say **"Afrikaans"** if you are currently viewing in English).
+2.  The entire app will instantly switch to your selected language.
+
+---
+
+## Part 2: For Administrators (Teachers & Staff)
+
+This section is for authorized administrators and teachers to manage the app's content.
+
+### How to Log In
+
+1.  Navigate to the app and click the **"Admin Login"** link in the header.
+2.  You will be taken to the admin login page. Use the secure email and password credentials provided to you to log in. These credentials are created for you in the school's Firebase Authentication console.
+3.  If you forget your password, you can use the **"Forgot Password?"** link to receive a reset link via email.
+
+### Dashboard Overview
+
+After logging in, you will land on the Admin Dashboard. This page gives you a quick overview of the school's status:
+*   **Summary Cards:** See the total number of registered children and upcoming events at a glance.
+*   **Quick Links:** Use the buttons and cards to quickly navigate to the main management sections of the app.
+
+### How to Manage Child Profiles
+
+1.  From the dashboard, navigate to the **"Children Profiles"** page using the sidebar menu.
+2.  Here you will see a table of all registered children.
+3.  **Importing Children:** You can bulk-add children using a CSV file.
+    *   Click the **"Import Children"** button.
+    *   Select your CSV file. **Note:** The file must have headers that exactly match the child profile fields (e.g., `name`, `dateOfBirth`, `parentEmail`, etc.).
+    *   Confirm the import.
+4.  **Exporting Children:** You can download a CSV file of all registered children by clicking the **"Export Children"** button.
+5.  **Deleting a Child:** To remove a child's profile, click the **trash can icon** in the "Actions" column for that child. You will be asked to confirm the deletion.
+
+### How to Manage Events
+
+1.  Navigate to the **"Manage Events"** page from the sidebar menu.
+2.  **To Create a New Event:**
+    *   Use the form on the left side of the page.
+    *   Fill in the **Event Title**, **Date**, and **Description**.
+    *   Upload an image for the event.
+    *   Click **"Create Event"**.
+3.  **To Edit an Existing Event:**
+    *   In the "Existing Events" table on the right, find the event you wish to edit.
+    *   Click the **pencil icon**. The form on the left will be populated with the event's current details.
+    *   Make your changes and click **"Update Event"**.
+4.  **To Delete an Event:**
+    *   In the table, click the **trash can icon** for the event you want to remove. Confirm the deletion.
+
+### How to Manage Homepage Activities
+
+These are the "Recent Fun Activities" that appear on the public homepage.
+
+1.  Navigate to the **"Manage Activities"** page from the sidebar.
+2.  The process is identical to managing events. Use the form to create, edit, or delete activities that showcase what the children have been doing.
+
+### How to Manage Teachers
+
+1.  Navigate to the **"Manage Teachers"** page from the sidebar.
+2.  **Important:** For security, new teacher and admin accounts **cannot be created from this page**. They must be created in the **Firebase Authentication console**. This page is for viewing teacher data that is already in the system.
+3.  Once a new teacher is added to the authentication system and logs in for the first time, their details will appear here.
+4.  **To Delete a Teacher's App Data:** Click the **trash can icon** next to a teacher's record. This will remove their profile information from the app but **will not** delete their login credentials.
+
+### How to Send Messages to Parents
+
+You can easily send a message to all registered parents via email or WhatsApp.
+
+1.  Navigate to the **"Compose Message"** page from the sidebar.
+2.  Fill out the message form:
+    *   **Subject:** This will be the subject line for emails.
+    *   **Body:** This is the main content of your message for both email and WhatsApp.
+3.  **To Send via Email:**
+    *   Click the **"Send via Email"** button.
+    *   This will open your computer's or phone's default email client (like Gmail, Outlook, Apple Mail).
+    *   The "To" field will be blank, but all parent email addresses will be automatically added to the **BCC (Blind Carbon Copy)** field. This protects parents' privacy.
+    *   You can then send the email as you normally would.
+4.  **To Send via WhatsApp:**
+    *   Click the **"Send via WhatsApp"** button.
+    *   A new browser tab will open to WhatsApp with your message body pre-filled.
+    *   For your convenience, all parent phone numbers have been **copied to your clipboard**. You can then paste these numbers into a new WhatsApp group or broadcast list to send your message.
+
+---
+If you have any questions or run into any issues, please contact the school's administrative office.
