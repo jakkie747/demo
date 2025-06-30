@@ -49,7 +49,7 @@ import type { Document } from "@/lib/types";
 import { getDocuments, addDocument, deleteDocument } from "@/services/documentService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import Link from "next/link";
 
 const documentFormSchema = z.object({
@@ -65,6 +65,7 @@ export default function ManageDocumentsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfigured] = useState(isFirebaseConfigured());
+  const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
 
   const form = useForm<z.infer<typeof documentFormSchema>>({
     resolver: zodResolver(documentFormSchema),
@@ -120,6 +121,7 @@ export default function ManageDocumentsPage() {
   };
 
   async function onSubmit(values: z.infer<typeof documentFormSchema>) {
+    setSubmissionError(null);
     if (!isConfigured) {
       toast({ variant: "destructive", title: "Firebase Not Configured", description: "Please configure Firebase credentials." });
       return;
@@ -140,7 +142,46 @@ export default function ManageDocumentsPage() {
       await fetchDocuments();
       form.reset();
     } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not upload document." });
+       const errorMessage = (error as Error).message || "Could not upload document.";
+       let errorTitle = "Error Uploading Document";
+
+        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+          errorTitle = "Upload Failed: Firebase Storage Not Ready";
+          setSubmissionError({
+            title: errorTitle,
+            description: (
+              <div className="space-y-4 text-sm">
+                <p className="font-bold text-base">
+                  This error usually means your Firebase project is not fully configured for file uploads. Please complete the following one-time setup steps.
+                </p>
+                <ol className="list-decimal list-inside space-y-4 pl-2">
+                  <li><strong>Enable Firebase Storage</strong> and update <strong>Security Rules</strong> as per the other admin pages.</li>
+                  <li>
+                    <strong>Set Storage CORS Policy using Cloud Shell.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
+                      <li>
+                        This step is required to allow your web app to upload files. Open the{' '}
+                        <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">
+                          Google Cloud Shell
+                        </a>.
+                      </li>
+                      <li>
+                        Run these two commands one by one. Copy them exactly.
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
+                          {`echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`}
+                        </pre>
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><strong>Try Again.</strong> After completing all steps, refresh and try again.</li>
+                </ol>
+              </div>
+            )
+          });
+        } else {
+          setSubmissionError({ title: errorTitle, description: errorMessage });
+        }
     } finally {
       setIsSaving(false);
     }
@@ -215,6 +256,15 @@ export default function ManageDocumentsPage() {
                 </Button>
               </form>
             </Form>
+             {submissionError && (
+              <Alert variant="destructive" className="mt-6">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>{submissionError.title}</AlertTitle>
+                <AlertDescription>
+                  {submissionError.description}
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
       </div>

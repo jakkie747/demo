@@ -66,6 +66,7 @@ export default function ManageTeachersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfigured] = useState(isFirebaseConfigured());
+  const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
   const currentUser = auth?.currentUser;
 
   const form = useForm<z.infer<typeof teacherFormSchema>>({
@@ -101,6 +102,7 @@ export default function ManageTeachersPage() {
       homeAddress: teacher.homeAddress || "",
       photo: undefined,
     });
+    setSubmissionError(null);
     setIsDialogOpen(true);
   };
 
@@ -142,6 +144,7 @@ export default function ManageTeachersPage() {
 
   const onEditSubmit = async (values: z.infer<typeof teacherFormSchema>) => {
     if (!editingTeacher) return;
+    setSubmissionError(null);
     setIsSaving(true);
     try {
       let photoUrl = editingTeacher.photo;
@@ -168,8 +171,17 @@ export default function ManageTeachersPage() {
       setEditingTeacher(null);
 
     } catch (error) {
-      const errorMessage = (error as Error).message;
-      toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not update teacher." });
+       const errorMessage = (error as Error).message;
+       let errorTitle = "Error updating teacher.";
+       if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+          errorTitle = "Update Failed: Firebase Storage Not Ready";
+          setSubmissionError({
+            title: errorTitle,
+            description: "There was a problem uploading the photo. Please check the troubleshooting steps on the Manage Events or Gallery pages."
+          });
+        } else {
+           setSubmissionError({ title: errorTitle, description: errorMessage });
+        }
     } finally {
       setIsSaving(false);
     }
@@ -296,7 +308,7 @@ export default function ManageTeachersPage() {
       </Card>
       
       {/* Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={(open) => { if(!open) { setIsDialogOpen(false); setSubmissionError(null); }}}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{t('editTeacherProfile')}</DialogTitle>
@@ -379,6 +391,16 @@ export default function ManageTeachersPage() {
                     </FormItem>
                   )}
                 />
+
+                {submissionError && (
+                    <Alert variant="destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>{submissionError.title}</AlertTitle>
+                        <AlertDescription>
+                        {submissionError.description}
+                        </AlertDescription>
+                    </Alert>
+                )}
 
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>

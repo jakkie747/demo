@@ -185,7 +185,7 @@ export default function ManageEventsPage() {
           description: t('eventUpdatedDesc', { title: values.title }),
         });
       } else {
-        const newEvent: Omit<Event, 'id'> = {
+        const newEvent: Omit<Event, 'id' | 'createdAt'> = {
           ...eventPayload,
           image: imageUrl || "https://placehold.co/600x400.png",
         };
@@ -204,29 +204,19 @@ export default function ManageEventsPage() {
         const errorMessage = (error as Error).message || "Could not save the event.";
         let errorTitle = "Error Saving Event";
 
-        if (errorMessage.includes("timed out")) {
-          errorTitle = "Image Upload Timed Out (Firebase Security Rules)";
+        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+          errorTitle = "Save Failed: Firebase Storage Not Ready";
           setSubmissionError({
             title: errorTitle,
             description: (
               <div className="space-y-4 text-sm">
                 <p className="font-bold text-base">
-                  The error{' '}
-                  <code className="text-destructive bg-destructive/10 px-1 py-0.5 rounded">
-                    NotFoundException: 404 The specified bucket does not exist
-                  </code>{' '}
-                  means one of two things:
+                  This error usually means your Firebase project is not fully configured for file uploads. Please complete the following one-time setup steps.
                 </p>
-                <ul className="list-disc list-inside space-y-1 pl-2">
-                    <li>Firebase Storage has not been enabled for your project yet.</li>
-                    <li>The `storageBucket` value in your `src/lib/firebase.ts` file is incorrect.</li>
-                </ul>
 
-
-                <div className="font-bold text-lg mt-4">Fix: Enable & Verify Storage</div>
-                <ol className="list-decimal list-inside space-y-3 pl-2">
+                <ol className="list-decimal list-inside space-y-4 pl-2">
                   <li>
-                    <strong className="text-destructive">CRITICAL FIRST STEP: Enable Firebase Storage.</strong>
+                    <strong>Enable Firebase Storage.</strong>
                     <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
                       <li>
                         Go to your{' '}
@@ -241,10 +231,7 @@ export default function ManageEventsPage() {
                         .
                       </li>
                       <li>
-                        If you see a "Get Started" screen, click through the prompts to enable it.
-                      </li>
-                      <li>
-                        <strong>You must do this before the other steps.</strong>
+                        If you see a "Get Started" screen, click through the prompts to enable it. This is a critical first step.
                       </li>
                     </ul>
                   </li>
@@ -258,38 +245,42 @@ export default function ManageEventsPage() {
                             Open the file `src/lib/firebase.ts` in your project.
                         </li>
                          <li>
-                            Confirm that the `storageBucket` value in the file **exactly matches** the bucket name from the Firebase Console (without the `gs://` prefix).
+                            Confirm that the `storageBucket` value in that file **exactly matches** the bucket name from the Firebase Console (the part that ends in `.appspot.com`).
                         </li>
-                        <li>If it does not match, update `storageBucket` in `firebase.ts` now.</li>
                     </ul>
                   </li>
                   <li>
-                    <strong>Update Storage Rules.</strong>
-                    <ul className="list-disc list-inside pl-4 mt-1">
+                    <strong>Update Your Security Rules.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
                       <li>
                         Open your{' '}
+                        <a
+                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          Firestore Rules
+                        </a> and replace the content with the rules from the `firestore.rules` file in your project. Click <strong>Publish</strong>.
+                      </li>
+                      <li>
+                         Open your{' '}
                         <a
                           href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="underline"
                         >
-                          Firebase Console Storage Rules
-                        </a>
-                        .
-                      </li>
-                      <li>
-                        Replace the existing rules with the content from the{' '}
-                        <strong>storage.rules</strong> file in your project, then click{' '}
-                        <strong>Publish</strong>.
+                          Storage Rules
+                        </a> and replace the content with the rules from the `storage.rules` file in your project. Click <strong>Publish</strong>.
                       </li>
                     </ul>
                   </li>
                   <li>
-                    <strong>Apply CORS Policy in Cloud Shell.</strong>
+                    <strong>Set Storage CORS Policy using Cloud Shell.</strong>
                     <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
                       <li>
-                        Open the{' '}
+                        This step is required to allow your web app to upload files. Open the{' '}
                         <a
                           href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`}
                           target="_blank"
@@ -298,25 +289,22 @@ export default function ManageEventsPage() {
                         >
                           Google Cloud Shell
                         </a>
-                        . This may take a moment to load.
+                        .
                       </li>
                       <li>
-                        Run these two commands exactly as shown:
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2">
+                        It may ask you to authorize. Once it loads, run the following two commands one by one. Copy them exactly.
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
                           {
-                            "echo '[{\"origin\": [\"*\"], \"method\": [\"GET\", \"PUT\", \"POST\"], \"responseHeader\": [\"Content-Type\"], \"maxAgeSeconds\": 3600}]' > cors.json"
+                            `echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`
                           }
                         </pre>
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
                       </li>
                     </ul>
                   </li>
                   <li>
-                      <strong>Update Firestore Rules.</strong>
-                       <ul className="list-disc list-inside pl-4 mt-1">
-                          <li>Open your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline">Firebase Console Firestore Rules</a>.</li>
-                          <li>Replace the existing rules with the content from the <strong>firestore.rules</strong> file in your project, then click <strong>Publish</strong>.</li>
-                      </ul>
+                      <strong>Try Again.</strong>
+                       <p>After completing all these steps, refresh this page and try saving the event again.</p>
                   </li>
                 </ol>
               </div>
