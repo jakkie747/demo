@@ -9,6 +9,7 @@ export const translations = {
     language: 'Language',
     installApp: 'Install App',
     callUs: 'Call Us',
+    whatsapp: 'WhatsApp',
 
     // Footer
     copyright: '© 2025 Blinkogies Family Hub. All rights reserved.',
@@ -250,6 +251,7 @@ export const translations = {
     language: 'Taal',
     installApp: 'Installeer Toepassing',
     callUs: 'Bel Ons',
+    whatsapp: 'WhatsApp',
 
     // Footer
     copyright: '© 2025 Blinkogies Family Hub. Alle regte voorbehou.',
