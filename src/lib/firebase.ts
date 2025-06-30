@@ -1,48 +1,46 @@
+
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
-import { getAuth, type Auth } from "firebase/auth";
-import { getMessaging, type Messaging } from "firebase/messaging";
 import { getFunctions, type Functions } from "firebase/functions";
 
 // =================================================================================
-// Your Web App's Firebase configuration
+// IMPORTANT: ACTION REQUIRED
+// =================================================================================
+// Your app is not connecting to Firebase. Please add your project's configuration
+// details below.
+//
+// How to find your Firebase config:
+// 1. Go to your Firebase project: https://console.firebase.google.com/project/blink-notify-494bf/overview
+// 2. Click the gear icon (Project settings) next to "Project Overview".
+// 3. In the "General" tab, scroll down to the "Your apps" section.
+// 4. Find your web app, and in the "SDK setup and configuration" box, select "Config".
+// 5. You will see an object called `firebaseConfig`. Copy the values from that
+//    object and paste them into the `firebaseConfig` object below, replacing
+//    the placeholder values like "PASTE_YOUR_API_KEY_HERE".
 // =================================================================================
 export const firebaseConfig = {
-  apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
-  authDomain: "blink-notify-494bf.firebaseapp.com",
+  apiKey: "PASTE_YOUR_API_KEY_HERE",
+  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
   projectId: "blink-notify-494bf",
-  storageBucket: "blink-notify-494bf.firebasestorage.app",
-  messagingSenderId: "450079883039",
-  appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
+  storageBucket: "blink-notify-494bf.appspot.com",
+  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+  appId: "",
 };
 
-let app: FirebaseApp | null = null;
-let db: any | null = null;
-let storage: FirebaseStorage | any | null = null;
-let auth: Auth | null = null;
-let messaging: Messaging | null = null;
-let functions: Functions | null = null;
 
-// Helper to check if the config is populated, so we can show a nice error.
-export const isFirebaseConfigured = () => {
-    return firebaseConfig.apiKey !== "" && firebaseConfig.appId !== "";
-}
+// Function to check if Firebase config is filled
+export const isFirebaseConfigured = (): boolean => {
+  return !!firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("PASTE_YOUR");
+};
 
-if (isFirebaseConfigured()) {
-    if (!getApps().length) {
-      app = initializeApp(firebaseConfig);
-    } else {
-      app = getApp();
-    }
-    db = getFirestore(app);
-    storage = getStorage(app);
-    auth = getAuth(app);
-    functions = getFunctions(app);
-    
-    if (typeof window !== 'undefined') {
-        messaging = getMessaging(app);
-    }
-}
+// Initialize Firebase
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
+const storage: FirebaseStorage = getStorage(app);
+const auth: Auth = getAuth(app);
+const functions: Functions | null = isFirebaseConfigured() ? getFunctions(app) : null;
 
-export { app, db, storage, auth, messaging, functions };
+
+export { app, db, storage, auth, functions };
