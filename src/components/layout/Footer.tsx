@@ -15,7 +15,7 @@ export function Footer() {
         </p>
         <div className="flex items-center gap-4">
           <Link
-            href="#"
+            href="/privacy-policy"
             className="text-sm text-muted-foreground hover:text-primary"
             prefetch={false}
           >
