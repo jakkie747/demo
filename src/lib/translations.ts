@@ -124,6 +124,8 @@ export const translations = {
     manageEventsCard: 'Manage Events',
     manageEventsDesc: 'Create new events or edit existing ones.',
     manageActivitiesDesc: 'Add or update the "Recent Fun Activities" on the homepage.',
+    manageTeachersDesc: 'View and manage teacher profiles.',
+    composeMessageDesc: 'Send a message to all registered parents.',
 
     // Admin Children Page
     registeredChildrenTitle: 'Registered Children',
@@ -357,6 +359,8 @@ export const translations = {
     manageEventsCard: 'Bestuur Geleenthede',
     manageEventsDesc: 'Skep nuwe geleenthede of wysig bestaandes.',
     manageActivitiesDesc: 'Voeg by of dateer die "Onlangse Prettige Aktiwiteite" op die tuisblad op.',
+    manageTeachersDesc: 'Sien en bestuur onderwyserprofiele.',
+    composeMessageDesc: 'Stuur \'n boodskap aan alle geregistreerde ouers.',
     
     // Admin Children Page
     registeredChildrenTitle: 'Geregistreerde Kinders',

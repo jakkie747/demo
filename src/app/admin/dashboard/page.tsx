@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
       <div>
         <h3 className="text-2xl font-semibold mb-4">{t("quickLinks")}</h3>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle>{t("viewAllChildren")}</CardTitle>
@@ -159,6 +159,32 @@ export default function DashboardPage() {
               <Button asChild variant="secondary">
                 <Link href="/admin/dashboard/activities">
                   {t("manageActivities")}
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle>{t("manageTeachers")}</CardTitle>
+              <CardDescription>{t("manageTeachersDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild variant="secondary">
+                <Link href="/admin/dashboard/teachers">
+                  {t("manageTeachers")}
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle>{t("composeMessage")}</CardTitle>
+              <CardDescription>{t("composeMessageDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild variant="secondary">
+                <Link href="/admin/dashboard/notifications">
+                  {t("composeMessage")}
                 </Link>
               </Button>
             </CardContent>
