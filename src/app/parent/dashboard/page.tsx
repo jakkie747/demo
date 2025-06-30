@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from "next/image";
-import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, Nap, NotebookPen, AlertTriangle } from "lucide-react";
+import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, NotebookPen, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,7 @@ function DailyReportCard({ report }: { report: DailyReport }) {
                     </div>
                 </div>
                  <div className="flex items-start gap-4">
-                    <Nap className="h-5 w-5 mt-1 text-primary"/>
+                    <Bed className="h-5 w-5 mt-1 text-primary"/>
                     <div>
                         <h4 className="font-semibold">Naps</h4>
                         <p className="text-muted-foreground">{report.naps}</p>
