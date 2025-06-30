@@ -1,6 +1,6 @@
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import type { Teacher } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
 
@@ -20,6 +20,16 @@ export const addTeacher = async (uid: string, teacherData: Omit<Teacher, 'id' | 
         setDoc(teacherDocRef, { ...teacherData, uid }),
         TIMEOUT_DURATION,
         new Error("Adding teacher document timed out.")
+    );
+};
+
+export const updateTeacher = async (teacherId: string, teacherData: Partial<Omit<Teacher, 'id' | 'uid' | 'email' | 'role'>>): Promise<void> => {
+    if (!db) throw new Error("Firebase is not configured.");
+    const teacherDocRef = doc(db, 'teachers', teacherId);
+    await promiseWithTimeout(
+        updateDoc(teacherDocRef, teacherData),
+        TIMEOUT_DURATION,
+        new Error(`Updating teacher document ${teacherId} timed out.`)
     );
 };
 

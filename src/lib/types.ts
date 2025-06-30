@@ -46,4 +46,6 @@ export interface Teacher {
   email: string;
   role: 'admin' | 'teacher';
   photo?: string;
+  contactNumber?: string;
+  homeAddress?: string;
 }

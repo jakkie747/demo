@@ -124,7 +124,7 @@ export const translations = {
     manageEventsCard: 'Manage Events',
     manageEventsDesc: 'Create new events or edit existing ones.',
     manageActivitiesDesc: 'Add or update the "Recent Fun Activities" on the homepage.',
-    manageTeachersDesc: 'View and manage teacher profiles.',
+    manageTeachersDesc: 'View, edit, and manage teacher profiles.',
     composeMessageDesc: 'Send a message to all registered parents.',
 
     // Admin Children Page
@@ -234,6 +234,11 @@ export const translations = {
     deleteTeacherConfirmDesc: 'This action cannot be undone. This will permanently delete the teacher profile for {name}. Because this is a prototype, the user account will need to be deleted manually from your authentication provider.',
     teacherPhoto: "Teacher's Photo",
     teacherPhotoDesc: "An optional profile photo for the teacher.",
+    contactNumber: 'Contact Number',
+    homeAddress: 'Home Address',
+    editTeacherProfile: 'Edit Teacher Profile',
+    updateTeacherProfileDesc: "Update the teacher's details below. Email and role cannot be changed here.",
+    saveChanges: 'Save Changes',
   },
   af: {
     // Header
@@ -359,7 +364,7 @@ export const translations = {
     manageEventsCard: 'Bestuur Geleenthede',
     manageEventsDesc: 'Skep nuwe geleenthede of wysig bestaandes.',
     manageActivitiesDesc: 'Voeg by of dateer die "Onlangse Prettige Aktiwiteite" op die tuisblad op.',
-    manageTeachersDesc: 'Sien en bestuur onderwyserprofiele.',
+    manageTeachersDesc: 'Sien, wysig en bestuur onderwyserprofiele.',
     composeMessageDesc: 'Stuur \'n boodskap aan alle geregistreerde ouers.',
     
     // Admin Children Page
@@ -470,6 +475,11 @@ export const translations = {
     deleteTeacherConfirmDesc: 'Hierdie aksie kan nie ongedaan gemaak word nie. Dit sal die onderwyserprofiel vir {name} permanent uitvee. Omdat dit \'n prototipe is, sal die gebruikersrekening handmatig van u stawingverskaffer verwyder moet word.',
     teacherPhoto: "Onderwyser se Foto",
     teacherPhotoDesc: "'n Opsionele profielfoto vir die onderwyser.",
+    contactNumber: 'Kontaknommer',
+    homeAddress: 'Huisadres',
+    editTeacherProfile: 'Wysig Onderwyserprofiel',
+    updateTeacherProfileDesc: "Dateer die onderwyser se besonderhede hieronder op. E-pos en rol kan nie hier verander word nie.",
+    saveChanges: 'Stoor Veranderinge',
   },
 };
 

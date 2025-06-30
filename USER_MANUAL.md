@@ -98,9 +98,13 @@ These are the "Recent Fun Activities" that appear on the public homepage.
 ### How to Manage Teachers
 
 1.  Navigate to the **"Manage Teachers"** page from the sidebar.
-2.  **Important:** For security, new teacher and admin accounts **cannot be created from this page**. They must be created in the **Firebase Authentication console**. This page is for viewing teacher data that is already in the system.
-3.  Once a new teacher is added to the authentication system and logs in for the first time, their details will appear here.
-4.  **To Delete a Teacher's App Data:** Click the **trash can icon** next to a teacher's record. This will remove their profile information from the app but **will not** delete their login credentials.
+2.  **Important:** For security, new teacher and admin accounts **cannot be created from this page**. They must be created in the **Firebase Authentication console**.
+3.  Once a new teacher is added to the authentication system and logs in for the first time, their details will appear here. You can then add more information to their profile.
+4.  **To Edit a Teacher's Profile:**
+    *   In the table, find the teacher you wish to edit and click the **pencil icon**.
+    *   A dialog will open where you can update their Name, Photo, Contact Number, and Home Address.
+    *   Click **"Save Changes"** to update their profile.
+5.  **To Delete a Teacher's App Data:** Click the **trash can icon** next to a teacher's record. This will remove their profile information from the app but **will not** delete their login credentials.
 
 ### How to Send Messages to Parents
 
