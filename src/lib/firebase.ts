@@ -21,11 +21,11 @@ import { getFunctions, type Functions } from "firebase/functions";
 //    the placeholder values like "PASTE_YOUR_API_KEY_HERE".
 // =================================================================================
 export const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
+  apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
+  authDomain: "blink-notify-494bf.firebaseapp.com",
   projectId: "blink-notify-494bf",
   storageBucket: "blink-notify-494bf.appspot.com",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+  messagingSenderId: "450079883039",
   appId: "",
 };
 
