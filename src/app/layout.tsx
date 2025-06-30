@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "A family hub for Blinkogies Pre-school",
   manifest: "/manifest.json",
   icons: {
-    apple: "/icons/icon-192x192.png",
+    apple: "https://placehold.co/180x180.png",
   },
 };
 
@@ -35,7 +35,6 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <meta name="theme-color" content="#59ABEF" />
-        <link rel="apple-touch-icon" href="https://placehold.co/180x180.png" />
       </head>
       <body className={cn("min-h-screen font-body antialiased")}>
         <LanguageProvider>
