@@ -8,34 +8,30 @@ import type { Activity } from "@/lib/types";
 import { getActivities } from "@/services/activityService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import { Camera, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function GalleryPage() {
   const { t } = useLanguage();
-  const { toast } = useToast();
   const [items, setItems] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isConfigured] = useState(isFirebaseConfigured());
 
   const loadItems = useCallback(async () => {
     setIsLoading(true);
+    setFetchError(null);
     try {
       const fetchedItems = await getActivities();
       setItems(fetchedItems);
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Could not fetch gallery items from the database."
-      });
+      setFetchError(error.message || "An unexpected error occurred.");
       setItems([]);
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     if (isConfigured) {
@@ -70,6 +66,22 @@ export default function GalleryPage() {
           {t("gallerySub")}
         </p>
       </div>
+
+      {fetchError && (
+        <Alert variant="destructive" className="mb-8">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error Loading Data</AlertTitle>
+            <AlertDescription>
+                <p className="mb-2">There was a problem fetching data from the database. This can happen for a few reasons:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li><strong>Firebase Not Configured:</strong> Your <code>src/lib/firebase.ts</code> file might have incorrect or missing credentials.</li>
+                    <li><strong>Security Rules:</strong> Your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">Firestore Security Rules</a> might be blocking public access. Make sure the `activities` collection is readable by everyone.</li>
+                    <li><strong>Database Index Missing:</strong> Firestore sometimes requires a special index for sorting data. If the error mentions "index", please check the browser's developer console (F12) for a direct link to create it.</li>
+                </ul>
+                <p className="mt-3"><strong>Raw Error:</strong> {fetchError}</p>
+            </AlertDescription>
+        </Alert>
+      )}
       
       {isLoading ? (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -85,7 +97,7 @@ export default function GalleryPage() {
               </Card>
             ))}
         </div>
-      ) : items.length === 0 ? (
+      ) : items.length === 0 && !fetchError ? (
         <div className="text-center text-muted-foreground py-16 flex flex-col items-center gap-4">
             <Camera className="w-16 h-16" />
             <p className="text-xl">{t('noGalleryItems')}</p>

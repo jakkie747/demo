@@ -1,3 +1,4 @@
+
 import { db } from '@/lib/firebase';
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, writeBatch, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import type { Event } from '@/lib/types';
@@ -81,13 +82,8 @@ export const getEvents = async (): Promise<Event[]> => {
         return events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     } catch (error: any) {
-        if ((error as any).code === 'failed-precondition') {
-            const message = (error as Error).message;
-            console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
-            throw new Error(`A database index is required to sort events. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh the page. Raw error: ${message}`);
-        }
         console.error("Error fetching events:", error);
-        throw new Error("Could not fetch events.");
+        throw error;
     }
 };
 

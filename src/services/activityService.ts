@@ -1,3 +1,4 @@
+
 import { db } from '@/lib/firebase';
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, writeBatch } from 'firebase/firestore';
 import type { Activity } from '@/lib/types';
@@ -85,13 +86,8 @@ export const getActivities = async (): Promise<Activity[]> => {
 
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
     } catch (error: any) {
-        if ((error as any).code === 'failed-precondition') {
-            const message = (error as Error).message;
-            console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
-            throw new Error(`A database index is required to sort activities. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh the page. Raw error: ${message}`);
-        }
         console.error("Error fetching activities:", error);
-        throw new Error("Could not fetch activities.");
+        throw error;
     }
 };
 

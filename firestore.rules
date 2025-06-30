@@ -1,11 +1,50 @@
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to all collections and documents
-    // for development purposes.
-    // WARNING: This is insecure for production.
-    match /{document=**} {
-      allow read, write: if true;
+    
+    // PUBLIC: Anyone can read these collections.
+    match /events/{doc=**} {
+      allow read: if true;
+      allow write: if request.auth != null; // Only logged-in users (admins) can write
+    }
+    match /activities/{doc=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /documents/{doc=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // PRIVATE: Rules for specific access patterns.
+    // Allow anyone to register a child.
+    match /children/{childId} {
+      allow create: if true;
+      // Allow an authenticated user to read/update/delete.
+      // Filtering for "only my child" happens in the app's queries.
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /daily_reports/{reportId} {
+      // Authenticated users can read/write reports.
+      // Filtering for "only my child" happens in the app's queries.
+      allow read, write: if request.auth != null;
+    }
+
+    match /teachers/{teacherId} {
+      allow read: if request.auth != null;
+      // Writing to the teacher document is restricted.
+      // An admin can write, or a user can write to their own document.
+      allow write: if request.auth != null && (
+                      request.auth.uid == teacherId ||
+                      get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.role == 'admin'
+                    );
+    }
+
+    match /fcmTokens/{token} {
+        allow read, write: if true;
     }
   }
 }

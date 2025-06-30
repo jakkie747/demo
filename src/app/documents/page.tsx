@@ -8,8 +8,7 @@ import type { Document } from "@/lib/types";
 import { getDocuments } from "@/services/documentService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import { FileText, Download, AlertTriangle, FileQuestion } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,27 +40,24 @@ const FormattedDate = ({ date, language }: { date: any; language: string }) => {
 
 export default function DocumentsPage() {
   const { t, language } = useLanguage();
-  const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isConfigured] = useState(isFirebaseConfigured());
 
   const loadDocuments = useCallback(async () => {
     setIsLoading(true);
+    setFetchError(null);
     try {
       const fetchedDocuments = await getDocuments();
       setDocuments(fetchedDocuments);
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Could not fetch documents from the database."
-      });
+      setFetchError(error.message || "An unexpected error occurred.");
       setDocuments([]);
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     if (isConfigured) {
@@ -96,6 +92,22 @@ export default function DocumentsPage() {
           {t("documentsSub")}
         </p>
       </div>
+
+      {fetchError && (
+        <Alert variant="destructive" className="mb-8">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error Loading Data</AlertTitle>
+            <AlertDescription>
+                <p className="mb-2">There was a problem fetching data from the database. This can happen for a few reasons:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li><strong>Firebase Not Configured:</strong> Your <code>src/lib/firebase.ts</code> file might have incorrect or missing credentials.</li>
+                    <li><strong>Security Rules:</strong> Your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">Firestore Security Rules</a> might be blocking public access. Make sure the `documents` collection is readable by everyone.</li>
+                    <li><strong>Database Index Missing:</strong> Firestore sometimes requires a special index for sorting data. If the error mentions "index", please check the browser's developer console (F12) for a direct link to create it.</li>
+                </ul>
+                <p className="mt-3"><strong>Raw Error:</strong> {fetchError}</p>
+            </AlertDescription>
+        </Alert>
+      )}
       
       {isLoading ? (
         <div className="max-w-4xl mx-auto space-y-4">
@@ -112,7 +124,7 @@ export default function DocumentsPage() {
                 </Card>
             ))}
         </div>
-      ) : documents.length === 0 ? (
+      ) : documents.length === 0 && !fetchError ? (
         <div className="text-center text-muted-foreground py-16 flex flex-col items-center gap-4">
             <FileQuestion className="w-16 h-16" />
             <p className="text-xl">{t('noDocuments')}</p>

@@ -17,8 +17,7 @@ import type { Event } from "@/lib/types";
 import { getEvents } from "@/services/eventsService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 
 const FormattedEventDate = ({ date, language }: { date: string; language: string; }) => {
   const [formattedDate, setFormattedDate] = useState('');
@@ -45,27 +44,24 @@ const FormattedEventDate = ({ date, language }: { date: string; language: string
 
 export default function EventsPage() {
   const { t, language } = useLanguage();
-  const { toast } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isConfigured] = useState(isFirebaseConfigured());
 
   const loadEvents = useCallback(async () => {
     setIsLoading(true);
+    setFetchError(null);
     try {
       const fetchedEvents = await getEvents();
       setEvents(fetchedEvents);
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Could not fetch events from the database."
-      });
+      setFetchError(error.message || "An unexpected error occurred.");
       setEvents([]);
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     if (isConfigured) {
@@ -100,6 +96,22 @@ export default function EventsPage() {
           {t("upcomingEventsSub")}
         </p>
       </div>
+
+      {fetchError && (
+        <Alert variant="destructive" className="mb-8">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error Loading Data</AlertTitle>
+            <AlertDescription>
+                <p className="mb-2">There was a problem fetching data from the database. This can happen for a few reasons:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li><strong>Firebase Not Configured:</strong> Your <code>src/lib/firebase.ts</code> file might have incorrect or missing credentials.</li>
+                    <li><strong>Security Rules:</strong> Your <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">Firestore Security Rules</a> might be blocking public access. Make sure the `events` collection is readable by everyone.</li>
+                    <li><strong>Database Index Missing:</strong> Firestore sometimes requires a special index for sorting data. If the error mentions "index", please check the browser's developer console (F12) for a direct link to create it.</li>
+                </ul>
+                <p className="mt-3"><strong>Raw Error:</strong> {fetchError}</p>
+            </AlertDescription>
+        </Alert>
+      )}
       
       {isLoading ? (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-2">
@@ -117,7 +129,7 @@ export default function EventsPage() {
                 </Card>
             ))}
         </div>
-      ) : events.length === 0 ? (
+      ) : events.length === 0 && !fetchError ? (
         <div className="text-center text-muted-foreground py-16 flex flex-col items-center gap-4">
             <Info className="w-16 h-16" />
             <p className="text-xl">No upcoming events at the moment.</p>
