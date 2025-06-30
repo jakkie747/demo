@@ -3,6 +3,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,13 @@ export default function ParentLayout({
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/parent-login');
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) {
     return (
       <div className="flex items-center justify-center h-screen">
           <div className="space-y-4 w-1/2">
@@ -29,11 +36,6 @@ export default function ParentLayout({
           </div>
       </div>
     );
-  }
-
-  if (!user) {
-    router.replace('/parent-login');
-    return null; // or a loading spinner
   }
 
   const handleLogout = async () => {
