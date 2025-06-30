@@ -231,7 +231,6 @@ export const translations = {
     noGalleryItemsDesc: 'Check back soon for photos of our activities!',
 
     // Admin Documents Page
-    manageDocuments: 'Manage Documents',
     uploadNewDocument: 'Upload New Document',
     documentDetails: 'Document Details',
     documentDetailsDesc: 'Upload a file that will be shared with all parents.',
@@ -542,7 +541,6 @@ export const translations = {
     noGalleryItemsDesc: 'Kom loer binnekort weer in vir fotos van ons aktiwiteite!',
 
     // Admin Documents Page
-    manageDocuments: 'Bestuur Dokumente',
     uploadNewDocument: 'Laai Nuwe Dokument Op',
     documentDetails: 'Dokument Besonderhede',
     documentDetailsDesc: "'n Lêer op wat met alle ouers gedeel sal word.",
@@ -625,5 +623,7 @@ export const translations = {
 };
 
 export type TranslationKey = keyof typeof translations.en;
+
+    
 
     
