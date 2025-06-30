@@ -10,9 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from "next/image";
-import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, Nap, NotebookPen } from "lucide-react";
+import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, Nap, NotebookPen, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 const moodConfig = {
     happy: { icon: Smile, color: "text-green-500", label: "Happy" },
@@ -80,6 +81,7 @@ function DailyReportCard({ report }: { report: DailyReport }) {
 function ChildSection({ child }: { child: Child }) {
   const [reports, setReports] = useState<DailyReport[]>([]);
   const [isLoadingReports, setIsLoadingReports] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -88,12 +90,45 @@ function ChildSection({ child }: { child: Child }) {
         setReports(fetchedReports);
       } catch (error) {
         console.error(`Failed to fetch reports for ${child.name}`, error);
+        setFetchError((error as Error).message);
       } finally {
         setIsLoadingReports(false);
       }
     };
     fetchReports();
   }, [child.id, child.name]);
+
+  const renderError = () => {
+    if (!fetchError) return null;
+
+    const urlRegex = /(https?:\/\/[^\s]+)/;
+    const match = fetchError.match(urlRegex);
+    const indexUrl = match ? match[0].replace(/\\?$/, "") : null;
+
+    if (indexUrl) {
+      return (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Database Setup Required</AlertTitle>
+          <AlertDescription>
+            <p>To view daily reports, a one-time database configuration is needed by an administrator.</p>
+            <p className="mt-2">Please ask the school administrator to click the link below to create the required database index. After it is created, please refresh this page.</p>
+            <Button asChild variant="link" className="p-0 h-auto mt-2 text-left whitespace-normal">
+              <a href={indexUrl} target="_blank" rel="noopener noreferrer" className="break-all">{indexUrl}</a>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Error Loading Reports</AlertTitle>
+        <AlertDescription>{fetchError}</AlertDescription>
+      </Alert>
+    );
+  };
 
   return (
     <div key={child.id} className="space-y-6">
@@ -113,6 +148,8 @@ function ChildSection({ child }: { child: Child }) {
           <Card><CardContent className="p-4"><Skeleton className="h-48 w-full" /></CardContent></Card>
           <Card><CardContent className="p-4"><Skeleton className="h-48 w-full" /></CardContent></Card>
         </div>
+      ) : fetchError ? (
+        renderError()
       ) : reports.length === 0 ? (
         <Alert>
           <AlertTitle>No Reports Yet</AlertTitle>

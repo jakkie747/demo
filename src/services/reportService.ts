@@ -18,7 +18,8 @@ export const getReportsByChildId = async (childId: string): Promise<DailyReport[
         if ((error as any).code === 'failed-precondition') {
             const message = (error as Error).message;
             console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
-            throw new Error(`A database index is required to query reports. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh the page. Raw error: ${message}`);
+            // Re-throw the original, more helpful error message which contains the direct link.
+            throw new Error(message);
         }
         console.error("Error fetching reports:", error);
         throw new Error("Could not fetch reports.");
