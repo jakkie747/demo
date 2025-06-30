@@ -100,7 +100,7 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     const file = values.childPhoto?.[0];
-    let photoUrl = "https://placehold.co/100x100.png";
+    let photoUrl = "https://picsum.photos/100";
 
     try {
       if (file) {

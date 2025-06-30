@@ -186,7 +186,7 @@ export default function ManageActivitiesPage() {
       const activityPayload = {
         title: values.title,
         description: values.description,
-        image: imageUrl || "https://placehold.co/400x300.png",
+        image: imageUrl || `https://picsum.photos/400/300?random=${Date.now()}`,
       };
 
       if (editingActivity) {

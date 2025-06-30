@@ -196,7 +196,7 @@ export default function ChildrenPage() {
                     parent: childObject.parent || '',
                     parentEmail: childObject.parentEmail || '',
                     parentPhone: childObject.parentPhone || '',
-                    photo: childObject.photo && childObject.photo.startsWith('http') ? childObject.photo : 'https://placehold.co/100x100.png',
+                    photo: childObject.photo && childObject.photo.startsWith('http') ? childObject.photo : 'https://picsum.photos/100',
                     medicalConditions: childObject.medicalConditions || '',
                     emergencyContactName: childObject.emergencyContactName || '',
                     emergencyContactPhone: childObject.emergencyContactPhone || '',

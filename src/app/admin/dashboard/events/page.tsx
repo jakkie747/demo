@@ -187,7 +187,7 @@ export default function ManageEventsPage() {
       } else {
         const newEvent: Omit<Event, 'id' | 'createdAt'> = {
           ...eventPayload,
-          image: imageUrl || "https://placehold.co/600x400.png",
+          image: imageUrl || `https://picsum.photos/600/400?random=${Date.now()}`,
         };
         await addEvent(newEvent);
         toast({

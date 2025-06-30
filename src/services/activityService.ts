@@ -16,49 +16,49 @@ const seedActivities = async (): Promise<Activity[]> => {
         {
             title: "Creative Craft Day",
             description: "Our little artists explored textures and colors, creating beautiful collages with various materials. So much creativity!",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=1",
             aiHint: "children painting"
         },
         {
             title: "Music and Movement",
             description: "Dancing, singing, and playing with instruments! We had a blast expressing ourselves through the joy of music.",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=2",
             aiHint: "children music"
         },
         {
             title: "Building Block Bonanza",
             description: "Teamwork makes the dream work! The children collaborated to build magnificent towers, castles, and cities.",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=3",
             aiHint: "kids blocks"
         },
         {
             title: "Outdoor Water Play",
             description: "Splish, splash! We cooled off on a sunny day with some fun and exciting water activities.",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=4",
             aiHint: "children water"
         },
         {
             title: "Story Time Adventures",
             description: "Gathered around, we traveled to magical lands and met fantastic creatures through the pages of a captivating storybook.",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=5",
             aiHint: "children reading"
         },
         {
             title: "Garden Exploration",
             description: "We got our hands dirty learning about plants, digging for worms, and watching our little garden grow.",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=6",
             aiHint: "kids garden"
         },
         {
             title: "Science Fun!",
             description: "Simple and safe experiments that wowed the little ones! We made a volcano erupt and explored with magnets.",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=7",
             aiHint: "kids science"
         },
         {
             title: "Dress-Up Day",
             description: "From superheroes to fairies, our classroom was filled with amazing characters for our annual dress-up day.",
-            image: "https://placehold.co/400x400.png",
+            image: "https://picsum.photos/400/400?random=8",
             aiHint: "children costumes"
         },
     ];
