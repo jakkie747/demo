@@ -46,6 +46,7 @@ import * as z from "zod";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
+import { Label } from "@/components/ui/label";
 
 const teacherFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
