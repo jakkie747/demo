@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   description: "A family hub for Blinkogies Pre-school",
   manifest: "/manifest.json",
   icons: {
-    apple: "https://placehold.co/180x180.png",
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/apple-touch-icon.png",
   },
 };
 
