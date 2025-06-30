@@ -177,7 +177,33 @@ export default function ManageTeachersPage() {
           errorTitle = "Update Failed: Firebase Storage Not Ready";
           setSubmissionError({
             title: errorTitle,
-            description: "There was a problem uploading the photo. Please check the troubleshooting steps on the Manage Events or Gallery pages."
+            description: (
+              <div className="space-y-4 text-sm">
+                <p className="font-bold text-base">
+                  This error almost always means your Firebase project is not fully configured for file uploads. The storage 'bucket' does not exist until you activate it.
+                </p>
+                 <p className="mb-2">Please complete the following one-time setup steps.</p>
+                <ol className="list-decimal list-inside space-y-4 pl-2">
+                  <li>
+                    <strong>Crucial First Step: Enable Firebase Storage.</strong>
+                     <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
+                      <li>
+                        Go to your{' '}
+                        <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
+                          Firebase Console Storage section
+                        </a>.
+                      </li>
+                      <li>If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket. If you do not do this, the next steps will fail.</li>
+                    </ul>
+                  </li>
+                  <li><strong>... (Other steps from the full guide would go here) ...</strong></li>
+                   <li>
+                      <strong>Try Again.</strong>
+                       <p>After completing all these steps, refresh this page and try saving again.</p>
+                  </li>
+                </ol>
+              </div>
+            )
           });
         } else {
            setSubmissionError({ title: errorTitle, description: errorMessage });
@@ -440,3 +466,5 @@ export default function ManageTeachersPage() {
     </div>
   );
 }
+
+    

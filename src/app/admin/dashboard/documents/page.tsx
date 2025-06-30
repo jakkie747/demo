@@ -152,10 +152,37 @@ export default function ManageDocumentsPage() {
             description: (
               <div className="space-y-4 text-sm">
                 <p className="font-bold text-base">
-                  This error usually means your Firebase project is not fully configured for file uploads. Please complete the following one-time setup steps.
+                  This error almost always means your Firebase project is not fully configured for file uploads. The storage 'bucket' does not exist until you activate it.
                 </p>
+                <p className="mb-2">Please complete the following one-time setup steps.</p>
                 <ol className="list-decimal list-inside space-y-4 pl-2">
-                  <li><strong>Enable Firebase Storage</strong> and update <strong>Security Rules</strong> as per the other admin pages.</li>
+                  <li>
+                    <strong>Crucial First Step: Enable Firebase Storage.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
+                      <li>Go to your{' '}
+                        <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
+                          Firebase Console Storage section
+                        </a>.
+                      </li>
+                      <li>If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket. If you do not do this, the next steps will fail.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>Update Your Security Rules.</strong>
+                     <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
+                      <li>
+                         Open your{' '}
+                        <a
+                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          Storage Rules
+                        </a> and replace the content with the rules from the `storage.rules` file in your project. Click <strong>Publish</strong>.
+                      </li>
+                    </ul>
+                  </li>
                   <li>
                     <strong>Set Storage CORS Policy using Cloud Shell.</strong>
                     <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
@@ -336,3 +363,5 @@ export default function ManageDocumentsPage() {
     </div>
   );
 }
+
+    

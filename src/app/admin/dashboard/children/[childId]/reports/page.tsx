@@ -47,6 +47,7 @@ import type { Child, DailyReport } from "@/lib/types";
 import { getChildById } from "@/services/childrenService";
 import { getReportsByChildId, addReport, updateReport, deleteReport } from "@/services/reportService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+import { firebaseConfig } from "@/lib/firebase";
 
 const reportFormSchema = z.object({
   date: z.string().min(1, "Date is required."),
@@ -82,6 +83,8 @@ export default function ManageReportsPage() {
   
   const [editingReport, setEditingReport] = useState<DailyReport | null>(null);
   const [reportToDelete, setReportToDelete] = useState<DailyReport | null>(null);
+  const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
+
 
   const form = useForm<ReportFormData>({
     resolver: zodResolver(reportFormSchema),
@@ -120,6 +123,7 @@ export default function ManageReportsPage() {
 
   const handleEditClick = (report: DailyReport) => {
     setEditingReport(report);
+    setSubmissionError(null);
     form.reset({
       date: report.date,
       mood: report.mood,
@@ -134,6 +138,7 @@ export default function ManageReportsPage() {
 
   const handleCancelEdit = () => {
     setEditingReport(null);
+    setSubmissionError(null);
     form.reset({ date: new Date().toISOString().split('T')[0], mood: "happy", activities: "", meals: "", naps: "", notes: "" });
   };
 
@@ -155,6 +160,7 @@ export default function ManageReportsPage() {
 
   const onSubmit = async (values: ReportFormData) => {
     setIsSaving(true);
+    setSubmissionError(null);
     try {
       let photoUrl = editingReport?.photoUrl;
       if (values.photo?.[0]) {
@@ -178,7 +184,58 @@ export default function ManageReportsPage() {
       await fetchChildAndReports();
 
     } catch (error) {
-      toast({ variant: "destructive", title: "Save Error", description: (error as Error).message });
+       const errorMessage = (error as Error).message || "Could not save the report.";
+       let errorTitle = "Save Error";
+
+        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+          errorTitle = "Save Failed: Firebase Storage Not Ready";
+          setSubmissionError({
+            title: errorTitle,
+            description: (
+              <div className="space-y-4 text-sm">
+                 <p className="font-bold text-base">
+                  This error almost always means your Firebase project is not fully configured for file uploads. The storage 'bucket' does not exist until you activate it.
+                </p>
+                <p className="mb-2">Please complete the following one-time setup steps.</p>
+                <ol className="list-decimal list-inside space-y-4 pl-2">
+                  <li>
+                    <strong>Crucial First Step: Enable Firebase Storage.</strong>
+                     <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
+                      <li>
+                        Go to your{' '}
+                        <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
+                          Firebase Console Storage section
+                        </a>.
+                      </li>
+                      <li>If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket. If you do not do this, the next steps will fail.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>Set Storage CORS Policy using Cloud Shell.</strong>
+                     <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
+                      <li>
+                        Open the{' '}
+                        <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">
+                          Google Cloud Shell
+                        </a>.
+                      </li>
+                      <li>
+                        Run these two commands one by one. Copy them exactly.
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
+                          {`echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`}
+                        </pre>
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><strong>Try Again.</strong> After completing all steps, refresh and try again.</li>
+                </ol>
+              </div>
+            )
+          });
+        } else {
+           setSubmissionError({ title: errorTitle, description: errorMessage });
+        }
     } finally {
       setIsSaving(false);
     }
@@ -301,6 +358,15 @@ export default function ManageReportsPage() {
                     </div>
                 </form>
               </Form>
+              {submissionError && (
+                <Alert variant="destructive" className="mt-6">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>{submissionError.title}</AlertTitle>
+                    <AlertDescription>
+                    {submissionError.description}
+                    </AlertDescription>
+                </Alert>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -367,3 +433,4 @@ export default function ManageReportsPage() {
   );
 }
 
+    
