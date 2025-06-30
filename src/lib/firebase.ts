@@ -23,10 +23,12 @@ import { getFunctions, type Functions } from "firebase/functions";
 export const firebaseConfig = {
   apiKey: "AIzaSyDORczgYjyxDvjSAfW7Q9fsT8wkJ4gIe1g",
   authDomain: "blink-notify-494bf.firebaseapp.com",
+  databaseURL: "https://blink-notify-494bf-default-rtdb.firebaseio.com",
   projectId: "blink-notify-494bf",
-  storageBucket: "blink-notify-494bf.appspot.com",
+  storageBucket: "blink-notify-494bf.firebasestorage.app",
   messagingSenderId: "450079883039",
   appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
+  measurementId: "G-3H7JE2SJFH"
 };
 
 

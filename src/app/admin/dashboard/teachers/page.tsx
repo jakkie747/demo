@@ -180,7 +180,7 @@ export default function ManageTeachersPage() {
             description: (
               <div className="space-y-4 text-sm">
                 <p className="font-bold text-base">
-                  This error almost always means your Firebase project is not fully configured for file uploads. The storage 'bucket' does not exist until you activate it.
+                  This error usually means your Firebase project is not fully configured for file uploads.
                 </p>
                  <p className="mb-2">Please complete the following one-time setup steps.</p>
                 <ol className="list-decimal list-inside space-y-4 pl-2">
@@ -193,10 +193,30 @@ export default function ManageTeachersPage() {
                           Firebase Console Storage section
                         </a>.
                       </li>
-                      <li>If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket. If you do not do this, the next steps will fail.</li>
+                      <li>If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket.</li>
                     </ul>
                   </li>
-                  <li><strong>... (Other steps from the full guide would go here) ...</strong></li>
+                  <li>
+                    <strong>Set Storage CORS Policy using Cloud Shell.</strong>
+                     <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
+                      <li>
+                        Open the{' '}
+                        <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">
+                          Google Cloud Shell
+                        </a>.
+                      </li>
+                      <li>
+                        Run these two commands one by one. Copy them exactly.
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
+                          {`echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`}
+                        </pre>
+                        <p className="mt-2 font-semibold">
+                          Crucial Note: For the next command, the Cloud Shell needs your bucket name in the format <code>gs://project-id.appspot.com</code>. Copy the command below exactly as it is:
+                        </p>
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.projectId}.appspot.com`}</pre>
+                      </li>
+                    </ul>
+                  </li>
                    <li>
                       <strong>Try Again.</strong>
                        <p>After completing all these steps, refresh this page and try saving again.</p>
@@ -466,5 +486,3 @@ export default function ManageTeachersPage() {
     </div>
   );
 }
-
-    

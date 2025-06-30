@@ -221,10 +221,9 @@ export default function ManageActivitiesPage() {
           description: (
              <div className="space-y-4 text-sm">
                 <p className="font-bold text-base">
-                  This error almost always means your Firebase project is not fully configured for file uploads. The storage 'bucket' does not exist until you activate it.
+                  This error usually means your Firebase project is not fully configured for file uploads.
                 </p>
                 <p className="mb-2">Please complete the following one-time setup steps.</p>
-
                 <ol className="list-decimal list-inside space-y-4 pl-2">
                   <li>
                     <strong>Crucial First Step: Enable Firebase Storage.</strong>
@@ -242,38 +241,13 @@ export default function ManageActivitiesPage() {
                         .
                       </li>
                       <li>
-                        If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket. If you do not do this, the next steps will fail.
+                        If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket.
                       </li>
-                    </ul>
-                  </li>
-                   <li>
-                    <strong>Verify your Storage Bucket name.</strong>
-                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
-                        <li>
-                            In the Firebase Console Storage section, at the top of the 'Files' tab, you will see your bucket URL. It will look like `gs://your-project-id.appspot.com`.
-                        </li>
-                        <li>
-                            Open the file `src/lib/firebase.ts` in your project.
-                        </li>
-                         <li>
-                            Confirm that the `storageBucket` value in that file **exactly matches** the bucket name from the Firebase Console (the part that ends in `.appspot.com`).
-                        </li>
                     </ul>
                   </li>
                   <li>
                     <strong>Update Your Security Rules.</strong>
                     <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
-                      <li>
-                        Open your{' '}
-                        <a
-                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          Firestore Rules
-                        </a> and replace the content with the rules from the `firestore.rules` file in your project. Click <strong>Publish</strong>.
-                      </li>
                       <li>
                          Open your{' '}
                         <a
@@ -303,13 +277,14 @@ export default function ManageActivitiesPage() {
                         .
                       </li>
                       <li>
-                        It may ask you to authorize. Once it loads, run the following two commands one by one. Copy them exactly.
+                        Run these two commands one by one. Copy them exactly.
                         <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
-                          {
-                            `echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`
-                          }
+                          {`echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`}
                         </pre>
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+                        <p className="mt-2 font-semibold">
+                          Crucial Note: For the next command, the Cloud Shell needs your bucket name in the format <code>gs://project-id.appspot.com</code>. Copy the command below exactly as it is:
+                        </p>
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.projectId}.appspot.com`}</pre>
                       </li>
                     </ul>
                   </li>
@@ -553,5 +528,3 @@ export default function ManageActivitiesPage() {
     </div>
   );
 }
-
-    

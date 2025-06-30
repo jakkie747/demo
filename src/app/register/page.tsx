@@ -142,10 +142,9 @@ export default function RegisterPage() {
           description: (
              <div className="space-y-4 text-sm">
                 <p className="font-bold text-base">
-                  This error almost always means your Firebase project is not fully configured for file uploads. The storage 'bucket' does not exist until you activate it.
+                  This error usually means your Firebase project is not fully configured for file uploads.
                 </p>
                 <p className="mb-2">Please complete the following one-time setup steps.</p>
-
                 <ol className="list-decimal list-inside space-y-4 pl-2">
                   <li>
                     <strong>Crucial First Step: Enable Firebase Storage.</strong>
@@ -163,7 +162,7 @@ export default function RegisterPage() {
                         .
                       </li>
                       <li>
-                        If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket. If you do not do this, the next steps will fail.
+                        If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket.
                       </li>
                     </ul>
                   </li>
@@ -205,7 +204,10 @@ export default function RegisterPage() {
                             `echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`
                           }
                         </pre>
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.storageBucket}`}</pre>
+                        <p className="mt-2 font-semibold">
+                          Crucial Note: For the next command, the Cloud Shell needs your bucket name in the format <code>gs://project-id.appspot.com</code>. Copy the command below exactly as it is:
+                        </p>
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.projectId}.appspot.com`}</pre>
                       </li>
                     </ul>
                   </li>
@@ -566,5 +568,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-    
