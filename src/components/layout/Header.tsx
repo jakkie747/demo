@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Languages, Download, Phone } from "lucide-react";
+import { Menu, Languages, Download, Phone, Facebook } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -107,6 +107,15 @@ export function Header() {
           )}
           
           <div className="hidden md:flex">
+            <Button asChild variant="ghost" size="icon">
+              <Link href="https://web.facebook.com/groups/1596188941091215/" target="_blank" rel="noopener noreferrer">
+                <Facebook className="h-5 w-5" />
+                <span className="sr-only">Facebook</span>
+              </Link>
+            </Button>
+          </div>
+
+          <div className="hidden md:flex">
              <Button asChild>
                 <Link href="tel:+27725953421">
                   <Phone className="mr-2" />
@@ -182,6 +191,19 @@ export function Header() {
                   <Languages className="mr-4 h-5 w-5" />
                   <span>{language === 'en' ? 'Switch to Afrikaans' : 'Switch to English'}</span>
                 </button>
+
+                <Link
+                  href="https://web.facebook.com/groups/1596188941091215/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                  )}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Facebook className="mr-4 h-5 w-5" />
+                  <span>Facebook</span>
+                </Link>
 
                 <Link
                   href="tel:+27725953421"
