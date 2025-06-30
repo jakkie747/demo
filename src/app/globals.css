@@ -4,55 +4,55 @@
 
 @layer base {
   :root {
-    /* New Playful Palette */
-    --background: 275 80% 97%; /* Very light purple */
-    --foreground: 215 28% 17%;
+    /* Blinkogies Brand Palette */
+    --background: 200 92% 95%; /* Very Light Blue from website */
+    --foreground: 215 28% 17%; /* Dark Blue/Gray */
 
     --card: 0 0% 100%;
     --card-foreground: 215 28% 17%;
     --popover: 0 0% 100%;
     --popover-foreground: 215 28% 17%;
 
-    --primary: 217 100% 65%;      /* Vibrant Blue */
-    --primary-foreground: 0 0% 100%;
+    --primary: 207 82% 64%;      /* Cheerful Light Blue (#59ABEF) */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 275 59% 66%;     /* Purple */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 207 70% 90%;     /* Lighter Blue */
+    --secondary-foreground: 207 82% 34%; /* Darker Blue */
 
-    --muted: 275 60% 94%;
+    --muted: 200 50% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 45 98% 69%;         /* Yellow */
+    --accent: 47 98% 70%;         /* Warm Yellow (#FDD764) */
     --accent-foreground: 45 98% 15%;
 
-    --destructive: 0 100% 71%;       /* Playful Red */
+    --destructive: 0 84% 60%;     /* Softer Red */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 275 30% 90%;
+    --border: 200 40% 90%;
     --input: 0 0% 100%;
-    --ring: 217 100% 65%;         /* Vibrant Blue for ring */
+    --ring: 207 82% 64%;
 
-    --chart-1: 217 100% 65%; /* Blue */
-    --chart-2: 275 59% 66%; /* Purple */
-    --chart-3: 0 100% 71%; /* Red */
-    --chart-4: 45 98% 69%; /* Yellow */
+    --chart-1: 207 82% 64%; /* Blue */
+    --chart-2: 47 98% 70%;  /* Yellow */
+    --chart-3: 0 84% 60%;   /* Red */
+    --chart-4: 275 59% 66%; /* A purple for contrast */
     --chart-5: 140 50% 60%; /* A green for contrast */
 
     --radius: 0.8rem;
 
-    /* Sidebar colors - Let's make it the vibrant blue */
-    --sidebar-background: 217 100% 65%;
+    /* Sidebar colors - Let's make it the brand blue */
+    --sidebar-background: 207 82% 64%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 217 100% 65%;
-    --sidebar-accent: 217 100% 59%;
+    --sidebar-primary-foreground: 207 82% 64%;
+    --sidebar-accent: 207 82% 58%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 217 100% 54%;
-    --sidebar-ring: 45 98% 69%;
+    --sidebar-border: 207 82% 54%;
+    --sidebar-ring: 47 98% 70%;
   }
 
   .dark {
-    /* Dark version of the new palette */
+    /* Dark version of the Blinkogies palette */
     --background: 215 28% 10%;
     --foreground: 210 40% 98%;
 
@@ -61,40 +61,40 @@
     --popover: 215 28% 15%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 100% 65%;      /* Vibrant Blue */
+    --primary: 207 82% 64%;      /* Cheerful Light Blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 275 59% 66%;     /* Purple */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 215 28% 22%;     /* Darker subtle blue */
+    --secondary-foreground: 210 40% 98%;
 
     --muted: 215 28% 22%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 45 98% 69%;         /* Yellow */
+    --accent: 47 98% 70%;         /* Warm Yellow */
     --accent-foreground: 45 98% 15%;
 
-    --destructive: 0 80% 65%;       /* Red */
+    --destructive: 0 70% 55%;       /* Red */
     --destructive-foreground: 0 0% 100%;
 
     --border: 215 28% 25%;
     --input: 215 28% 25%;
-    --ring: 217 100% 65%;
+    --ring: 207 82% 64%;
 
-    --chart-1: 217 100% 65%; /* Blue */
-    --chart-2: 275 59% 66%; /* Purple */
-    --chart-3: 0 100% 71%; /* Red */
-    --chart-4: 45 98% 69%; /* Yellow */
-    --chart-5: 140 50% 60%; /* A green for contrast */
+    --chart-1: 207 82% 64%; /* Blue */
+    --chart-2: 47 98% 70%;  /* Yellow */
+    --chart-3: 0 70% 55%;   /* Red */
+    --chart-4: 275 59% 66%; /* Purple */
+    --chart-5: 140 50% 60%; /* Green */
 
     /* Dark Sidebar colors */
     --sidebar-background: 215 28% 17%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 100% 65%;
+    --sidebar-primary: 207 82% 64%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 215 28% 22%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 215 28% 25%;
-    --sidebar-ring: 45 98% 69%;
+    --sidebar-ring: 47 98% 70%;
   }
 }
 
