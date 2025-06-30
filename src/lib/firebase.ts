@@ -26,7 +26,7 @@ export const firebaseConfig = {
   projectId: "blink-notify-494bf",
   storageBucket: "blink-notify-494bf.appspot.com",
   messagingSenderId: "450079883039",
-  appId: "",
+  appId: "1:450079883039:web:4e4162b5a3f6e1beb27a2a",
 };
 
 
