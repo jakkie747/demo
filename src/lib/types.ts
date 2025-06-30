@@ -27,6 +27,7 @@ export interface Event {
   aiHint?: string;
   titleKey?: TranslationKey;
   descriptionKey?: TranslationKey;
+  createdAt: any; // For Firestore timestamp
 }
 
 export interface Activity {

@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, writeBatch, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import type { Event } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
 
@@ -17,7 +17,7 @@ const seedEvents = async (): Promise<Event[]> => {
         return date.toISOString().split('T')[0];
     }
 
-    const mockEvents: Omit<Event, 'id'>[] = [
+    const mockEvents: Omit<Event, 'id' | 'createdAt'>[] = [
         {
             title: "Annual Sports Day",
             date: getFutureDate(30),
@@ -49,11 +49,12 @@ const seedEvents = async (): Promise<Event[]> => {
     ];
 
     const seededEvents: Event[] = [];
+    const now = new Date();
 
     mockEvents.forEach(event => {
         const docRef = doc(eventsCollectionRef);
-        batch.set(docRef, event);
-        seededEvents.push({ ...event, id: docRef.id });
+        batch.set(docRef, { ...event, createdAt: serverTimestamp() });
+        seededEvents.push({ ...event, id: docRef.id, createdAt: now });
     });
 
     await batch.commit();
@@ -64,31 +65,44 @@ const seedEvents = async (): Promise<Event[]> => {
 
 export const getEvents = async (): Promise<Event[]> => {
     if (!db) return [];
-    const eventsCollectionRef = collection(db, 'events');
-    const snapshot = await getDocs(eventsCollectionRef);
+    try {
+        const eventsCollectionRef = collection(db, 'events');
+        // Sort by the event date to show the soonest events first.
+        const q = query(eventsCollectionRef, orderBy("date", "asc"));
+        const snapshot = await getDocs(q);
 
-    if (snapshot.empty) {
-        console.log("No events found, seeding mock data.");
-        return await seedEvents();
+        if (snapshot.empty) {
+            console.log("No events found, seeding mock data.");
+            return await seedEvents();
+        }
+        
+        const events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
+        // Client-side sort is still a good fallback.
+        return events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    } catch (error: any) {
+        if ((error as any).code === 'failed-precondition') {
+            const message = (error as Error).message;
+            console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
+            throw new Error(`A database index is required to sort events. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh the page. Raw error: ${message}`);
+        }
+        console.error("Error fetching events:", error);
+        throw new Error("Could not fetch events.");
     }
-    
-    const events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
-    // Sorting events by date to show upcoming ones first
-    return events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 };
 
-export const addEvent = async (eventData: Omit<Event, 'id'>): Promise<string> => {
+export const addEvent = async (eventData: Omit<Event, 'id' | 'createdAt'>): Promise<string> => {
     if (!db) throw new Error("Firebase is not configured.");
     const eventsCollectionRef = collection(db, 'events');
     const docRef = await promiseWithTimeout(
-        addDoc(eventsCollectionRef, eventData),
+        addDoc(eventsCollectionRef, { ...eventData, createdAt: serverTimestamp() }),
         TIMEOUT_DURATION,
         new Error("Adding event document timed out.")
     );
     return docRef.id;
 };
 
-export const updateEvent = async (eventId: string, eventData: Partial<Omit<Event, 'id'>>): Promise<void> => {
+export const updateEvent = async (eventId: string, eventData: Partial<Omit<Event, 'id' | 'createdAt'>>): Promise<void> => {
     if (!db) throw new Error("Firebase is not configured.");
     const eventDoc = doc(db, 'events', eventId);
     await promiseWithTimeout(
