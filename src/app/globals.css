@@ -4,68 +4,92 @@
 
 @layer base {
   :root {
-    --background: 45 98% 95%;
+    /* New Playful Palette */
+    --background: 275 80% 97%; /* Very light purple */
     --foreground: 215 28% 17%;
+
     --card: 0 0% 100%;
     --card-foreground: 215 28% 17%;
     --popover: 0 0% 100%;
     --popover-foreground: 215 28% 17%;
-    --primary: 206 82% 64%;
+
+    --primary: 217 100% 65%;      /* Vibrant Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 45 80% 92%;
-    --secondary-foreground: 215 28% 17%;
-    --muted: 45 90% 97%;
+
+    --secondary: 275 59% 66%;     /* Purple */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 275 60% 94%;
     --muted-foreground: 215 16% 47%;
-    --accent: 45 98% 69%;
+
+    --accent: 45 98% 69%;         /* Yellow */
     --accent-foreground: 45 98% 15%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 45 50% 90%;
+
+    --destructive: 0 100% 71%;       /* Playful Red */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 275 30% 90%;
     --input: 0 0% 100%;
-    --ring: 206 82% 64%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --ring: 217 100% 65%;         /* Vibrant Blue for ring */
+
+    --chart-1: 217 100% 65%; /* Blue */
+    --chart-2: 275 59% 66%; /* Purple */
+    --chart-3: 0 100% 71%; /* Red */
+    --chart-4: 45 98% 69%; /* Yellow */
+    --chart-5: 140 50% 60%; /* A green for contrast */
+
     --radius: 0.8rem;
-    --sidebar-background: 206 82% 64%;
+
+    /* Sidebar colors - Let's make it the vibrant blue */
+    --sidebar-background: 217 100% 65%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 206 82% 64%;
-    --sidebar-accent: 206 82% 59%;
+    --sidebar-primary-foreground: 217 100% 65%;
+    --sidebar-accent: 217 100% 59%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 206 82% 54%;
+    --sidebar-border: 217 100% 54%;
     --sidebar-ring: 45 98% 69%;
   }
+
   .dark {
-    --background: 215 28% 17%;
+    /* Dark version of the new palette */
+    --background: 215 28% 10%;
     --foreground: 210 40% 98%;
-    --card: 215 28% 12%;
+
+    --card: 215 28% 15%;
     --card-foreground: 210 40% 98%;
-    --popover: 215 28% 12%;
+    --popover: 215 28% 15%;
     --popover-foreground: 210 40% 98%;
-    --primary: 206 82% 64%;
+
+    --primary: 217 100% 65%;      /* Vibrant Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 215 28% 22%;
-    --secondary-foreground: 210 40% 98%;
+
+    --secondary: 275 59% 66%;     /* Purple */
+    --secondary-foreground: 0 0% 100%;
+
     --muted: 215 28% 22%;
     --muted-foreground: 215 20% 65%;
-    --accent: 45 98% 69%;
+
+    --accent: 45 98% 69%;         /* Yellow */
     --accent-foreground: 45 98% 15%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+
+    --destructive: 0 80% 65%;       /* Red */
+    --destructive-foreground: 0 0% 100%;
+
     --border: 215 28% 25%;
     --input: 215 28% 25%;
-    --ring: 206 82% 64%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --ring: 217 100% 65%;
+
+    --chart-1: 217 100% 65%; /* Blue */
+    --chart-2: 275 59% 66%; /* Purple */
+    --chart-3: 0 100% 71%; /* Red */
+    --chart-4: 45 98% 69%; /* Yellow */
+    --chart-5: 140 50% 60%; /* A green for contrast */
+
+    /* Dark Sidebar colors */
     --sidebar-background: 215 28% 17%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 206 82% 64%;
+    --sidebar-primary: 217 100% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 215 28% 22%;
     --sidebar-accent-foreground: 210 40% 98%;
