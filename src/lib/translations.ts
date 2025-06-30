@@ -12,7 +12,7 @@ export const translations = {
     whatsapp: 'WhatsApp',
 
     // Footer
-    copyright: '© 2025 Blinkogies Family Hub. All rights reserved.',
+    copyright: '© 2025 Blinkogies App. All rights reserved.',
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
     
@@ -85,7 +85,7 @@ export const translations = {
 
     // Admin Login Page
     adminLogin: 'Admin Login',
-    adminLoginSub: 'Access the Blinkogies Family Hub dashboard.',
+    adminLoginSub: 'Access the Blinkogies App dashboard.',
     username: 'Username',
     password: 'Password',
     loggingIn: 'Logging in...',
@@ -270,7 +270,7 @@ export const translations = {
     whatsapp: 'WhatsApp',
 
     // Footer
-    copyright: '© 2025 Blinkogies Family Hub. Alle regte voorbehou.',
+    copyright: '© 2025 Blinkogies App. Alle regte voorbehou.',
     privacyPolicy: 'Privaatheidsbeleid',
     termsOfService: 'Diensbepalings',
 
@@ -343,7 +343,7 @@ export const translations = {
 
     // Admin Login Page
     adminLogin: 'Admin Aanteken',
-    adminLoginSub: 'Toegang tot die Blinkogies Familie Hub-kontroleskerm.',
+    adminLoginSub: 'Toegang tot die Blinkogies App-kontroleskerm.',
     username: 'Gebruikersnaam',
     password: 'Wagwoord',
     loggingIn: 'Teken tans aan...',

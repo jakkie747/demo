@@ -1,7 +1,6 @@
+# Blinkogies App - User Manual
 
-# Blinkogies Family Hub - User Manual
-
-Welcome to the Blinkogies Family Hub! This application is designed to be a central place for all communication between the school and our families. This guide will walk you through all the features available to you.
+Welcome to the Blinkogies App! This application is designed to be a central place for all communication between the school and our families. This guide will walk you through all the features available to you.
 
 ---
 
@@ -31,7 +30,7 @@ Stay up-to-date with all the fun and important dates on our school calendar.
 
 ### How to Install the App on Your Device
 
-For easy access, you can install the Blinkogies Family Hub app directly to your phone or computer's home screen.
+For easy access, you can install the Blinkogies App directly to your phone or computer's home screen.
 
 1.  Look for the **"Install App"** button in the header of the website.
 2.  Click the button. Your device will prompt you to confirm the installation.

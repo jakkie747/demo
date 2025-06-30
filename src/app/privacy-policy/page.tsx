@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-2">
             <h2 className="font-headline text-2xl font-semibold text-primary/90 border-b pb-2">1. Introduction</h2>
             <p>
-              Welcome to the Blinkogies Family Hub (the "App"). This App is operated by Blinkogies Pre-School ("we", "us", "our"). We are committed to protecting the privacy and personal information of our students, parents, guardians, and staff.
+              Welcome to the Blinkogies App (the "App"). This App is operated by Blinkogies Pre-School ("we", "us", "our"). We are committed to protecting the privacy and personal information of our students, parents, guardians, and staff.
             </p>
             <p>
               This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our App. It is designed to comply with the Protection of Personal Information Act (POPIA) of South Africa.

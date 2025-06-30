@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/context/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "Blinkogies Family Hub",
+  title: "Blinkogies App",
   description: "A family hub for Blinkogies Pre-school",
   manifest: "/manifest.json",
   icons: {
