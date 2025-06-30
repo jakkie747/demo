@@ -104,7 +104,7 @@ These are the "Recent Fun Activities" that appear on the public homepage.
     *   In the table, find the teacher you wish to edit and click the **pencil icon**.
     *   A dialog will open where you can update their Name, Photo, Contact Number, and Home Address.
     *   Click **"Save Changes"** to update their profile.
-5.  **To Delete a Teacher's App Data:** Click the **trash can icon** next to a teacher's record. This will remove their profile information from the app but **will not** delete their login credentials.
+5.  **To Delete a Teacher:** Click the **trash can icon** next to a teacher's record. This will permanently delete their profile information from the app **and** their login credentials, preventing them from accessing the system.
 
 ### How to Send Messages to Parents
 

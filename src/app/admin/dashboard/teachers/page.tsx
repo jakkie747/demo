@@ -31,10 +31,11 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers, deleteTeacher, updateTeacher } from "@/services/teacherService";
+import { getTeachers, updateTeacher } from "@/services/teacherService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { auth, isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
+import { auth, isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
+import { httpsCallable } from "firebase/functions";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -108,24 +109,34 @@ export default function ManageTeachersPage() {
   };
 
   const confirmDelete = async () => {
-    if (teacherToDelete) {
-      try {
-        if (teacherToDelete.photo && teacherToDelete.photo.includes('firebasestorage')) {
-          await deleteImageFromUrl(teacherToDelete.photo);
-        }
-        await deleteTeacher(teacherToDelete.id);
-        await fetchTeachers();
-        toast({
-          title: t('teacherDeleted'),
-          description: t('teacherDeletedDesc', { name: teacherToDelete.name }),
-          variant: "destructive",
-        });
-      } catch (error) {
-        const errorMessage = (error as Error).message;
-        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete teacher data." });
-      } finally {
-        setTeacherToDelete(null);
+    if (!teacherToDelete || !functions) return;
+
+    try {
+      const deleteTeacherUser = httpsCallable(functions, 'deleteTeacherUser');
+      await deleteTeacherUser({ uid: teacherToDelete.id });
+      
+      await fetchTeachers();
+      toast({
+        title: t('teacherDeleted'),
+        description: t('teacherDeletedAndAuthDesc', { name: teacherToDelete.name }),
+        variant: "destructive",
+      });
+    } catch (error: any) {
+      let errorMessage = "Could not delete teacher.";
+      if (error.code === 'functions/permission-denied') {
+          errorMessage = "Permission denied. You cannot delete this user.";
+      } else if (error.message) {
+          errorMessage = error.message;
       }
+      
+      toast({ 
+          variant: "destructive", 
+          title: "Error", 
+          description: errorMessage
+      });
+      console.error("Error deleting teacher:", error);
+    } finally {
+      setTeacherToDelete(null);
     }
   };
 
@@ -393,7 +404,7 @@ export default function ManageTeachersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteTeacherConfirmDesc', { name: teacherToDelete?.name || '' })} This will only remove their data from the app, not their ability to log in.
+              {t('deleteTeacherConfirmDesc', { name: teacherToDelete?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
