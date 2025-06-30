@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarDays, Sparkles, Briefcase, Mail, Settings } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, GalleryHorizontal, Briefcase, Mail, Settings, Lightbulb, FileText } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -28,8 +28,13 @@ export function AdminNav() {
     },
     {
       href: "/admin/dashboard/activities",
-      label: t('manageActivities'),
-      icon: Sparkles,
+      label: t('manageGallery'),
+      icon: GalleryHorizontal,
+    },
+    {
+        href: "/admin/dashboard/documents",
+        label: t('manageDocuments'),
+        icon: FileText
     },
     {
       href: "/admin/dashboard/teachers",
@@ -40,6 +45,11 @@ export function AdminNav() {
       href: "/admin/dashboard/notifications",
       label: t('composeMessage'),
       icon: Mail,
+    },
+    {
+      href: "/admin/dashboard/ai-assistant",
+      label: t('aiAssistant'),
+      icon: Lightbulb
     },
     {
       href: "/admin/dashboard/settings",

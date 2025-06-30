@@ -144,13 +144,13 @@ export default function ManageActivitiesPage() {
         await deleteActivity(activityToDelete.id);
         await fetchActivities();
         toast({
-          title: t('activityDeleted'),
-          description: t('activityDeletedDesc', { title: activityToDelete.title }),
+          title: t('galleryItemDeleted'),
+          description: t('galleryItemDeletedDesc', { title: activityToDelete.title }),
           variant: "destructive",
         });
       } catch (error) {
         const errorMessage = (error as Error).message;
-        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete activity." });
+        toast({ variant: "destructive", title: "Error", description: errorMessage || "Could not delete gallery item." });
       } finally {
         setActivityToDelete(null);
       }
@@ -192,8 +192,8 @@ export default function ManageActivitiesPage() {
       if (editingActivity) {
         await updateActivity(editingActivity.id, activityPayload);
         toast({
-          title: t('activityUpdated'),
-          description: t('activityUpdatedDesc', { title: values.title }),
+          title: t('galleryItemUpdated'),
+          description: t('galleryItemUpdatedDesc', { title: values.title }),
         });
       } else {
         const newActivity: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'> = {
@@ -201,8 +201,8 @@ export default function ManageActivitiesPage() {
         };
         await addActivity(newActivity);
         toast({
-          title: t('activityCreated'),
-          description: t('activityCreatedDesc', { title: values.title }),
+          title: t('galleryItemCreated'),
+          description: t('galleryItemCreatedDesc', { title: values.title }),
         });
       }
       
@@ -211,8 +211,8 @@ export default function ManageActivitiesPage() {
       form.reset();
 
     } catch (error) {
-      const errorMessage = (error as Error).message || "Could not save the activity.";
-      let errorTitle = "Error Saving Activity";
+      const errorMessage = (error as Error).message || "Could not save the gallery item.";
+      let errorTitle = "Error Saving Item";
 
       if (errorMessage.includes("timed out")) {
         errorTitle = "Image Upload Timed Out (Firebase Security Rules)";
@@ -348,7 +348,7 @@ export default function ManageActivitiesPage() {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Firebase Configuration Error</AlertTitle>
           <AlertDescription>
-            <p>Cannot manage activities because the application is not connected to Firebase.</p>
+            <p>Cannot manage gallery because the application is not connected to Firebase.</p>
             <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
           </AlertDescription>
         </Alert>
@@ -360,19 +360,19 @@ export default function ManageActivitiesPage() {
     <div className="py-6 grid gap-10 lg:grid-cols-2">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
-          {editingActivity ? t('editingActivity', { title: editingActivity.title }) : t('createNewActivityTitle')}
+          {editingActivity ? t('editingGalleryItem', { title: editingActivity.title }) : t('createNewGalleryItemTitle')}
         </h2>
         <Card>
           <CardHeader>
             <CardTitle>
               {editingActivity
-                ? t('editingActivity', { title: editingActivity.title })
-                : t('activityDetails')}
+                ? t('editingGalleryItem', { title: editingActivity.title })
+                : t('galleryItemDetails')}
             </CardTitle>
             <CardDescription>
               {editingActivity
-                ? t('updateActivityDetails')
-                : t('createActivityDetails')}
+                ? t('updateGalleryItemDetails')
+                : t('createGalleryItemDetails')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -386,7 +386,7 @@ export default function ManageActivitiesPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('activityTitle')}</FormLabel>
+                      <FormLabel>{t('galleryItemTitle')}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder={t('egArtDay')}
@@ -406,7 +406,7 @@ export default function ManageActivitiesPage() {
                       <FormLabel>{t('description')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={t('describeActivity')}
+                          placeholder={t('describeGalleryItem')}
                           {...field}
                           disabled={isSaving}
                         />
@@ -432,7 +432,7 @@ export default function ManageActivitiesPage() {
                   name="image"
                   render={({ field: { onChange, onBlur, name, ref } }) => (
                     <FormItem>
-                      <FormLabel>{t('activityImage')}</FormLabel>
+                      <FormLabel>{t('galleryItemImage')}</FormLabel>
                       <FormControl>
                         <Input
                           type="file"
@@ -455,7 +455,7 @@ export default function ManageActivitiesPage() {
                 />
                 <div className="flex gap-2">
                   <Button type="submit" className="w-full" disabled={isSaving || !isConfigured}>
-                    {isSaving ? "Saving..." : editingActivity ? t('updateActivity') : t('createActivity')}
+                    {isSaving ? "Saving..." : editingActivity ? t('updateGalleryItem') : t('createGalleryItem')}
                   </Button>
                   {editingActivity && (
                     <Button
@@ -485,7 +485,7 @@ export default function ManageActivitiesPage() {
       </div>
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
-          {t('existingActivities')}
+          {t('existingGalleryItems')}
         </h2>
         <Card>
           <Table>
@@ -508,7 +508,7 @@ export default function ManageActivitiesPage() {
               ) : activities.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={3} className="h-24 text-center">
-                    No activities created yet.
+                    No gallery items created yet.
                   </TableCell>
                 </TableRow>
               ) : (
@@ -549,7 +549,7 @@ export default function ManageActivitiesPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
               <AlertDialogDescription>
-                {t('activityDeletedDesc', { title: activityToDelete?.title || '' })}
+                {t('galleryItemDeletedDesc', { title: activityToDelete?.title || '' })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

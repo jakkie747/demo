@@ -64,6 +64,8 @@ export function Header() {
     { href: "/", label: t("home") },
     { href: "/register", label: t("registerChildNav") },
     { href: "/events", label: t("eventsNav") },
+    { href: "/gallery", label: t("galleryNav") },
+    { href: "/documents", label: t("documentsNav") },
   ];
 
   return (

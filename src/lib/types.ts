@@ -49,3 +49,10 @@ export interface Teacher {
   contactNumber?: string;
   homeAddress?: string;
 }
+
+export interface Document {
+    id: string;
+    title: string;
+    fileUrl: string;
+    createdAt: any;
+}

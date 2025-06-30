@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, PlusCircle, AlertTriangle } from "lucide-react";
+import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Lightbulb, Mail } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getChildren } from "@/services/childrenService";
@@ -152,15 +152,26 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>{t("manageActivities")}</CardTitle>
-              <CardDescription>{t("manageActivitiesDesc")}</CardDescription>
+              <CardTitle>{t("manageGallery")}</CardTitle>
+              <CardDescription>{t("manageGalleryDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild variant="secondary">
                 <Link href="/admin/dashboard/activities">
-                  {t("manageActivities")}
+                  {t("manageGallery")}
                 </Link>
               </Button>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+                <CardTitle>{t("manageDocuments")}</CardTitle>
+                <CardDescription>{t("manageDocumentsDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild variant="secondary">
+                    <Link href="/admin/dashboard/documents">{t("manageDocuments")}</Link>
+                </Button>
             </CardContent>
           </Card>
            <Card>
@@ -187,6 +198,17 @@ export default function DashboardPage() {
                   {t("composeMessage")}
                 </Link>
               </Button>
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+                <CardTitle>{t("aiAssistant")}</CardTitle>
+                <CardDescription>{t("aiAssistantDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild variant="secondary">
+                    <Link href="/admin/dashboard/ai-assistant">{t("aiAssistant")}</Link>
+                </Button>
             </CardContent>
           </Card>
         </div>

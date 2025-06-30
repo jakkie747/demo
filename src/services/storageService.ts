@@ -1,10 +1,11 @@
+
 import { storage } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { promiseWithTimeout } from "@/lib/utils";
 
 const TIMEOUT_DURATION = 15000; // 15 seconds
 
-export const uploadImage = async (file: File, path: 'activities' | 'events' | 'children' | 'teachers'): Promise<string> => {
+export const uploadImage = async (file: File, path: 'activities' | 'events' | 'children' | 'teachers' | 'documents'): Promise<string> => {
     if (!storage) {
         throw new Error("Firebase Storage is not configured. Please check your firebase.ts file.");
     }

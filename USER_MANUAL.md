@@ -1,3 +1,4 @@
+
 # Blinkogies App - User Manual
 
 Welcome to the Blinkogies App! This application is designed to be a central place for all communication between the school and our families. This guide will walk you through all the features available to you.
@@ -27,6 +28,20 @@ Stay up-to-date with all the fun and important dates on our school calendar.
 1.  Click on the **"Events"** link in the header.
 2.  This page will display a list of all upcoming events, such as Sports Day, Pajama Day, or school concerts.
 3.  Each event card shows the event's title, a description, an image, and the date.
+
+### How to View the Photo Gallery
+
+See what our little ones have been up to!
+
+1.  Click on the **"Gallery"** link in the header.
+2.  This page shows a collection of photos from various school activities and fun moments.
+
+### How to View School Documents
+
+Access important school documents like newsletters and calendars.
+
+1. Click on the **"Documents"** link in the header.
+2. This page lists all available documents. Click the **"Download"** button next to any document to save it to your device.
 
 ### How to Install the App on Your Device
 
@@ -87,12 +102,24 @@ After logging in, you will land on the Admin Dashboard. This page gives you a qu
 4.  **To Delete an Event:**
     *   In the table, click the **trash can icon** for the event you want to remove. Confirm the deletion.
 
-### How to Manage Homepage Activities
+### How to Manage the Photo Gallery
 
-These are the "Recent Fun Activities" that appear on the public homepage.
+These are the photos that appear on the homepage and on the public "Gallery" page.
 
-1.  Navigate to the **"Manage Activities"** page from the sidebar.
-2.  The process is identical to managing events. Use the form to create, edit, or delete activities that showcase what the children have been doing.
+1.  Navigate to the **"Manage Gallery"** page from the sidebar.
+2.  The process is identical to managing events. Use the form to create, edit, or delete gallery items that showcase what the children have been doing.
+
+### How to Manage Documents
+
+1.  Navigate to the **"Manage Documents"** page from the sidebar.
+2.  **To Upload a New Document:**
+    *   Use the form on the left side of the page.
+    *   Fill in the **Document Title** (e.g., "October Newsletter").
+    *   Click to select and upload your file (PDF, Word, JPG, etc.).
+    *   Click **"Upload Document"**.
+3.  **To Delete a Document:**
+    *   In the "Existing Documents" table on the right, find the document you wish to remove.
+    *   Click the **trash can icon** and confirm the deletion.
 
 ### How to Manage Teachers
 
@@ -122,6 +149,15 @@ You can easily send a message to all registered parents via email or WhatsApp.
     *   Click the **"Send via WhatsApp"** button.
     *   A new browser tab will open to WhatsApp with your message body pre-filled.
     *   For your convenience, all parent phone numbers have been **copied to your clipboard**. You can then paste these numbers into a new WhatsApp group or broadcast list to send your message.
+
+### How to Use the AI Assistant
+
+Get help with creative ideas for your classroom.
+
+1.  Navigate to the **"AI Assistant"** page from the sidebar.
+2.  You will see options to generate ideas for **Story Starters** or **Activity Ideas**.
+3.  Click one of the buttons (e.g., "Generate Story Starters").
+4.  The AI will generate five unique ideas and display them in cards for your inspiration.
 
 ### How to Change Your Password
 
