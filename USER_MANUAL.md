@@ -124,5 +124,17 @@ You can easily send a message to all registered parents via email or WhatsApp.
     *   A new browser tab will open to WhatsApp with your message body pre-filled.
     *   For your convenience, all parent phone numbers have been **copied to your clipboard**. You can then paste these numbers into a new WhatsApp group or broadcast list to send your message.
 
+### How to Change Your Password
+
+For security, you can change your own login password at any time.
+
+1.  From the sidebar menu, navigate to the **"Settings"** page.
+2.  On this page, you will see a form to change your password.
+3.  Enter your **Current Password**.
+4.  Enter your desired **New Password**. It must be at least 6 characters long.
+5.  **Confirm** your new password by entering it again.
+6.  Click the **"Update Password"** button.
+7.  If successful, you will see a confirmation message and be automatically logged out. You can then log back in with your new password.
+
 ---
 If you have any questions or run into any issues, please contact the school's administrative office.

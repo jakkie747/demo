@@ -241,6 +241,22 @@ export const translations = {
     editTeacherProfile: 'Edit Teacher Profile',
     updateTeacherProfileDesc: "Update the teacher's details below. Email and role cannot be changed here.",
     saveChanges: 'Save Changes',
+
+    // Admin Settings Page
+    settings: 'Settings',
+    changePassword: 'Change Password',
+    changePasswordDesc: 'Update your login password here. You will be logged out after a successful change.',
+    currentPassword: 'Current Password',
+    newPassword: 'New Password',
+    confirmNewPassword: 'Confirm New Password',
+    updatePassword: 'Update Password',
+    saving: 'Saving...',
+    passwordChangedSuccessTitle: 'Password Changed Successfully',
+    passwordChangedSuccessDesc: 'Your password has been updated. Please log in again with your new password.',
+    changePasswordErrorNoUser: 'Could not find an authenticated user. Please log in again.',
+    changePasswordErrorWrongPassword: 'The current password you entered is incorrect.',
+    changePasswordErrorGeneric: 'An unexpected error occurred. Please try again.',
+    error: 'Error',
   },
   af: {
     // Header
@@ -484,6 +500,22 @@ export const translations = {
     editTeacherProfile: 'Wysig Onderwyserprofiel',
     updateTeacherProfileDesc: "Dateer die onderwyser se besonderhede hieronder op. E-pos en rol kan nie hier verander word nie.",
     saveChanges: 'Stoor Veranderinge',
+
+    // Admin Settings Page
+    settings: 'Instellings',
+    changePassword: 'Verander Wagwoord',
+    changePasswordDesc: 'Dateer jou aanmeldwagwoord hier op. Jy sal uitgeteken word na \'n suksesvolle verandering.',
+    currentPassword: 'Huidige Wagwoord',
+    newPassword: 'Nuwe Wagwoord',
+    confirmNewPassword: 'Bevestig Nuwe Wagwoord',
+    updatePassword: 'Dateer Wagwoord Op',
+    saving: 'Besig om te stoor...',
+    passwordChangedSuccessTitle: 'Wagwoord Suksesvol Verander',
+    passwordChangedSuccessDesc: 'Jou wagwoord is opgedateer. Teken asseblief weer aan met jou nuwe wagwoord.',
+    changePasswordErrorNoUser: 'Kon nie \'n aangemelde gebruiker vind nie. Teken asseblief weer aan.',
+    changePasswordErrorWrongPassword: 'Die huidige wagwoord wat jy ingevoer het, is verkeerd.',
+    changePasswordErrorGeneric: '\'n Onverwagte fout het voorgekom. Probeer asseblief weer.',
+    error: 'Fout',
   },
 };
 

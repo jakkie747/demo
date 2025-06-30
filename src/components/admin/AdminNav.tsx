@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarDays, Sparkles, Briefcase, Mail } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, Sparkles, Briefcase, Mail, Settings } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -40,6 +40,11 @@ export function AdminNav() {
       href: "/admin/dashboard/notifications",
       label: t('composeMessage'),
       icon: Mail,
+    },
+    {
+      href: "/admin/dashboard/settings",
+      label: t('settings'),
+      icon: Settings,
     },
   ];
 
