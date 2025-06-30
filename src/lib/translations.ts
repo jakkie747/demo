@@ -205,7 +205,6 @@ export const translations = {
     delete: 'Delete',
     
     // Admin Activities Page -> Renamed to Gallery
-    manageGallery: 'Manage Gallery',
     createNewGalleryItemTitle: 'Add to Gallery',
     editingGalleryItem: 'Editing "{title}"',
     galleryItemDetails: 'Gallery Item Details',
@@ -517,7 +516,6 @@ export const translations = {
     delete: 'Vee uit',
 
     // Admin Activities Page -> Renamed to Gallery
-    manageGallery: 'Bestuur Galery',
     createNewGalleryItemTitle: 'Voeg by Galery',
     editingGalleryItem: 'Wysig "{title}"',
     galleryItemDetails: 'Galery-item Besonderhede',
@@ -627,3 +625,5 @@ export const translations = {
 };
 
 export type TranslationKey = keyof typeof translations.en;
+
+    
