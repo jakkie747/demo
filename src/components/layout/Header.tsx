@@ -109,7 +109,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-1">
             <Button asChild variant="ghost" size="icon">
               <Link href="https://web.facebook.com/groups/1596188941091215/" target="_blank" rel="noopener noreferrer">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="h-6 w-6">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="h-7 w-7">
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                 </svg>
                 <span className="sr-only">Facebook</span>
@@ -117,7 +117,7 @@ export function Header() {
             </Button>
             <Button asChild variant="ghost" size="icon">
                 <Link href="https://www.instagram.com/blink.ogies?utm_source=qr&igsh=Yjh6cDNwd2xldzNv" target="_blank" rel="noopener noreferrer">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-7 w-7" fill="none">
                       <defs>
                           <radialGradient id="instagram-gradient" cx="0.3" cy="1.2" r="1.2">
                               <stop offset="0" stopColor="#F58529" />
@@ -222,7 +222,7 @@ export function Header() {
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="mr-4 h-5 w-5">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="mr-4 h-6 w-6">
                     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                   </svg>
                   <span>Facebook</span>
@@ -237,7 +237,7 @@ export function Header() {
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-4 h-5 w-5" fill="none">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-4 h-6 w-6" fill="none">
                       <defs>
                           <radialGradient id="instagram-gradient-mobile" cx="0.3" cy="1.2" r="1.2">
                               <stop offset="0" stopColor="#F58529" />
