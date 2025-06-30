@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Languages, Download, Phone, Facebook, Instagram } from "lucide-react";
+import { Menu, Languages, Download, Phone } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -109,13 +109,28 @@ export function Header() {
           <div className="hidden md:flex items-center gap-1">
             <Button asChild variant="ghost" size="icon">
               <Link href="https://web.facebook.com/groups/1596188941091215/" target="_blank" rel="noopener noreferrer">
-                <Facebook className="h-5 w-5" />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="h-6 w-6">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
                 <span className="sr-only">Facebook</span>
               </Link>
             </Button>
             <Button asChild variant="ghost" size="icon">
                 <Link href="https://www.instagram.com/blink.ogies?utm_source=qr&igsh=Yjh6cDNwd2xldzNv" target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-5 w-5" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
+                      <defs>
+                          <radialGradient id="instagram-gradient" cx="0.3" cy="1.2" r="1.2">
+                              <stop offset="0" stopColor="#F58529" />
+                              <stop offset="0.2" stopColor="#FEDA77" />
+                              <stop offset="0.4" stopColor="#DD2A7B" />
+                              <stop offset="0.7" stopColor="#8134AF" />
+                              <stop offset="1" stopColor="#515BD4" />
+                          </radialGradient>
+                      </defs>
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" fill="url(#instagram-gradient)"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke="white" strokeWidth="2"></path>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="white" strokeWidth="2"></line>
+                  </svg>
                     <span className="sr-only">Instagram</span>
                 </Link>
             </Button>
@@ -207,7 +222,9 @@ export function Header() {
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <Facebook className="mr-4 h-5 w-5" />
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="mr-4 h-5 w-5">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                  </svg>
                   <span>Facebook</span>
                 </Link>
 
@@ -220,8 +237,21 @@ export function Header() {
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
                 >
-                    <Instagram className="mr-4 h-5 w-5" />
-                    <span>Instagram</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-4 h-5 w-5" fill="none">
+                      <defs>
+                          <radialGradient id="instagram-gradient-mobile" cx="0.3" cy="1.2" r="1.2">
+                              <stop offset="0" stopColor="#F58529" />
+                              <stop offset="0.2" stopColor="#FEDA77" />
+                              <stop offset="0.4" stopColor="#DD2A7B" />
+                              <stop offset="0.7" stopColor="#8134AF" />
+                              <stop offset="1" stopColor="#515BD4" />
+                          </radialGradient>
+                      </defs>
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" fill="url(#instagram-gradient-mobile)"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke="white" strokeWidth="2"></path>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="white" strokeWidth="2"></line>
+                  </svg>
+                  <span>Instagram</span>
                 </Link>
 
                 <Link
