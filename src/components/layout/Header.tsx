@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Languages, Download, Phone, Facebook } from "lucide-react";
+import { Menu, Languages, Download, Phone, Facebook, Instagram } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -106,12 +106,18 @@ export function Header() {
             </div>
           )}
           
-          <div className="hidden md:flex">
+          <div className="hidden md:flex items-center gap-1">
             <Button asChild variant="ghost" size="icon">
               <Link href="https://web.facebook.com/groups/1596188941091215/" target="_blank" rel="noopener noreferrer">
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
+            </Button>
+            <Button asChild variant="ghost" size="icon">
+                <Link href="https://www.instagram.com/blink.ogies?utm_source=qr&igsh=Yjh6cDNwd2xldzNv" target="_blank" rel="noopener noreferrer">
+                    <Instagram className="h-5 w-5" />
+                    <span className="sr-only">Instagram</span>
+                </Link>
             </Button>
           </div>
 
@@ -203,6 +209,19 @@ export function Header() {
                 >
                   <Facebook className="mr-4 h-5 w-5" />
                   <span>Facebook</span>
+                </Link>
+
+                <Link
+                    href="https://www.instagram.com/blink.ogies?utm_source=qr&igsh=Yjh6cDNwd2xldzNv"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                    "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                    )}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                >
+                    <Instagram className="mr-4 h-5 w-5" />
+                    <span>Instagram</span>
                 </Link>
 
                 <Link
