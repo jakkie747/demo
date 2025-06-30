@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -19,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { isFirebaseConfigured } from "@/lib/firebase";
-import { AlertTriangle, FileDown, FileUp, Trash2, HeartPulse } from "lucide-react";
+import { AlertTriangle, FileDown, FileUp, Trash2, HeartPulse, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -318,7 +319,7 @@ export default function ChildrenPage() {
                     <TableCell><Skeleton className="h-12 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-8 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-6 w-6" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-10" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-24" /></TableCell>
                   </TableRow>
                 ))
               ) : children.length === 0 ? (
@@ -373,9 +374,24 @@ export default function ChildrenPage() {
                     </TableCell>
                     <TableCell>
                         <div className="flex gap-2">
-                           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}>
-                                <Trash2 className="h-4 w-4" />
-                           </Button>
+                           <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button asChild variant="ghost" size="icon">
+                                <Link href={`/admin/dashboard/children/${child.id}/reports`}>
+                                  <FileText className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Manage Daily Reports</p></TooltipContent>
+                           </Tooltip>
+                           <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}>
+                                  <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Delete Child Profile</p></TooltipContent>
+                           </Tooltip>
                         </div>
                     </TableCell>
                   </TableRow>
@@ -405,5 +421,3 @@ export default function ChildrenPage() {
     </div>
   );
 }
-
-    

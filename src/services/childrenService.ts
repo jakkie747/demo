@@ -1,5 +1,6 @@
+
 import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, writeBatch, doc, query, orderBy, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, writeBatch, doc, query, orderBy, updateDoc, deleteDoc, getDoc, where } from 'firebase/firestore';
 import type { Child } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
 import { deleteImageFromUrl } from './storageService';
@@ -21,6 +22,42 @@ export const getChildren = async (): Promise<Child[]> => {
         }
         console.error("Error fetching children:", error);
         throw new Error("Could not fetch children.");
+    }
+};
+
+export const getChildById = async (childId: string): Promise<Child | null> => {
+    if (!db) return null;
+    try {
+        const childDocRef = doc(db, 'children', childId);
+        const docSnap = await getDoc(childDocRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as Child;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching child by ID:", error);
+        throw new Error("Could not fetch child data.");
+    }
+}
+
+export const getChildrenByParentEmail = async (email: string): Promise<Child[]> => {
+    if (!db) return [];
+    try {
+        const childrenCollectionRef = collection(db, 'children');
+        const q = query(childrenCollectionRef, where("parentEmail", "==", email));
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) {
+            return [];
+        }
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Child));
+    } catch (error: any) {
+         if ((error as any).code === 'failed-precondition') {
+            const message = (error as Error).message;
+            console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
+            throw new Error(`A database index is required to query children by parent email. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh the page. Raw error: ${message}`);
+        }
+        console.error("Error fetching children by parent email:", error);
+        throw new Error("Could not fetch children for the logged in parent.");
     }
 };
 

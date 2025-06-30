@@ -8,6 +8,7 @@ export const translations = {
     galleryNav: 'Gallery',
     documentsNav: 'Documents',
     adminLoginNav: 'Admin Login',
+    parentLoginNav: 'Parent Login',
     language: 'Language',
     installApp: 'Install App',
     callUs: 'Call Us',
@@ -85,9 +86,11 @@ export const translations = {
     concertTitle: 'End-of-Year Concert',
     concertDesc: "Our little stars will be showcasing their talents in our annual concert. A performance you won't want to miss!",
 
-    // Admin Login Page
+    // Login Pages (Admin & Parent)
     adminLogin: 'Admin Login',
     adminLoginSub: 'Access the Blinkogies App dashboard.',
+    parentLogin: 'Parent Login',
+    parentLoginSub: "Log in to view your child's daily reports.",
     username: 'Username',
     password: 'Password',
     loggingIn: 'Logging in...',
@@ -253,7 +256,7 @@ export const translations = {
     download: 'Download',
     noDocuments: 'No documents have been uploaded yet.',
     noDocumentsDesc: 'Please check back later.',
-
+    
     // Admin Teachers Page
     editTeacher: 'Edit Teacher',
     editingTeacher: 'Editing "{name}"',
@@ -317,6 +320,7 @@ export const translations = {
     galleryNav: 'Galery',
     documentsNav: 'Dokumente',
     adminLoginNav: 'Admin Aanteken',
+    parentLoginNav: 'Ouer Aanteken',
     language: 'Taal',
     installApp: 'Installeer Toepassing',
     callUs: 'Bel Ons',
@@ -394,9 +398,11 @@ export const translations = {
     concertTitle: 'Einde-van-die-jaar Konsert',
     concertDesc: "Ons klein sterretjies gaan hul talente ten toon stel in ons jaarlikse konsert. 'n Opvoering wat jy nie wil misloop nie!",
 
-    // Admin Login Page
+    // Login Pages (Admin & Parent)
     adminLogin: 'Admin Aanteken',
     adminLoginSub: 'Toegang tot die Blinkogies App-kontroleskerm.',
+    parentLogin: 'Ouer Aanteken',
+    parentLoginSub: "Teken in om jou kind se daaglikse verslae te sien.",
     username: 'Gebruikersnaam',
     password: 'Wagwoord',
     loggingIn: 'Teken tans aan...',

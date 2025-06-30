@@ -9,6 +9,28 @@ Welcome to the Blinkogies App! This application is designed to be a central plac
 
 This section covers the features available to all parents and guardians.
 
+### How to Create a Parent Account & Log In
+
+To view private information like your child's daily reports, you need to create an account.
+
+1.  From the app's homepage, click the **"Parent Login"** link in the header.
+2.  On the login page, click the **"Register here"** link.
+3.  Fill in your email address and choose a secure password. **Important:** You must use the **same email address** that you provided to the school when you registered your child. This is how we link your account to your child's profile.
+4.  Once registered, you will be automatically logged in. In the future, you can use the "Parent Login" link to sign in with your email and password.
+
+### How to View Your Child's Daily Reports
+
+Once you are logged in, you will be taken to your Parent Dashboard.
+
+1.  This dashboard will automatically show the latest daily reports for your child (or children).
+2.  Each report is displayed on a card for a specific date and includes:
+    *   **Mood:** An icon showing how your child was feeling.
+    *   **Activities:** A summary of the day's activities and lessons.
+    *   **Meals:** What your child ate for their meals and snacks.
+    *   **Naps:** Information about their nap time.
+    *   **Photo:** A daily photo from the teacher.
+    *   **Notes:** Any special notes or reminders from the teacher.
+
 ### How to Register Your Child
 
 Enrolling your child is the first step to getting connected.
@@ -16,7 +38,7 @@ Enrolling your child is the first step to getting connected.
 1.  From the app's homepage, click the **"Register Your Child"** button or navigate to the **"Register Child"** link in the header.
 2.  You will see a detailed registration form. Please fill out each section carefully:
     *   **Child's Information:** Provide your child's full name, date of birth, and gender. You can also optionally upload a recent photo for their profile.
-    *   **Parent/Guardian Information:** Enter your full name, email address, phone number, and physical address.
+    *   **Parent/Guardian Information:** Enter your full name, email address, phone number, and physical address. The email you enter here will be used for your parent login.
     *   **Emergency & Medical Information:** This is crucial. Please provide an emergency contact person and their phone number. Also, list any medical conditions or allergies your child has.
     *   **Other Information:** Let us know if your child has attended preschool before and add any other notes that might be helpful for our teachers.
 3.  Once the form is complete, click the **"Register Child"** button at the bottom. You will see a success message confirming your registration.
@@ -86,6 +108,22 @@ After logging in, you will land on the Admin Dashboard. This page gives you a qu
     *   Confirm the import.
 4.  **Exporting Children:** You can download a CSV file of all registered children by clicking the **"Export Children"** button.
 5.  **Deleting a Child:** To remove a child's profile, click the **trash can icon** in the "Actions" column for that child. You will be asked to confirm the deletion.
+
+### How to Create Daily Reports for a Child
+
+This feature allows you to create private daily updates for parents.
+
+1.  From the sidebar, go to the **"Children Profiles"** page.
+2.  Find the child you want to create a report for and click the **document icon** (Manage Daily Reports) in the "Actions" column.
+3.  You will be taken to that child's report management page.
+4.  Use the **"Create New Report"** form on the left to fill in the details:
+    *   **Date:** The date of the report.
+    *   **Mood:** Select the child's general mood for the day.
+    *   **Activities, Meals, Naps:** Fill in the text boxes with details about what the child did, ate, and how they slept.
+    *   **Notes:** Add any other notes for the parents.
+    *   **Photo:** Optionally upload a photo for the day.
+5.  Click **"Create Report"**. The new report will appear in the "Past Reports" list on the right and will be immediately visible to the parent on their dashboard.
+6.  You can **edit** or **delete** past reports using the icons on each report card.
 
 ### How to Manage Events
 

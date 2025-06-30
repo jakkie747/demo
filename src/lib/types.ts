@@ -56,3 +56,16 @@ export interface Document {
     fileUrl: string;
     createdAt: any;
 }
+
+export interface DailyReport {
+  id: string;
+  childId: string;
+  date: string; // YYYY-MM-DD
+  mood: 'happy' | 'calm' | 'sad' | 'energetic' | 'tired';
+  activities: string;
+  meals: string;
+  naps: string;
+  notes?: string;
+  photoUrl?: string;
+  createdAt: any; // Firestore timestamp
+}

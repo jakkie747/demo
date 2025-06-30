@@ -5,7 +5,7 @@ import { promiseWithTimeout } from "@/lib/utils";
 
 const TIMEOUT_DURATION = 15000; // 15 seconds
 
-export const uploadImage = async (file: File, path: 'activities' | 'events' | 'children' | 'teachers' | 'documents'): Promise<string> => {
+export const uploadImage = async (file: File, path: 'activities' | 'events' | 'children' | 'teachers' | 'documents' | 'reports'): Promise<string> => {
     if (!storage) {
         throw new Error("Firebase Storage is not configured. Please check your firebase.ts file.");
     }

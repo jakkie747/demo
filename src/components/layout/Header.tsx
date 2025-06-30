@@ -156,7 +156,10 @@ export function Header() {
               </Button>
           </div>
 
-          <div className="hidden md:flex">
+          <div className="hidden md:flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href="/parent-login">{t("parentLoginNav")}</Link>
+            </Button>
             <Button asChild variant="outline">
               <Link href="/admin">{t("adminLoginNav")}</Link>
             </Button>
@@ -292,18 +295,33 @@ export function Header() {
                   <span>{t("callUs")}</span>
                 </Link>
 
-                <Link
-                  href="/admin"
-                  className={cn(
-                    "text-lg font-medium transition-colors hover:text-primary",
-                    pathname.startsWith('/admin')
-                      ? "text-primary"
-                      : "text-foreground/60"
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {t("adminLoginNav")}
-                </Link>
+                 <div className="border-t pt-4 mt-4 space-y-4">
+                    <Link
+                    href="/parent-login"
+                    className={cn(
+                        "text-lg font-medium transition-colors hover:text-primary",
+                        pathname.startsWith('/parent-login')
+                        ? "text-primary"
+                        : "text-foreground/60"
+                    )}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                    {t("parentLoginNav")}
+                    </Link>
+
+                    <Link
+                    href="/admin"
+                    className={cn(
+                        "text-lg font-medium transition-colors hover:text-primary",
+                        pathname.startsWith('/admin')
+                        ? "text-primary"
+                        : "text-foreground/60"
+                    )}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                    {t("adminLoginNav")}
+                    </Link>
+                 </div>
               </nav>
             </SheetContent>
           </Sheet>
