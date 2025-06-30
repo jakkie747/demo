@@ -1,9 +1,74 @@
 import { db } from '@/lib/firebase';
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, writeBatch } from 'firebase/firestore';
 import type { Activity } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
 
 const TIMEOUT_DURATION = 15000; // 15 seconds
+
+const seedActivities = async (): Promise<Activity[]> => {
+    if (!db) throw new Error("Firebase is not configured for seeding.");
+    
+    const batch = writeBatch(db);
+    const activitiesCollectionRef = collection(db, 'activities');
+
+    const mockActivities: Omit<Activity, 'id' | 'createdAt' | 'updatedAt'>[] = [
+        {
+            title: "Creative Craft Day",
+            description: "Our little artists explored textures and colors, creating beautiful collages with various materials.",
+            image: "https://placehold.co/400x400.png",
+            aiHint: "children art"
+        },
+        {
+            title: "Music and Movement",
+            description: "Dancing, singing, and playing with instruments! We had a blast expressing ourselves through music.",
+            image: "https://placehold.co/400x400.png",
+            aiHint: "children music"
+        },
+        {
+            title: "Building Block Bonanza",
+            description: "Teamwork makes the dream work! The children collaborated to build magnificent towers and structures.",
+            image: "https://placehold.co/400x400.png",
+            aiHint: "kids blocks"
+        },
+        {
+            title: "Outdoor Water Play",
+            description: "Splish, splash! We cooled off with some fun and exciting water activities in the sunshine.",
+            image: "https://placehold.co/400x400.png",
+            aiHint: "children water"
+        },
+        {
+            title: "Story Time Adventures",
+            description: "Gathered around, we traveled to magical lands through the pages of a captivating storybook.",
+            image: "https://placehold.co/400x400.png",
+            aiHint: "children reading"
+        },
+        {
+            title: "Garden Exploration",
+            description: "We got our hands dirty learning about plants and insects in our very own school garden.",
+            image: "https://placehold.co/400x400.png",
+            aiHint: "kids garden"
+        },
+    ];
+
+    const seededActivities: Activity[] = [];
+    const now = new Date();
+
+    mockActivities.forEach((activity, index) => {
+        const docRef = doc(activitiesCollectionRef);
+        const newActivity = { 
+            ...activity, 
+            createdAt: serverTimestamp(),
+        };
+        batch.set(docRef, newActivity);
+        // We subtract seconds to ensure a consistent descending order for the initial return
+        seededActivities.push({ ...activity, id: docRef.id, createdAt: new Date(now.getTime() - index * 1000) });
+    });
+
+    await batch.commit();
+    console.log("Seeded mock activities.");
+    // Sort by the JS date to ensure correct order on first load
+    return seededActivities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
 
 export const getActivities = async (): Promise<Activity[]> => {
     if (!db) return [];
@@ -12,6 +77,12 @@ export const getActivities = async (): Promise<Activity[]> => {
         const activitiesCollectionRef = collection(db, 'activities');
         const q = query(activitiesCollectionRef, orderBy("createdAt", "desc"));
         const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            console.log("No activities found, seeding mock data.");
+            return await seedActivities();
+        }
+
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
     } catch (error: any) {
         if ((error as any).code === 'failed-precondition') {
