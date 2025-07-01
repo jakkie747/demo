@@ -1,16 +1,62 @@
 
 rules_version = '2';
 
-// Warning: These rules are insecure and are meant for development purposes only.
-// They allow public read and write access to your entire database.
-// Before deploying to production, you should implement proper security rules.
-// Learn more here: https://firebase.google.com/docs/firestore/security/get-started
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read and write access to all documents
-    match /{document=**} {
-      allow read, write: if true;
+
+    // Helper function to check if a user is an authenticated admin
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Helper function to check if a user is authenticated
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Children collection can be read by admins, and created by anyone (public registration form).
+    // Updates and deletes are restricted to admins.
+    match /children/{childId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+    
+    // Events, Activities (Gallery), and Documents can be read by anyone.
+    // Only admins can create, update, or delete them.
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /activities/{activityId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+    
+    match /documents/{documentId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+
+    // Teachers collection can only be read and written to by admins.
+    // This prevents non-admin users from seeing or modifying teacher data.
+    match /teachers/{teacherId} {
+        allow read, write: if isAdmin();
+    }
+
+    // Daily reports can only be read by the child's parent or an admin.
+    // They can only be created, updated, or deleted by an admin.
+    match /daily_reports/{reportId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.childId in get(/databases/$(database)/documents/children?where("parentEmail", "==", request.auth.token.email)).docs.map(doc => doc.id));
+      allow write: if isAdmin();
+    }
+
+    // FCM tokens for push notifications can be written by anyone,
+    // but should not be readable to prevent leaking tokens.
+    match /fcmTokens/{token} {
+      allow read: if false;
+      allow write: if true;
     }
   }
 }
