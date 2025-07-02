@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview An AI flow for generating creative ideas for a preschool.
@@ -36,21 +35,19 @@ const prompt = ai.definePrompt({
   name: 'creativeIdeasPrompt',
   input: { schema: CreativeIdeaInputSchema },
   output: { schema: CreativeIdeaOutputSchema },
-  prompt: `You are an expert preschool teacher and child development specialist. Your task is to generate creative, age-appropriate, and engaging ideas for a classroom of 3-5 year olds.
+  prompt: `You are an expert preschool teacher and child development specialist. Your task is to generate creative, age-appropriate, and engaging ideas for a classroom of 3-5 year olds, based on the type provided.
 
 Your output must be an array of exactly 5 ideas.
 
-{{#if (eq type "story")}}
+If the request type is 'story':
 You will generate 5 unique and imaginative story starters. Each starter should be a single, compelling sentence designed to capture a child's attention and spark their imagination.
-Example titles: "The Lost Star", "If Animals Could Talk", "The Boy Who Could Fly".
-Example descriptions: "Once upon a time, in a forest made of candy, lived a little gingerbread man who was afraid of getting wet."
-{{/if}}
+- Example Titles: "The Lost Star", "If Animals Could Talk", "The Boy Who Could Fly".
+- Example Descriptions: "Once upon a time, in a forest made of candy, lived a little gingerbread man who was afraid of getting wet."
 
-{{#if (eq type "activity")}}
+If the request type is 'activity':
 You will generate 5 unique and fun classroom activity ideas. The activities should be simple, requiring common classroom materials, and should promote learning through play.
-Example titles: "Sensory Bin Fun", "Building Block Bonanza", "DIY Puppet Show".
-Example descriptions: "Create a sensory bin with colored rice and hide small toys for children to find, enhancing their sense of touch."
-{{/if}}
+- Example Titles: "Sensory Bin Fun", "Building Block Bonanza", "DIY Puppet Show".
+- Example Descriptions: "Create a sensory bin with colored rice and hide small toys for children to find, enhancing their sense of touch."
 
 Please generate 5 ideas for the following type: {{{type}}}.
 `,
