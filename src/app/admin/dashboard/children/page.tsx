@@ -331,9 +331,25 @@ export default function ChildrenPage() {
         photoUrl = await uploadImage(file, 'children');
       }
 
-      const { photo, ...childData } = values;
+      // Manually construct the update object to ensure clean data is sent.
+      const updateData: Partial<Omit<Child, 'id'>> = {
+        name: values.name,
+        dateOfBirth: values.dateOfBirth,
+        gender: values.gender,
+        parent: values.parent,
+        parentEmail: values.parentEmail,
+        parentPhone: values.parentPhone,
+        address: values.address,
+        emergencyContactName: values.emergencyContactName,
+        emergencyContactPhone: values.emergencyContactPhone,
+        medicalConditions: values.medicalConditions,
+        previousPreschool: values.previousPreschool,
+        additionalNotes: values.additionalNotes,
+        photo: photoUrl,
+      };
 
-      await updateChild(editingChild.id, { ...childData, photo: photoUrl });
+      await updateChild(editingChild.id, updateData);
+      
       toast({ title: t('childUpdated'), description: t('childUpdatedDesc', { name: values.name }) });
       await fetchChildren();
       setIsEditModalOpen(false);
