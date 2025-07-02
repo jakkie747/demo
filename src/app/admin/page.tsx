@@ -47,13 +47,13 @@ export default function AdminLoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // On first login for a new admin user, create their Firestore document
+      // On first login, create a Firestore document for the new user if it doesn't exist.
       const teacherProfile = await getTeacherByUid(user.uid);
-      if (!teacherProfile && user.email?.toLowerCase() === 'admin@blinkogies.co.za') {
+      if (!teacherProfile && user.email) {
           await addTeacher(user.uid, {
-              name: "Admin User",
+              name: user.email, // Default name to email, can be edited later
               email: user.email,
-              role: 'admin'
+              role: 'teacher' // Default new users to 'teacher' role
           });
       }
       
