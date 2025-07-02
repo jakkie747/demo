@@ -16,7 +16,7 @@ const CreativeIdeaInputSchema = z.object({
 });
 export type CreativeIdeaInput = z.infer<typeof CreativeIdeaInputSchema>;
 
-export const CreativeIdeaSchema = z.object({
+const CreativeIdeaSchema = z.object({
     title: z.string().describe("A short, catchy title for the idea (e.g., 'The Magical Paintbrush' or 'Nature Scavenger Hunt')."),
     description: z.string().describe("A one or two-sentence description of the idea. For stories, this is the opening line. For activities, this is a brief summary.")
 });
