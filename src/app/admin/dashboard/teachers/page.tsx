@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, AlertTriangle, UserPlus, Edit } from "lucide-react";
+import { Trash2, AlertTriangle, UserPlus, Edit, Ban } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,10 +31,11 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers, updateTeacher } from "@/services/teacherService";
+import { getTeachers, updateTeacher, getTeacherByUid } from "@/services/teacherService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { auth, isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -67,11 +68,39 @@ export default function ManageTeachersPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isConfigured] = useState(isFirebaseConfigured());
   const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const currentUser = auth?.currentUser;
 
   const form = useForm<z.infer<typeof teacherFormSchema>>({
     resolver: zodResolver(teacherFormSchema),
   });
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const profile = await getTeacherByUid(user.uid);
+                if (profile && profile.role === 'admin') {
+                    setIsAuthorized(true);
+                } else {
+                    setIsAuthorized(false);
+                }
+            } catch (e) {
+                console.error("Authorization check failed:", e);
+                setIsAuthorized(false);
+            } finally {
+                setIsCheckingAuth(false);
+            }
+        } else {
+            // Not logged in, layout will handle the redirect.
+            setIsAuthorized(false);
+            setIsCheckingAuth(false);
+        }
+    });
+    
+    return () => unsubscribe();
+  }, []);
 
   const fetchTeachers = useCallback(async () => {
     setIsLoading(true);
@@ -87,12 +116,12 @@ export default function ManageTeachersPage() {
   }, [toast]);
 
   useEffect(() => {
-    if (isConfigured) {
+    if (isConfigured && isAuthorized) {
       fetchTeachers();
-    } else {
+    } else if (!isCheckingAuth) {
       setIsLoading(false);
     }
-  }, [isConfigured, fetchTeachers]);
+  }, [isConfigured, fetchTeachers, isAuthorized, isCheckingAuth]);
 
   const handleEditClick = (teacher: Teacher) => {
     setEditingTeacher(teacher);
@@ -232,6 +261,30 @@ export default function ManageTeachersPage() {
       setIsSaving(false);
     }
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div className="py-6 space-y-4">
+        <Skeleton className="h-8 w-1/3 mb-4" />
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="py-12 flex justify-center">
+        <Alert variant="destructive" className="max-w-lg">
+          <Ban className="h-4 w-4" />
+          <AlertTitle>Access Denied</AlertTitle>
+          <AlertDescription>
+            You do not have permission to view this page. This feature is restricted to administrators.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   if (!isConfigured) {
     return (
