@@ -508,15 +508,15 @@ export default function ManageTeachersPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
+            <AlertDialogTitle>Delete {teacherToDelete?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteTeacherConfirmDesc', { name: teacherToDelete?.name || '' })}
+              This will permanently delete their profile and login access. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>
-              {t('delete')}
+              Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

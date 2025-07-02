@@ -618,14 +618,14 @@ export default function ChildrenPage() {
       <AlertDialog open={!!deletingChild} onOpenChange={(open) => { if (!open) setDeletingChild(null) }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
+            <AlertDialogTitle>Delete {deletingChild?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('areYouSureDeleteChild', { name: deletingChild?.name || '' })}
+              This action is permanent and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>{t('deleteChild')}</AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
