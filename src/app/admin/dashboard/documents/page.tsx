@@ -145,7 +145,7 @@ export default function ManageDocumentsPage() {
        const errorMessage = (error as Error).message || "Could not upload document.";
        let errorTitle = "Error Uploading Document";
 
-        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
           errorTitle = "Upload Failed: Firebase Storage Not Ready";
           setSubmissionError({
             title: errorTitle,

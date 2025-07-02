@@ -25,7 +25,7 @@ import type { Child } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import { AlertTriangle, FileDown, FileUp, Trash2, HeartPulse, FileText, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -121,6 +121,7 @@ export default function ChildrenPage() {
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
 
   const form = useForm<z.infer<typeof childEditFormSchema>>({
     resolver: zodResolver(childEditFormSchema),
@@ -261,7 +262,7 @@ export default function ChildrenPage() {
                     parent: childObject.parent || '',
                     parentEmail: childObject.parentEmail || '',
                     parentPhone: childObject.parentPhone || '',
-                    photo: childObject.photo && childObject.photo.startsWith('http') ? childObject.photo : 'https://picsum.photos/100',
+                    photo: childObject.photo && childObject.photo.startsWith('http') ? childObject.photo : 'https://placehold.co/100x100.png',
                     medicalConditions: childObject.medicalConditions || '',
                     emergencyContactName: childObject.emergencyContactName || '',
                     emergencyContactPhone: childObject.emergencyContactPhone || '',
@@ -313,6 +314,7 @@ export default function ChildrenPage() {
 
   const handleEditClick = (child: Child) => {
     setEditingChild(child);
+    setSubmissionError(null);
     form.reset({
       name: child.name || '',
       dateOfBirth: child.dateOfBirth || '',
@@ -334,6 +336,7 @@ export default function ChildrenPage() {
   const onEditSubmit = async (values: z.infer<typeof childEditFormSchema>) => {
     if (!editingChild) return;
     setIsSaving(true);
+    setSubmissionError(null);
     try {
       let photoUrl = editingChild.photo;
       const file = values.photo?.[0];
@@ -368,7 +371,77 @@ export default function ChildrenPage() {
       setIsEditModalOpen(false);
       
     } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not update profile." });
+      const errorMessage = (error as Error).message || "Could not update profile.";
+      let errorTitle = "Error updating profile";
+       if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
+        errorTitle = "Save Failed: Firebase Storage Not Ready";
+        setSubmissionError({
+          title: errorTitle,
+          description: (
+             <div className="space-y-4 text-sm">
+                <p className="font-bold text-base">
+                  This error usually means your Firebase project is not fully configured for file uploads.
+                </p>
+                <p className="mb-2">Please complete the following one-time setup steps.</p>
+                <ol className="list-decimal list-inside space-y-4 pl-2">
+                  <li>
+                    <strong>Crucial First Step: Enable Firebase Storage.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
+                      <li>
+                        Go to your{' '}
+                        <a
+                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline font-semibold"
+                        >
+                          Firebase Console Storage section
+                        </a>
+                        .
+                      </li>
+                      <li>
+                        If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket.
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>Set Storage CORS Policy using Cloud Shell.</strong>
+                    <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
+                      <li>
+                        This step is required to allow your web app to upload files. Open the{' '}
+                        <a
+                          href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          Google Cloud Shell
+                        </a>
+                        .
+                      </li>
+                      <li>
+                        Run these two commands one by one. Copy them exactly.
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
+                          {`echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`}
+                        </pre>
+                        <p className="mt-2 font-semibold">
+                          Crucial Note: For the next command, you must use the bucket name ending in `.appspot.com`.
+                        </p>
+                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.projectId}.appspot.com`}</pre>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                      <strong>Try Again.</strong>
+                       <p>After completing all these steps, refresh this page and try saving again.</p>
+                  </li>
+                </ol>
+              </div>
+          )
+        });
+      } else {
+        setSubmissionError({ title: errorTitle, description: errorMessage });
+      }
     } finally {
       setIsSaving(false);
     }
@@ -421,123 +494,125 @@ export default function ChildrenPage() {
             <Button onClick={handleExportCSV}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
         </div>
       </div>
-      <Card>
-          <CardContent className="p-0">
-          <Table>
-              <TableHeader>
-              <TableRow>
-                  <TableHead>{t('photo')}</TableHead>
-                  <TableHead>{t('childsName')}</TableHead>
-                  <TableHead>{t('ageInTable')}</TableHead>
-                  <TableHead>{t('gender')}</TableHead>
-                  <TableHead>{t('parentDetails')}</TableHead>
-                  <TableHead>{t('emergencyContact')}</TableHead>
-                  <TableHead>{t('medicalNotes')}</TableHead>
-                  <TableHead>{t('actions')}</TableHead>
-              </TableRow>
-              </TableHeader>
-              <TableBody>
-              {isLoading ? (
-                  Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={index}>
-                      <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                      <TableCell><Skeleton className="h-12 w-40" /></TableCell>
-                      <TableCell><Skeleton className="h-8 w-40" /></TableCell>
-                      <TableCell><Skeleton className="h-6 w-6" /></TableCell>
-                      <TableCell><Skeleton className="h-8 w-24" /></TableCell>
-                  </TableRow>
-                  ))
-              ) : children.length === 0 ? (
-                  <TableRow>
-                      <TableCell colSpan={8} className="h-24 text-center">
-                          No children registered yet.
-                      </TableCell>
-                  </TableRow>
-              ) : (
-                  <TooltipProvider>
-                  {children.map((child) => (
-                  <TableRow key={child.id}>
-                      <TableCell>
-                      <Avatar>
-                          <AvatarImage src={child.photo} alt={child.name} />
-                          <AvatarFallback>
-                          {child.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                      </Avatar>
-                      </TableCell>
-                      <TableCell className="font-medium">{child.name}</TableCell>
-                      <TableCell>
-                      {child.dateOfBirth ? <ChildAge dobString={child.dateOfBirth} /> : "N/A"}
-                      </TableCell>
-                      <TableCell className="capitalize">{child.gender}</TableCell>
-                      <TableCell>
-                      <div className="flex flex-col text-sm">
-                          <span className="font-medium">{child.parent}</span>
-                          <span className="text-muted-foreground">{child.parentEmail}</span>
-                          <span className="text-muted-foreground">{child.parentPhone}</span>
-                      </div>
-                      </TableCell>
-                      <TableCell>
-                          <div className="flex flex-col text-sm">
-                          <span className="font-medium">{child.emergencyContactName}</span>
-                          <span className="text-muted-foreground">{child.emergencyContactPhone}</span>
-                          </div>
-                      </TableCell>
-                      <TableCell>
-                      {child.medicalConditions && child.medicalConditions.trim() !== '' ? (
-                          <Tooltip>
-                          <TooltipTrigger>
-                              <HeartPulse className="h-5 w-5 text-destructive" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                              <p className="max-w-[300px] whitespace-pre-wrap">{child.medicalConditions}</p>
-                          </TooltipContent>
-                          </Tooltip>
-                      ) : (
-                          <span className="text-muted-foreground">-</span>
-                      )}
-                      </TableCell>
-                      <TableCell>
-                          <div className="flex gap-2">
-                          <Tooltip>
-                              <TooltipTrigger asChild>
-                              <Button asChild variant="ghost" size="icon">
-                                  <Link href={`/admin/dashboard/children/${child.id}/reports`}>
-                                  <FileText className="h-4 w-4" />
-                                  </Link>
-                              </Button>
-                              </TooltipTrigger>
-                              <TooltipContent><p>Manage Daily Reports</p></TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                              <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" onClick={() => handleEditClick(child)}>
-                                  <Edit className="h-4 w-4" />
-                              </Button>
-                              </TooltipTrigger>
-                              <TooltipContent><p>Edit Child Profile</p></TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                              <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}>
-                                  <Trash2 className="h-4 w-4" />
-                              </Button>
-                              </TooltipTrigger>
-                              <TooltipContent><p>Delete Child Profile</p></TooltipContent>
-                          </Tooltip>
-                          </div>
-                      </TableCell>
-                  </TableRow>
-                  ))}
-                  </TooltipProvider>
-              )}
-              </TableBody>
-          </Table>
-          </CardContent>
-      </Card>
+      <div className="w-full overflow-x-auto">
+        <Card>
+            <CardContent className="p-0">
+            <Table>
+                <TableHeader>
+                <TableRow>
+                    <TableHead>{t('photo')}</TableHead>
+                    <TableHead>{t('childsName')}</TableHead>
+                    <TableHead>{t('ageInTable')}</TableHead>
+                    <TableHead>{t('gender')}</TableHead>
+                    <TableHead>{t('parentDetails')}</TableHead>
+                    <TableHead>{t('emergencyContact')}</TableHead>
+                    <TableHead>{t('medicalNotes')}</TableHead>
+                    <TableHead>{t('actions')}</TableHead>
+                </TableRow>
+                </TableHeader>
+                <TableBody>
+                {isLoading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={index}>
+                        <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                        <TableCell><Skeleton className="h-12 w-40" /></TableCell>
+                        <TableCell><Skeleton className="h-8 w-40" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-6" /></TableCell>
+                        <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                    </TableRow>
+                    ))
+                ) : children.length === 0 ? (
+                    <TableRow>
+                        <TableCell colSpan={8} className="h-24 text-center">
+                            No children registered yet.
+                        </TableCell>
+                    </TableRow>
+                ) : (
+                    <TooltipProvider>
+                    {children.map((child) => (
+                    <TableRow key={child.id}>
+                        <TableCell>
+                        <Avatar>
+                            <AvatarImage src={child.photo} alt={child.name} />
+                            <AvatarFallback>
+                            {child.name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                        </TableCell>
+                        <TableCell className="font-medium">{child.name}</TableCell>
+                        <TableCell>
+                        {child.dateOfBirth ? <ChildAge dobString={child.dateOfBirth} /> : "N/A"}
+                        </TableCell>
+                        <TableCell className="capitalize">{child.gender}</TableCell>
+                        <TableCell>
+                        <div className="flex flex-col text-sm">
+                            <span className="font-medium">{child.parent}</span>
+                            <span className="text-muted-foreground">{child.parentEmail}</span>
+                            <span className="text-muted-foreground">{child.parentPhone}</span>
+                        </div>
+                        </TableCell>
+                        <TableCell>
+                            <div className="flex flex-col text-sm">
+                            <span className="font-medium">{child.emergencyContactName}</span>
+                            <span className="text-muted-foreground">{child.emergencyContactPhone}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                        {child.medicalConditions && child.medicalConditions.trim() !== '' ? (
+                            <Tooltip>
+                            <TooltipTrigger>
+                                <HeartPulse className="h-5 w-5 text-destructive" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className="max-w-[300px] whitespace-pre-wrap">{child.medicalConditions}</p>
+                            </TooltipContent>
+                            </Tooltip>
+                        ) : (
+                            <span className="text-muted-foreground">-</span>
+                        )}
+                        </TableCell>
+                        <TableCell>
+                            <div className="flex gap-2">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                <Button asChild variant="ghost" size="icon">
+                                    <Link href={`/admin/dashboard/children/${child.id}/reports`}>
+                                    <FileText className="h-4 w-4" />
+                                    </Link>
+                                </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Manage Daily Reports</p></TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={() => handleEditClick(child)}>
+                                    <Edit className="h-4 w-4" />
+                                </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Edit Child Profile</p></TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Delete Child Profile</p></TooltipContent>
+                            </Tooltip>
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                    ))}
+                    </TooltipProvider>
+                )}
+                </TableBody>
+            </Table>
+            </CardContent>
+        </Card>
+      </div>
       
       {/* Delete Child Alert Dialog */}
       <AlertDialog open={!!deletingChild} onOpenChange={(open) => { if (!open) setDeletingChild(null) }}>
@@ -556,7 +631,7 @@ export default function ChildrenPage() {
       </AlertDialog>
 
       {/* Edit Child Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+      <Dialog open={isEditModalOpen} onOpenChange={(open) => { setIsEditModalOpen(open); if(!open) setSubmissionError(null); }}>
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Edit Profile for {editingChild?.name}</DialogTitle>
@@ -647,10 +722,19 @@ export default function ChildrenPage() {
                   </div>
                 </div>
               </ScrollArea>
-              <DialogFooter className="pt-4">
+              <DialogFooter className="pt-4 mt-4 border-t">
                   <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={isSaving}>{t('cancel')}</Button>
                   <Button type="submit" disabled={isSaving}>{isSaving ? "Saving..." : t('saveChanges')}</Button>
               </DialogFooter>
+               {submissionError && (
+                <Alert variant="destructive" className="mt-4">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>{submissionError.title}</AlertTitle>
+                    <AlertDescription>
+                    {submissionError.description}
+                    </AlertDescription>
+                </Alert>
+                )}
             </form>
           </Form>
         </DialogContent>

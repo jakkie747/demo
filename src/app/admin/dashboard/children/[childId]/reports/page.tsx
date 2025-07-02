@@ -192,7 +192,7 @@ export default function ManageReportsPage() {
        const errorMessage = (error as Error).message || "Could not save the report.";
        let errorTitle = "Save Error";
 
-        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
           errorTitle = "Save Failed: Firebase Storage Not Ready";
           setSubmissionError({
             title: errorTitle,

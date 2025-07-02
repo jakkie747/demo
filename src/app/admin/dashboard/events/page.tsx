@@ -187,7 +187,7 @@ export default function ManageEventsPage() {
       } else {
         const newEvent: Omit<Event, 'id' | 'createdAt'> = {
           ...eventPayload,
-          image: imageUrl || `https://picsum.photos/600/400?random=${Date.now()}`,
+          image: imageUrl || `https://placehold.co/600x400.png`,
         };
         await addEvent(newEvent);
         toast({
@@ -204,7 +204,7 @@ export default function ManageEventsPage() {
         const errorMessage = (error as Error).message || "Could not save the event.";
         let errorTitle = "Error Saving Event";
 
-        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+        if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
           errorTitle = "Save Failed: Firebase Storage Not Ready";
           setSubmissionError({
             title: errorTitle,

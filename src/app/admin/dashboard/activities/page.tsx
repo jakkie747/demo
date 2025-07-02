@@ -186,7 +186,7 @@ export default function ManageActivitiesPage() {
       const activityPayload = {
         title: values.title,
         description: values.description,
-        image: imageUrl || `https://picsum.photos/400/300?random=${Date.now()}`,
+        image: imageUrl || `https://placehold.co/400x300.png`,
       };
 
       if (editingActivity) {
@@ -214,7 +214,7 @@ export default function ManageActivitiesPage() {
       const errorMessage = (error as Error).message || "Could not save the gallery item.";
       let errorTitle = "Error Saving Item";
 
-      if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+      if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
         errorTitle = "Save Failed: Firebase Storage Not Ready";
         setSubmissionError({
           title: errorTitle,
@@ -454,7 +454,7 @@ export default function ManageActivitiesPage() {
         <div className="w-full overflow-x-auto">
           <Card>
             <CardContent className="p-0">
-              <Table>
+               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('title')}</TableHead>

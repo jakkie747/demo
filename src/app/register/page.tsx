@@ -100,7 +100,7 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     const file = values.childPhoto?.[0];
-    let photoUrl = "https://picsum.photos/100";
+    let photoUrl = "https://placehold.co/100x100.png";
 
     try {
       if (file) {
@@ -135,7 +135,7 @@ export default function RegisterPage() {
       const errorMessage = (error as Error).message || "There was a problem saving the registration.";
       let errorTitle = "Uh oh! Something went wrong.";
       
-      if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+      if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
         errorTitle = "Save Failed: Firebase Storage Not Ready";
         setSubmissionError({
           title: errorTitle,
@@ -283,7 +283,7 @@ export default function RegisterPage() {
                           <FormLabel>{t('dateOfBirth')}</FormLabel>
                            <FormControl>
                               <Input 
-                                type="text" 
+                                type="date"
                                 placeholder={t('egDob')}
                                 {...field} 
                                 disabled={isSubmitting}

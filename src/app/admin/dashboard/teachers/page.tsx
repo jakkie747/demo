@@ -179,7 +179,7 @@ export default function ManageTeachersPage() {
     } catch (error) {
        const errorMessage = (error as Error).message;
        let errorTitle = "Error updating teacher.";
-       if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found")) {
+       if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
           errorTitle = "Update Failed: Firebase Storage Not Ready";
           setSubmissionError({
             title: errorTitle,
@@ -311,82 +311,84 @@ export default function ManageTeachersPage() {
         <h2 className="text-2xl font-bold tracking-tight mb-4">
           {t('existingTeachers')}
         </h2>
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-            <TableHeader>
-                <TableRow>
-                <TableHead>{t('photo')}</TableHead>
-                <TableHead>{t('teacherName')}</TableHead>
-                <TableHead>{t('teacherEmail')}</TableHead>
-                <TableHead>{t('contactNumber')}</TableHead>
-                <TableHead>{t('homeAddress')}</TableHead>
-                <TableHead>{t('role')}</TableHead>
-                <TableHead>{t('actions')}</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {isLoading ? (
-                Array.from({ length: 2 }).map((_, i) => (
-                    <TableRow key={i}>
-                    <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-48" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-48" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-20" /></TableCell>
-                    </TableRow>
-                ))
-                ) : teachers.length === 0 ? (
-                <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
-                    No teachers enrolled yet.
-                    </TableCell>
-                </TableRow>
-                ) : (
-                teachers.map((teacher) => (
-                    <TableRow key={teacher.id}>
-                    <TableCell>
-                        <Avatar>
-                            <AvatarImage src={teacher.photo} alt={teacher.name} />
-                            <AvatarFallback>
-                            {teacher.name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                        </Avatar>
-                        </TableCell>
-                    <TableCell className="font-medium">{teacher.name}</TableCell>
-                    <TableCell>{teacher.email}</TableCell>
-                    <TableCell>{teacher.contactNumber || '-'}</TableCell>
-                    <TableCell>{teacher.homeAddress || '-'}</TableCell>
-                    <TableCell><Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge></TableCell>
-                    <TableCell>
-                        <div className="flex gap-2">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEditClick(teacher)}
-                        >
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteClick(teacher)}
-                            disabled={teacher.id === currentUser?.uid}
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                        </div>
-                    </TableCell>
-                    </TableRow>
-                ))
-                )}
-            </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <div className="w-full overflow-x-auto">
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+              <TableHeader>
+                  <TableRow>
+                  <TableHead>{t('photo')}</TableHead>
+                  <TableHead>{t('teacherName')}</TableHead>
+                  <TableHead>{t('teacherEmail')}</TableHead>
+                  <TableHead>{t('contactNumber')}</TableHead>
+                  <TableHead>{t('homeAddress')}</TableHead>
+                  <TableHead>{t('role')}</TableHead>
+                  <TableHead>{t('actions')}</TableHead>
+                  </TableRow>
+              </TableHeader>
+              <TableBody>
+                  {isLoading ? (
+                  Array.from({ length: 2 }).map((_, i) => (
+                      <TableRow key={i}>
+                      <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                      <TableCell><Skeleton className="h-6 w-16" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+                      </TableRow>
+                  ))
+                  ) : teachers.length === 0 ? (
+                  <TableRow>
+                      <TableCell colSpan={7} className="h-24 text-center">
+                      No teachers enrolled yet.
+                      </TableCell>
+                  </TableRow>
+                  ) : (
+                  teachers.map((teacher) => (
+                      <TableRow key={teacher.id}>
+                      <TableCell>
+                          <Avatar>
+                              <AvatarImage src={teacher.photo} alt={teacher.name} />
+                              <AvatarFallback>
+                              {teacher.name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                          </Avatar>
+                          </TableCell>
+                      <TableCell className="font-medium">{teacher.name}</TableCell>
+                      <TableCell>{teacher.email}</TableCell>
+                      <TableCell>{teacher.contactNumber || '-'}</TableCell>
+                      <TableCell>{teacher.homeAddress || '-'}</TableCell>
+                      <TableCell><Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge></TableCell>
+                      <TableCell>
+                          <div className="flex gap-2">
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditClick(teacher)}
+                          >
+                              <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteClick(teacher)}
+                              disabled={teacher.id === currentUser?.uid}
+                          >
+                              <Trash2 className="h-4 w-4" />
+                          </Button>
+                          </div>
+                      </TableCell>
+                      </TableRow>
+                  ))
+                  )}
+              </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
       </div>
       
       {/* Edit Dialog */}
