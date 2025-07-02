@@ -279,7 +279,7 @@ export default function ManageTeachersPage() {
   }
 
   return (
-    <div className="py-6 grid grid-cols-1 gap-6">
+    <div className="py-6 space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
           {t('manageTeachers')}
@@ -311,7 +311,7 @@ export default function ManageTeachersPage() {
         <h2 className="text-2xl font-bold tracking-tight mb-4">
           {t('existingTeachers')}
         </h2>
-        <div className="w-full overflow-x-auto">
+        <div className="overflow-x-auto">
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -508,10 +508,7 @@ export default function ManageTeachersPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {teacherToDelete?.name}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete their profile and login access. This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

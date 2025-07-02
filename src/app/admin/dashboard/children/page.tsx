@@ -464,7 +464,7 @@ export default function ChildrenPage() {
   }
 
   return (
-    <div className="py-6 grid grid-cols-1 gap-6">
+    <div className="py-6 space-y-6">
        <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">
             {t('registeredChildrenTitle')}
@@ -494,7 +494,7 @@ export default function ChildrenPage() {
             <Button onClick={handleExportCSV}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
         </div>
       </div>
-      <div className="w-full overflow-x-auto">
+      <div className="overflow-x-auto">
         <Card>
             <CardContent className="p-0">
             <Table>
@@ -615,13 +615,10 @@ export default function ChildrenPage() {
       </div>
       
       {/* Delete Child Alert Dialog */}
-      <AlertDialog open={!!deletingChild} onOpenChange={(open) => { if (!open) setDeletingChild(null) }}>
+      <AlertDialog open={!!deletingChild} onOpenChange={(open) => { if (!open) setDeletingChild(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {deletingChild?.name}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action is permanent and cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
