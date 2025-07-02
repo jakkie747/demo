@@ -110,6 +110,21 @@ export default function ChildrenPage() {
 
   const form = useForm<z.infer<typeof childEditFormSchema>>({
     resolver: zodResolver(childEditFormSchema),
+    defaultValues: {
+      name: "",
+      dateOfBirth: "",
+      parent: "",
+      parentEmail: "",
+      parentPhone: "",
+      address: "",
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      medicalConditions: "",
+      additionalNotes: "",
+      gender: "other",
+      previousPreschool: "no",
+      photo: undefined,
+    },
   });
 
   const fetchChildren = useCallback(async () => {
@@ -614,5 +629,3 @@ export default function ChildrenPage() {
     </div>
   );
 }
-
-    
