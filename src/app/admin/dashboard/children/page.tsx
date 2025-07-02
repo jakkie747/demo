@@ -7,6 +7,7 @@ import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { intervalToDuration } from 'date-fns';
 
 import {
   Table,
@@ -66,7 +67,7 @@ const childEditFormSchema = z.object({
 
 
 const ChildAge = ({ dobString }: { dobString: string }) => {
-  const [age, setAge] = useState<number | string>('');
+  const [age, setAge] = useState<string>('');
 
   useEffect(() => {
     if (!dobString || isNaN(new Date(dobString).getTime())) {
@@ -75,16 +76,26 @@ const ChildAge = ({ dobString }: { dobString: string }) => {
     }
     const dob = new Date(dobString);
     const today = new Date();
-    let calculatedAge = today.getFullYear() - dob.getFullYear();
-    const monthDiff = today.getMonth() - dob.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-      calculatedAge--;
+
+    if (dob > today) {
+      setAge("Future date");
+      return;
     }
-    setAge(calculatedAge >= 0 ? calculatedAge : "N/A");
+
+    const duration = intervalToDuration({ start: dob, end: today });
+    
+    const years = duration.years || 0;
+    const months = duration.months || 0;
+
+    const yearString = `${years} year${years !== 1 ? 's' : ''}`;
+    const monthString = `${months} month${months !== 1 ? 's' : ''}`;
+
+    setAge(`${yearString} ${monthString}`);
+
   }, [dobString]);
 
   if (age === '') {
-    return <Skeleton className="h-4 w-10" />;
+    return <Skeleton className="h-4 w-24" />;
   }
 
   return <>{age}</>;
@@ -428,7 +439,7 @@ export default function ChildrenPage() {
                   <TableRow key={index}>
                     <TableCell><Skeleton className="h-10 w-10 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-10" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                     <TableCell><Skeleton className="h-12 w-40" /></TableCell>
                     <TableCell><Skeleton className="h-8 w-40" /></TableCell>
