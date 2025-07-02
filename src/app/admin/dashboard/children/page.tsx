@@ -331,7 +331,6 @@ export default function ChildrenPage() {
         photoUrl = await uploadImage(file, 'children');
       }
 
-      // Manually construct the update object to ensure clean data is sent.
       const updateData: Partial<Omit<Child, 'id'>> = {
         name: values.name,
         dateOfBirth: values.dateOfBirth,
