@@ -313,6 +313,9 @@ export const translations = {
     // PWA Install Sheet
     installInstructionsTitle: 'Install App',
     installInstructionsDesc: 'For easy access, add this app to your home screen.',
+    installInstructionsDesktop: 'For Desktop (Chrome/Edge):',
+    installDesktopStep1: 'Look for the Install icon (a computer with a down arrow) on the right side of the address bar.',
+    installDesktopStep2: "Click it, and then click 'Install' to confirm.",
     installInstructionsAndroid: 'For Android/Chrome:',
     installAndroidStep1: "Tap the menu button (the three dots {icon}) in the top right corner.",
     installAndroidStep2: "Tap 'Install app' or 'Add to Home screen'.",
@@ -634,6 +637,9 @@ export const translations = {
     // PWA Install Sheet
     installInstructionsTitle: 'Installeer Toepassing',
     installInstructionsDesc: 'Vir maklike toegang, voeg hierdie toepassing by jou tuisskerm.',
+    installInstructionsDesktop: 'Vir Rekenaar (Chrome/Edge):',
+    installDesktopStep1: "Soek vir die Installeer-ikoon ('n rekenaar met 'n afpyltjie) aan die regterkant van die adresbalk.",
+    installDesktopStep2: "Klik daarop, en klik dan 'Installeer' om te bevestig.",
     installInstructionsAndroid: 'Vir Android/Chrome:',
     installAndroidStep1: "Tik op die kieslysknoppie (die drie kolletjies {icon}) in die regter boonste hoek.",
     installAndroidStep2: "Tik op 'Installeer toepassing' of 'Voeg by Tuisskerm'.",

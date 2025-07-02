@@ -333,6 +333,13 @@ export function Header() {
                 <SheetDescription>{t('installInstructionsDesc')}</SheetDescription>
             </SheetHeader>
             <div className="py-4 space-y-6">
+                 <div>
+                    <h3 className="font-semibold mb-2">{t('installInstructionsDesktop')}</h3>
+                     <ol className="list-decimal list-inside space-y-2 text-sm">
+                        <li>{t('installDesktopStep1')}</li>
+                        <li>{t('installDesktopStep2')}</li>
+                    </ol>
+                </div>
                 <div>
                     <h3 className="font-semibold mb-2">{t('installInstructionsAndroid')}</h3>
                     <ol className="list-decimal list-inside space-y-2 text-sm">
