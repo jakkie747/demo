@@ -496,7 +496,7 @@ export default function ChildrenPage() {
       </div>
       <div className="overflow-x-auto">
         <Card>
-            <CardContent className="p-0">
+          <CardContent className="p-0">
             <Table>
                 <TableHeader>
                 <TableRow>
@@ -618,7 +618,10 @@ export default function ChildrenPage() {
       <AlertDialog open={!!deletingChild} onOpenChange={(open) => { if (!open) setDeletingChild(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this profile? This action cannot be undone.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
