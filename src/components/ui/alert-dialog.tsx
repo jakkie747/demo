@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -34,14 +35,14 @@ const AlertDialogContent = React.forwardRef<
   <AlertDialogPortal>
     <AlertDialogOverlay />
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <AlertDialogPrimitive.Content
-            ref={ref}
-            className={cn(
-                "relative grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg",
-                className
-            )}
-            {...props}
-        />
+      <AlertDialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          "relative grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-lg",
+          className
+        )}
+        {...props}
+      />
     </div>
   </AlertDialogPortal>
 ))
