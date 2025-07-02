@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Lightbulb, Mail } from "lucide-react";
+import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Lightbulb, Mail, Briefcase } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getChildren } from "@/services/childrenService";
@@ -18,7 +18,9 @@ import { getEvents } from "@/services/eventsService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { auth, isFirebaseConfigured } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { getTeacherByUid } from "@/services/teacherService";
 
 export default function DashboardPage() {
   const { t } = useLanguage();
@@ -27,32 +29,45 @@ export default function DashboardPage() {
   const [eventsCount, setEventsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isConfigured] = useState(isFirebaseConfigured());
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [children, events] = await Promise.all([
-        getChildren(),
-        getEvents(),
-      ]);
-      setChildrenCount(children.length);
-      setEventsCount(events.length);
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data." });
-      setChildrenCount(0);
-      setEventsCount(0);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
+  const [userRole, setUserRole] = useState<'teacher' | 'admin' | null>(null);
 
   useEffect(() => {
-    if (isConfigured) {
-      fetchData();
-    } else {
+    if (!isConfigured) {
       setIsLoading(false);
+      return;
     }
-  }, [isConfigured, fetchData]);
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const profile = await getTeacherByUid(user.uid);
+          if (profile) {
+            setUserRole(profile.role);
+          }
+        } catch (e) {
+          toast({ variant: "destructive", title: "Error", description: "Could not fetch user role." });
+        }
+      }
+
+      try {
+        const [children, events] = await Promise.all([
+          getChildren(),
+          getEvents(),
+        ]);
+        setChildrenCount(children.length);
+        setEventsCount(events.length);
+      } catch (error) {
+        toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data." });
+        setChildrenCount(0);
+        setEventsCount(0);
+      } finally {
+        setIsLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isConfigured, toast]);
+  
 
   if (!isConfigured) {
     return (
@@ -174,19 +189,22 @@ export default function DashboardPage() {
                 </Button>
             </CardContent>
           </Card>
-           <Card>
-            <CardHeader>
-              <CardTitle>{t("manageTeachers")}</CardTitle>
-              <CardDescription>{t("manageTeachersDesc")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild variant="secondary">
-                <Link href="/admin/dashboard/teachers">
-                  {t("manageTeachers")}
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+           {userRole === 'admin' && (
+            <Card>
+                <CardHeader>
+                <CardTitle>{t("manageTeachers")}</CardTitle>
+                <CardDescription>{t("manageTeachersDesc")}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                <Button asChild variant="secondary">
+                    <Link href="/admin/dashboard/teachers">
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    {t("manageTeachers")}
+                    </Link>
+                </Button>
+                </CardContent>
+            </Card>
+           )}
            <Card>
             <CardHeader>
               <CardTitle>{t("composeMessage")}</CardTitle>
