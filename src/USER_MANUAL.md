@@ -40,6 +40,9 @@ Once you are logged in, you will be taken to your Parent Dashboard.
 Enrolling your child is the first step to getting connected.
 
 1.  From the app's homepage, click the **"Register Your Child"** button or navigate to the **"Register Child"** link in the header.
+
+![Screenshot of the app homepage.](https://firebasestorage.googleapis.com/v0/b/blink-notify-494bf.firebasestorage.app/o/user_manual_assets%2Fhomepage.png?alt=media&token=2b2de243-9ab7-4c41-bafc-7d04efdb2968)
+
 2.  You will see a detailed registration form. Please fill out each section carefully:
     *   **Child's Information:** Provide your child's full name, date of birth, and gender. You can also optionally upload a recent photo for their profile.
     *   **Parent/Guardian Information:** Enter your full name, email address, phone number, and physical address. The email you enter here will be used for your parent login.
