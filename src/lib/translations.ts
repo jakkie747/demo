@@ -309,6 +309,17 @@ export const translations = {
     activityIdeasDesc: 'Find inspiration for new, fun, and educational classroom activities.',
     generating: 'Generating...',
     yourNewIdeas: 'Here are some new ideas!',
+
+    // PWA Install Sheet
+    installInstructionsTitle: 'Install App',
+    installInstructionsDesc: 'For easy access, add this app to your home screen.',
+    installInstructionsAndroid: 'For Android/Chrome:',
+    installAndroidStep1: "Tap the menu button (the three dots {icon}) in the top right corner.",
+    installAndroidStep2: "Tap 'Install app' or 'Add to Home screen'.",
+    installInstructionsIOS: 'For iPhone/iPad (Safari):',
+    installIOSStep1: "Tap the Share button ({icon}) in the bottom bar.",
+    installIOSStep2: "Scroll down and tap 'Add to Home Screen'.",
+    close: 'Close',
   },
   af: {
     // Header
@@ -619,11 +630,18 @@ export const translations = {
     activityIdeasDesc: 'Vind inspirasie vir nuwe, prettige en opvoedkundige klaskameraktiwiteite.',
     generating: 'Besig om te genereer...',
     yourNewIdeas: 'Hier is \'n paar nuwe idees!',
+
+    // PWA Install Sheet
+    installInstructionsTitle: 'Installeer Toepassing',
+    installInstructionsDesc: 'Vir maklike toegang, voeg hierdie toepassing by jou tuisskerm.',
+    installInstructionsAndroid: 'Vir Android/Chrome:',
+    installAndroidStep1: "Tik op die kieslysknoppie (die drie kolletjies {icon}) in die regter boonste hoek.",
+    installAndroidStep2: "Tik op 'Installeer toepassing' of 'Voeg by Tuisskerm'.",
+    installInstructionsIOS: 'Vir iPhone/iPad (Safari):',
+    installIOSStep1: "Tik op die Deel-knoppie ({icon}) in die onderste balk.",
+    installIOSStep2: "Rollees af en tik op 'Voeg by Tuisskerm'.",
+    close: 'Maak toe',
   },
 };
 
 export type TranslationKey = keyof typeof translations.en;
-
-    
-
-    

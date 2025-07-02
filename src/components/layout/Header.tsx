@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Languages, Download, Phone } from "lucide-react";
+import { Menu, Languages, Download, Phone, MoreVertical, Share } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -11,34 +11,37 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
+// This interface is a basic representation of the BeforeInstallPromptEvent
+interface CustomBeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export function Header() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [installPrompt, setInstallPrompt] = useState<CustomBeforeInstallPromptEvent | null>(null);
+  const [isInstallSheetOpen, setIsInstallSheetOpen] = useState(false);
   
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
-      console.log("PWA: 'beforeinstallprompt' event fired.");
-      setInstallPrompt(event);
+      setInstallPrompt(event as CustomBeforeInstallPromptEvent);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    console.log("PWA: 'beforeinstallprompt' event listener added.");
 
     return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt
-      );
-      console.log("PWA: 'beforeinstallprompt' event listener removed.");
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     };
   }, []);
 
@@ -47,17 +50,17 @@ export function Header() {
   };
 
   const handleInstallClick = async () => {
-    if (!installPrompt) {
-      return;
-    }
-    await installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === "accepted") {
-      console.log("PWA: User accepted the install prompt");
+    if (installPrompt) {
+      await installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      if (outcome === "accepted") {
+        console.log("PWA: User accepted the install prompt");
+      }
+      setInstallPrompt(null);
     } else {
-      console.log("PWA: User dismissed the install prompt");
+      // If the native prompt isn't available, show our instruction sheet.
+      setIsInstallSheetOpen(true);
     }
-    setInstallPrompt(null);
   };
 
   const navLinks = [
@@ -69,6 +72,7 @@ export function Header() {
   ];
 
   return (
+    <>
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-20 items-center justify-between">
         <div className="flex items-center gap-6">
@@ -99,14 +103,12 @@ export function Header() {
             </Button>
           </div>
 
-          {!!installPrompt && (
-            <div className="hidden md:flex">
-              <Button onClick={handleInstallClick}>
-                <Download className="mr-2" />
-                {t("installApp")}
-              </Button>
-            </div>
-          )}
+          <div className="hidden md:flex">
+            <Button onClick={handleInstallClick}>
+              <Download className="mr-2" />
+              {t("installApp")}
+            </Button>
+          </div>
           
           <div className="hidden md:flex items-center gap-1">
             <Button asChild variant="ghost" size="icon">
@@ -199,20 +201,18 @@ export function Header() {
                   </Link>
                 ))}
                 
-                {!!installPrompt && (
-                  <button
-                    onClick={() => {
-                      handleInstallClick();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={cn(
-                      "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
-                    )}
-                  >
-                    <Download className="mr-4 h-5 w-5" />
-                    {t("installApp")}
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    handleInstallClick();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={cn(
+                    "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                  )}
+                >
+                  <Download className="mr-4 h-5 w-5" />
+                  {t("installApp")}
+                </button>
 
                  <button
                   onClick={() => {
@@ -328,5 +328,31 @@ export function Header() {
         </div>
       </div>
     </header>
+
+    <Sheet open={isInstallSheetOpen} onOpenChange={setIsInstallSheetOpen}>
+        <SheetContent side="bottom">
+            <SheetHeader>
+                <SheetTitle>{t('installInstructionsTitle')}</SheetTitle>
+                <SheetDescription>{t('installInstructionsDesc')}</SheetDescription>
+            </SheetHeader>
+            <div className="py-4 space-y-6">
+                <div>
+                    <h3 className="font-semibold mb-2">{t('installInstructionsAndroid')}</h3>
+                    <ol className="list-decimal list-inside space-y-2 text-sm">
+                        <li>{t('installAndroidStep1', { icon: 'MoreVertical' })}</li>
+                        <li>{t('installAndroidStep2')}</li>
+                    </ol>
+                </div>
+                 <div>
+                    <h3 className="font-semibold mb-2">{t('installInstructionsIOS')}</h3>
+                     <ol className="list-decimal list-inside space-y-2 text-sm">
+                        <li>{t('installIOSStep1', { icon: 'Share' })}</li>
+                        <li>{t('installIOSStep2')}</li>
+                    </ol>
+                </div>
+            </div>
+        </SheetContent>
+    </Sheet>
+    </>
   );
 }
