@@ -3,6 +3,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
 import {
   Table,
   TableBody,
@@ -14,13 +19,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
-import { getChildren, addMultipleChildren, deleteChild } from "@/services/childrenService";
+import { getChildren, addMultipleChildren, deleteChild, updateChild } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { isFirebaseConfigured } from "@/lib/firebase";
-import { AlertTriangle, FileDown, FileUp, Trash2, HeartPulse, FileText } from "lucide-react";
+import { AlertTriangle, FileDown, FileUp, Trash2, HeartPulse, FileText, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,6 +40,29 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+
+
+const childEditFormSchema = z.object({
+  name: z.string().min(2, "Name is too short"),
+  dateOfBirth: z.string().refine(v => v, { message: "Date of Birth is required." }),
+  gender: z.enum(["male", "female", "other"]),
+  photo: z.any().optional(),
+  parent: z.string().min(2, "Parent name is too short"),
+  parentEmail: z.string().email(),
+  parentPhone: z.string().min(10, "Phone number is too short"),
+  address: z.string().min(10, "Address is too short"),
+  emergencyContactName: z.string().min(2, "Emergency contact name is too short"),
+  emergencyContactPhone: z.string().min(10, "Emergency phone is too short"),
+  medicalConditions: z.string().optional(),
+  previousPreschool: z.enum(["yes", "no"]),
+  additionalNotes: z.string().optional(),
+});
 
 
 const ChildAge = ({ dobString }: { dobString: string }) => {
@@ -75,6 +103,14 @@ export default function ChildrenPage() {
   const [isImporting, setIsImporting] = useState(false);
 
   const [deletingChild, setDeletingChild] = useState<Child | null>(null);
+  
+  const [editingChild, setEditingChild] = useState<Child | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const form = useForm<z.infer<typeof childEditFormSchema>>({
+    resolver: zodResolver(childEditFormSchema),
+  });
 
   const fetchChildren = useCallback(async () => {
     setIsLoading(true);
@@ -246,6 +282,54 @@ export default function ChildrenPage() {
     }
   };
 
+  const handleEditClick = (child: Child) => {
+    setEditingChild(child);
+    form.reset({
+      name: child.name,
+      dateOfBirth: child.dateOfBirth,
+      gender: child.gender,
+      photo: undefined,
+      parent: child.parent,
+      parentEmail: child.parentEmail,
+      parentPhone: child.parentPhone,
+      address: child.address,
+      emergencyContactName: child.emergencyContactName,
+      emergencyContactPhone: child.emergencyContactPhone,
+      medicalConditions: child.medicalConditions || '',
+      previousPreschool: child.previousPreschool,
+      additionalNotes: child.additionalNotes || '',
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const onEditSubmit = async (values: z.infer<typeof childEditFormSchema>) => {
+    if (!editingChild) return;
+    setIsSaving(true);
+    try {
+      let photoUrl = editingChild.photo;
+      const file = values.photo?.[0];
+
+      if (file) {
+        if (editingChild.photo && editingChild.photo.includes('firebasestorage')) {
+          await deleteImageFromUrl(editingChild.photo);
+        }
+        photoUrl = await uploadImage(file, 'children');
+      }
+
+      const { photo, ...childData } = values;
+
+      await updateChild(editingChild.id, { ...childData, photo: photoUrl });
+      toast({ title: t('childUpdated'), description: t('childUpdatedDesc', { name: values.name }) });
+      await fetchChildren();
+      setIsEditModalOpen(false);
+      
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: (error as Error).message || "Could not update profile." });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
 
   if (!isConfigured) {
     return (
@@ -386,6 +470,14 @@ export default function ChildrenPage() {
                            </Tooltip>
                            <Tooltip>
                             <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => handleEditClick(child)}>
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Edit Child Profile</p></TooltipContent>
+                           </Tooltip>
+                           <Tooltip>
+                            <TooltipTrigger asChild>
                               <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}>
                                   <Trash2 className="h-4 w-4" />
                               </Button>
@@ -418,6 +510,109 @@ export default function ChildrenPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Child Dialog */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Edit Profile for {editingChild?.name}</DialogTitle>
+            <DialogDescription>
+              Update the child's details below. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onEditSubmit)}>
+              <ScrollArea className="h-[60vh] p-4">
+                <div className="space-y-8">
+                  {/* Child's Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Child's Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="name" render={({ field }) => (
+                          <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={form.control} name="dateOfBirth" render={({ field }) => (
+                          <FormItem><FormLabel>Date of Birth</FormLabel><FormControl><Input type="date" {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={form.control} name="gender" render={({ field }) => (
+                        <FormItem><FormLabel>Gender</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSaving}>
+                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                            <SelectContent><SelectItem value="male">Male</SelectItem><SelectItem value="female">Female</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent>
+                          </Select><FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="photo" render={({ field: { onChange } }) => (
+                        <FormItem><FormLabel>Replace Photo</FormLabel>
+                          {editingChild?.photo && <Image src={editingChild.photo} alt="Current photo" width={60} height={60} className="rounded-md object-cover"/>}
+                          <FormControl><Input type="file" accept="image/*" onChange={(e) => onChange(e.target.files)} disabled={isSaving} /></FormControl>
+                          <FormDescription>Upload a new photo to replace the old one.</FormDescription><FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+                  {/* Parent Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Parent/Guardian Information</h3>
+                     <FormField control={form.control} name="parent" render={({ field }) => (
+                          <FormItem><FormLabel>Parent's Full Name</FormLabel><FormControl><Input {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="parentEmail" render={({ field }) => (
+                            <FormItem><FormLabel>Parent's Email</FormLabel><FormControl><Input type="email" {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={form.control} name="parentPhone" render={({ field }) => (
+                            <FormItem><FormLabel>Parent's Phone</FormLabel><FormControl><Input type="tel" {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                    </div>
+                     <FormField control={form.control} name="address" render={({ field }) => (
+                          <FormItem><FormLabel>Physical Address</FormLabel><FormControl><Textarea {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                  </div>
+                   {/* Emergency & Medical Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Emergency & Medical Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="emergencyContactName" render={({ field }) => (
+                            <FormItem><FormLabel>Emergency Contact Name</FormLabel><FormControl><Input {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={form.control} name="emergencyContactPhone" render={({ field }) => (
+                            <FormItem><FormLabel>Emergency Contact Phone</FormLabel><FormControl><Input type="tel" {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                    </div>
+                     <FormField control={form.control} name="medicalConditions" render={({ field }) => (
+                        <FormItem><FormLabel>Medical Conditions / Allergies</FormLabel><FormControl><Textarea {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                     )} />
+                  </div>
+                   {/* Other Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Other Information</h3>
+                    <FormField control={form.control} name="previousPreschool" render={({ field }) => (
+                      <FormItem className="space-y-3"><FormLabel>Previous Preschool Experience?</FormLabel>
+                        <FormControl>
+                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4" disabled={isSaving}>
+                            <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="yes" /></FormControl><FormLabel className="font-normal">Yes</FormLabel></FormItem>
+                            <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="no" /></FormControl><FormLabel className="font-normal">No</FormLabel></FormItem>
+                          </RadioGroup>
+                        </FormControl><FormMessage />
+                      </FormItem>
+                    )} />
+                     <FormField control={form.control} name="additionalNotes" render={({ field }) => (
+                        <FormItem><FormLabel>Additional Notes</FormLabel><FormControl><Textarea {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
+                     )} />
+                  </div>
+                </div>
+              </ScrollArea>
+              <DialogFooter className="pt-4">
+                  <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={isSaving}>{t('cancel')}</Button>
+                  <Button type="submit" disabled={isSaving}>{isSaving ? "Saving..." : t('saveChanges')}</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
+    
