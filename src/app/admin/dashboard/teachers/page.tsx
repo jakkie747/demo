@@ -305,7 +305,7 @@ export default function ManageTeachersPage() {
           </CardContent>
        </Card>
 
-      <h2 className="text-3xl font-bold tracking-tight mb-4">
+      <h2 className="text-2xl font-bold tracking-tight mb-4">
         {t('existingTeachers')}
       </h2>
       <div className="w-full overflow-x-auto">
