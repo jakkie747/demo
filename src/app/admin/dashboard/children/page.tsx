@@ -300,18 +300,18 @@ export default function ChildrenPage() {
   const handleEditClick = (child: Child) => {
     setEditingChild(child);
     form.reset({
-      name: child.name,
-      dateOfBirth: child.dateOfBirth,
-      gender: child.gender,
+      name: child.name || '',
+      dateOfBirth: child.dateOfBirth || '',
+      gender: child.gender || 'other',
       photo: undefined,
-      parent: child.parent,
-      parentEmail: child.parentEmail,
-      parentPhone: child.parentPhone,
-      address: child.address,
-      emergencyContactName: child.emergencyContactName,
-      emergencyContactPhone: child.emergencyContactPhone,
+      parent: child.parent || '',
+      parentEmail: child.parentEmail || '',
+      parentPhone: child.parentPhone || '',
+      address: child.address || '',
+      emergencyContactName: child.emergencyContactName || '',
+      emergencyContactPhone: child.emergencyContactPhone || '',
       medicalConditions: child.medicalConditions || '',
-      previousPreschool: child.previousPreschool,
+      previousPreschool: child.previousPreschool || 'no',
       additionalNotes: child.additionalNotes || '',
     });
     setIsEditModalOpen(true);
