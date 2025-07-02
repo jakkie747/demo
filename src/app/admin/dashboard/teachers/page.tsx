@@ -279,36 +279,38 @@ export default function ManageTeachersPage() {
   }
 
   return (
-    <div className="py-6">
-      <h2 className="text-3xl font-bold tracking-tight mb-4">
-        {t('manageTeachers')}
-      </h2>
+    <div className="py-6 grid grid-cols-1 gap-6">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight mb-4">
+          {t('manageTeachers')}
+        </h2>
+        
+        <Card className="mb-8">
+            <CardHeader>
+                <CardTitle>Important: How to Add New Teachers</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <Alert>
+                    <UserPlus className="h-4 w-4" />
+                    <AlertTitle>User management is handled in the Firebase Console.</AlertTitle>
+                    <AlertDescription>
+                        For security, new teachers must be added directly through the Firebase Authentication service. This page only displays and allows editing of teacher information stored in the database.
+                    </AlertDescription>
+                </Alert>
+                <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/users`} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline">
+                        Go to Firebase Console to Add Users
+                    </Button>
+                </a>
+                <p className="text-sm text-muted-foreground">After adding a user in the console, their details will appear here once they log in for the first time. You can then edit their profile to add more details.</p>
+            </CardContent>
+        </Card>
+      </div>
       
-       <Card className="mb-8">
-          <CardHeader>
-              <CardTitle>Important: How to Add New Teachers</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-               <Alert>
-                  <UserPlus className="h-4 w-4" />
-                  <AlertTitle>User management is handled in the Firebase Console.</AlertTitle>
-                  <AlertDescription>
-                      For security, new teachers must be added directly through the Firebase Authentication service. This page only displays and allows editing of teacher information stored in the database.
-                  </AlertDescription>
-              </Alert>
-              <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/users`} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline">
-                      Go to Firebase Console to Add Users
-                  </Button>
-              </a>
-              <p className="text-sm text-muted-foreground">After adding a user in the console, their details will appear here once they log in for the first time. You can then edit their profile to add more details.</p>
-          </CardContent>
-       </Card>
-
-      <h2 className="text-2xl font-bold tracking-tight mb-4">
-        {t('existingTeachers')}
-      </h2>
-      <div className="w-full overflow-x-auto">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-4">
+          {t('existingTeachers')}
+        </h2>
         <Card>
           <CardContent className="p-0">
             <Table>
