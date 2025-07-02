@@ -31,16 +31,15 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers, updateTeacher, getTeacherByUid } from "@/services/teacherService";
+import { getTeachers, updateTeacher } from "@/services/teacherService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { auth, isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
 import { httpsCallable } from "firebase/functions";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,6 +48,7 @@ import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { Label } from "@/components/ui/label";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 
 const teacherFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -68,39 +68,14 @@ export default function ManageTeachersPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isConfigured] = useState(isFirebaseConfigured());
   const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const currentUser = auth?.currentUser;
+
+  const { teacher, user, loading: authLoading } = useAdminAuth();
+  const isAuthorized = teacher?.role === 'admin';
+  const currentUser = user;
 
   const form = useForm<z.infer<typeof teacherFormSchema>>({
     resolver: zodResolver(teacherFormSchema),
   });
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const profile = await getTeacherByUid(user.uid);
-                if (profile && profile.role === 'admin') {
-                    setIsAuthorized(true);
-                } else {
-                    setIsAuthorized(false);
-                }
-            } catch (e) {
-                console.error("Authorization check failed:", e);
-                setIsAuthorized(false);
-            } finally {
-                setIsCheckingAuth(false);
-            }
-        } else {
-            // Not logged in, layout will handle the redirect.
-            setIsAuthorized(false);
-            setIsCheckingAuth(false);
-        }
-    });
-    
-    return () => unsubscribe();
-  }, []);
 
   const fetchTeachers = useCallback(async () => {
     setIsLoading(true);
@@ -116,12 +91,14 @@ export default function ManageTeachersPage() {
   }, [toast]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     if (isConfigured && isAuthorized) {
       fetchTeachers();
-    } else if (!isCheckingAuth) {
+    } else {
       setIsLoading(false);
     }
-  }, [isConfigured, fetchTeachers, isAuthorized, isCheckingAuth]);
+  }, [isConfigured, fetchTeachers, isAuthorized, authLoading]);
 
   const handleEditClick = (teacher: Teacher) => {
     setEditingTeacher(teacher);
@@ -262,7 +239,7 @@ export default function ManageTeachersPage() {
     }
   };
 
-  if (isCheckingAuth) {
+  if (authLoading) {
     return (
       <div className="py-6 space-y-4">
         <Skeleton className="h-8 w-1/3 mb-4" />

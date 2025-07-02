@@ -5,9 +5,9 @@ import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { AdminAuthProvider, useAdminAuth } from "@/context/AdminAuthContext";
 
 import {
   SidebarProvider,
@@ -25,35 +25,10 @@ import { AdminNav } from "@/components/admin/AdminNav";
 import { Logo } from "@/components/Logo";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   const router = useRouter();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  useEffect(() => {
-    if (!auth) {
-        // Firebase not configured
-        router.replace('/admin');
-        return;
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in.
-        setIsCheckingAuth(false);
-      } else {
-        // User is signed out.
-        router.replace('/admin');
-      }
-    });
-
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [router]);
+  const { loading } = useAdminAuth();
 
   const handleLogout = async () => {
     if (!auth) return;
@@ -65,7 +40,7 @@ export default function DashboardLayout({
     }
   };
 
-  if (isCheckingAuth) {
+  if (loading) {
     return (
         <div className="flex items-center justify-center h-screen">
             <div className="space-y-4 w-1/2">
@@ -110,5 +85,18 @@ export default function DashboardLayout({
         <main className="p-4 sm:px-6 sm:py-0">{children}</main>
       </SidebarInset>
     </SidebarProvider>
+  );
+}
+
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AdminAuthProvider>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </AdminAuthProvider>
   );
 }

@@ -9,31 +9,13 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { useLanguage } from "@/context/LanguageContext";
-import { useState, useEffect } from "react";
-import { auth } from "@/lib/firebase";
-import { getTeacherByUid } from "@/services/teacherService";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 
 export function AdminNav() {
   const pathname = usePathname();
   const { t } = useLanguage();
-  const [userRole, setUserRole] = useState<'teacher' | 'admin' | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const teacherProfile = await getTeacherByUid(user.uid);
-        if (teacherProfile) {
-          setUserRole(teacherProfile.role);
-        } else {
-          setUserRole(null);
-        }
-      } else {
-        setUserRole(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const { teacher } = useAdminAuth();
+  const userRole = teacher?.role;
 
   const menuItems = [
     { href: "/admin/dashboard", label: t('dashboard'), icon: LayoutDashboard, roles: ['admin', 'teacher'] },

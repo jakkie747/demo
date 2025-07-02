@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -18,37 +18,29 @@ import { getEvents } from "@/services/eventsService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { auth, isFirebaseConfigured } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { getTeacherByUid } from "@/services/teacherService";
+import { isFirebaseConfigured } from "@/lib/firebase";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 
 export default function DashboardPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [childrenCount, setChildrenCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [isConfigured] = useState(isFirebaseConfigured());
-  const [userRole, setUserRole] = useState<'teacher' | 'admin' | null>(null);
+  const { teacher, loading: authLoading } = useAdminAuth();
+  const userRole = teacher?.role;
 
   useEffect(() => {
+    if (authLoading) return; // Wait until auth state is resolved
+
     if (!isConfigured) {
-      setIsLoading(false);
+      setIsLoadingData(false);
       return;
     }
-
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const profile = await getTeacherByUid(user.uid);
-          if (profile) {
-            setUserRole(profile.role);
-          }
-        } catch (e) {
-          toast({ variant: "destructive", title: "Error", description: "Could not fetch user role." });
-        }
-      }
-
+    
+    const fetchData = async () => {
+      setIsLoadingData(true);
       try {
         const [children, events] = await Promise.all([
           getChildren(),
@@ -61,13 +53,14 @@ export default function DashboardPage() {
         setChildrenCount(0);
         setEventsCount(0);
       } finally {
-        setIsLoading(false);
+        setIsLoadingData(false);
       }
-    });
+    };
+    
+    fetchData();
+  }, [isConfigured, toast, authLoading]);
 
-    return () => unsubscribe();
-  }, [isConfigured, toast]);
-  
+  const isLoading = authLoading || isLoadingData;
 
   if (!isConfigured) {
     return (
