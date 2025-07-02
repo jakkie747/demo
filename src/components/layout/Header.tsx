@@ -74,26 +74,27 @@ export function Header() {
   return (
     <>
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center justify-between">
+      <div className="container relative flex h-20 items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="mr-4 flex">
             <Logo />
           </div>
-          <nav className="hidden items-center gap-6 text-sm md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "font-medium transition-colors hover:text-primary",
-                  pathname === link.href ? "text-primary" : "text-foreground/60"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
         </div>
+
+        <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 transform items-center gap-6 text-sm md:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "font-medium transition-colors hover:text-primary",
+                pathname === link.href ? "text-primary" : "text-foreground/60"
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
 
         <div className="flex items-center gap-2">
           
