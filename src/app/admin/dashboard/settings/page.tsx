@@ -15,6 +15,7 @@ import { auth } from "@/lib/firebase";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, signOut } from "firebase/auth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle, KeyRound } from "lucide-react";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 
 const passwordFormSchema = z.object({
   currentPassword: z.string().min(1, "Current password is required."),
@@ -31,6 +32,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAdminAuth();
 
   const form = useForm<z.infer<typeof passwordFormSchema>>({
     resolver: zodResolver(passwordFormSchema),
@@ -44,8 +46,6 @@ export default function SettingsPage() {
   async function onSubmit(values: z.infer<typeof passwordFormSchema>) {
     setIsLoading(true);
     setError(null);
-
-    const user = auth?.currentUser;
 
     if (!user || !user.email) {
       setError(t('changePasswordErrorNoUser'));
@@ -73,6 +73,8 @@ export default function SettingsPage() {
       console.error("Password change error:", err);
       if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setError(t('changePasswordErrorWrongPassword'));
+      } else if (err.code === 'auth/invalid-email') {
+        setError("The user's email is invalid. Please contact support.");
       } else {
         setError(t('changePasswordErrorGeneric'));
       }
