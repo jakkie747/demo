@@ -3,10 +3,12 @@
  * This file uses the v2 API for Cloud Functions.
  */
 
+// CORRECTED: Import logger from its dedicated module, which was the root cause of the deployment failure.
+import * as logger from 'firebase-functions/logger';
 import {onCall, HttpsError} from 'firebase-functions/v2/https';
-import {logger} from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
 
+// Initialize the Admin SDK once
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -58,7 +60,7 @@ export const deleteTeacherUser = onCall(async request => {
         'Only admins can delete users.'
       );
     }
-  } catch (e) {
+  } catch (e: any) {
     logger.error(`Error checking admin role for ${callerUid}`, e);
     throw new HttpsError('internal', 'Could not verify admin permissions.');
   }
