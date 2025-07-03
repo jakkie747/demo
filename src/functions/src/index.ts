@@ -1,11 +1,9 @@
 /**
  * @fileoverview Cloud Functions for Firebase.
- * This file uses the v2 API for Cloud Functions.
+ * This file uses the v1 API for Cloud Functions for stability.
  */
 
-// CORRECTED: Import logger from its dedicated module, which was the root cause of the deployment failure.
-import * as logger from 'firebase-functions/logger';
-import {onCall, HttpsError} from 'firebase-functions/v2/https';
+import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 // Initialize the Admin SDK once
@@ -16,25 +14,25 @@ const authAdmin = admin.auth();
 const storage = admin.storage();
 
 /**
- * A v2 callable Cloud Function to delete a teacher's auth credentials and Firestore profile.
+ * A v1 callable Cloud Function to delete a teacher's auth credentials and Firestore profile.
  * This function also handles deleting the teacher's profile photo from Firebase Storage.
  */
-export const deleteTeacherUser = onCall(async request => {
+export const deleteTeacherUser = functions.https.onCall(async (data, context) => {
   // 1. Authentication Check: Ensure the user calling the function is authenticated.
-  if (!request.auth) {
-    logger.warn('Unauthenticated user tried to call deleteTeacherUser');
-    throw new HttpsError(
+  if (!context.auth) {
+    functions.logger.warn('Unauthenticated user tried to call deleteTeacherUser');
+    throw new functions.https.HttpsError(
       'unauthenticated',
       'The function must be called while authenticated.'
     );
   }
 
-  const callerUid = request.auth.uid;
-  const uidToDelete = request.data.uid;
+  const callerUid = context.auth.uid;
+  const uidToDelete = data.uid;
 
   // 2. Input Validation: Ensure the UID to delete is a valid string.
   if (typeof uidToDelete !== 'string' || uidToDelete.length === 0) {
-    throw new HttpsError(
+    throw new functions.https.HttpsError(
       'invalid-argument',
       'The function must be called with a valid "uid" string argument.'
     );
@@ -42,7 +40,7 @@ export const deleteTeacherUser = onCall(async request => {
 
   // 3. Self-Deletion Check: Prevent admins from deleting themselves.
   if (callerUid === uidToDelete) {
-    throw new HttpsError(
+    throw new functions.https.HttpsError(
       'permission-denied',
       'Admins cannot delete their own accounts.'
     );
@@ -52,20 +50,20 @@ export const deleteTeacherUser = onCall(async request => {
   try {
     const callerDoc = await db.collection('teachers').doc(callerUid).get();
     if (!callerDoc.exists || callerDoc.data()?.role !== 'admin') {
-      logger.warn(
+      functions.logger.warn(
         `User ${callerUid} without admin role attempted to delete user ${uidToDelete}.`
       );
-      throw new HttpsError(
+      throw new functions.https.HttpsError(
         'permission-denied',
         'Only admins can delete users.'
       );
     }
   } catch (e: any) {
-    logger.error(`Error checking admin role for ${callerUid}`, e);
-    throw new HttpsError('internal', 'Could not verify admin permissions.');
+    functions.logger.error(`Error checking admin role for ${callerUid}`, e);
+    throw new functions.https.HttpsError('internal', 'Could not verify admin permissions.');
   }
 
-  logger.log(
+  functions.logger.log(
     `Admin ${callerUid} is attempting to delete user ${uidToDelete}.`
   );
 
@@ -88,17 +86,17 @@ export const deleteTeacherUser = onCall(async request => {
           const file = storage.bucket().file(filePath);
 
           await file.delete();
-          logger.log(
+          functions.logger.log(
             `Successfully deleted photo for user ${uidToDelete} at path ${filePath}`
           );
         } catch (storageError: any) {
           // If the file is not found, it's not a critical error, just log it.
           if (storageError.code === 404) {
-            logger.warn(
+            functions.logger.warn(
               `Photo for user ${uidToDelete} not found in Storage. It may have already been deleted.`
             );
           } else {
-            logger.error(
+            functions.logger.error(
               `Failed to delete photo for user ${uidToDelete}.`,
               storageError
             );
@@ -110,25 +108,25 @@ export const deleteTeacherUser = onCall(async request => {
 
     // 5b. Delete Firebase Auth user
     await authAdmin.deleteUser(uidToDelete);
-    logger.log(
+    functions.logger.log(
       `Successfully deleted user ${uidToDelete} from Firebase Authentication.`
     );
 
     // 5c. Delete Firestore document
     await teacherDocRef.delete();
-    logger.log(
+    functions.logger.log(
       `Successfully deleted teacher document for ${uidToDelete} from Firestore.`
     );
 
     return {status: 'success', message: `Successfully deleted user ${uidToDelete}`};
   } catch (error: any) {
-    logger.error(`Error during deletion process for user ${uidToDelete}:`, error);
+    functions.logger.error(`Error during deletion process for user ${uidToDelete}:`, error);
 
     // Handle case where auth user might not exist but Firestore doc does.
     if (error.code === 'auth/user-not-found') {
       try {
         await db.collection('teachers').doc(uidToDelete).delete();
-        logger.log(
+        functions.logger.log(
           `Auth user not found for ${uidToDelete}, but cleaned up Firestore document.`
         );
         return {
@@ -136,7 +134,7 @@ export const deleteTeacherUser = onCall(async request => {
           message: `User auth not found, but Firestore document for ${uidToDelete} was cleaned up.`,
         };
       } catch (dbError) {
-        logger.error(
+        functions.logger.error(
           `Error deleting Firestore doc for user ${uidToDelete} after auth/user-not-found error:`,
           dbError
         );
@@ -144,12 +142,12 @@ export const deleteTeacherUser = onCall(async request => {
     }
 
     // Re-throw HttpsError if it's already in the correct format
-    if (error instanceof HttpsError) {
+    if (error instanceof functions.https.HttpsError) {
       throw error;
     }
 
     // Throw a generic internal error for all other cases
-    throw new HttpsError(
+    throw new functions.https.HttpsError(
       'internal',
       'An unexpected error occurred while deleting the user.'
     );
