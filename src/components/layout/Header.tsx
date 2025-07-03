@@ -173,153 +173,157 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-full max-w-xs bg-background p-6"
+              className="w-full max-w-xs bg-background p-0"
             >
-              <SheetTitle>
-                <div className="sr-only">Menu</div>
-              </SheetTitle>
-              <div className="mb-8">
-                <Logo />
-              </div>
-              <nav className="flex flex-col gap-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
+              <div className="flex h-full flex-col p-6">
+                <SheetHeader>
+                  <SheetTitle>
+                    <div className="sr-only">Menu</div>
+                  </SheetTitle>
+                  <div className="mb-8 flex justify-start">
+                    <Logo />
+                  </div>
+                </SheetHeader>
+                <nav className="flex-1 flex flex-col gap-4 overflow-y-auto">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        "text-lg font-medium transition-colors hover:text-primary",
+                        pathname === link.href
+                          ? "text-primary"
+                          : "text-foreground/60"
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                  
+                  <button
+                    onClick={() => {
+                      handleInstallClick();
+                      setIsMobileMenuOpen(false);
+                    }}
                     className={cn(
-                      "text-lg font-medium transition-colors hover:text-primary",
-                      pathname === link.href
-                        ? "text-primary"
-                        : "text-foreground/60"
-                    )}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                
-                <button
-                  onClick={() => {
-                    handleInstallClick();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={cn(
-                    "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
-                  )}
-                >
-                  <Download className="mr-4 h-5 w-5" />
-                  {t("installApp")}
-                </button>
-
-                 <button
-                  onClick={() => {
-                    handleLanguageToggle();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={cn(
                       "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
-                  )}
-                >
-                  <Languages className="mr-4 h-5 w-5" />
-                  <span>{language === 'en' ? 'Switch to Afrikaans' : 'Switch to English'}</span>
-                </button>
-
-                <Link
-                  href="https://web.facebook.com/groups/1596188941091215/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="mr-4 h-6 w-6">
-                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                  </svg>
-                  <span>Facebook</span>
-                </Link>
-
-                <Link
-                    href="https://www.instagram.com/blink.ogies?utm_source=qr&igsh=Yjh6cDNwd2xldzNv"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                    "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
                     )}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-4 h-6 w-6" fill="none">
-                      <defs>
-                          <radialGradient id="instagram-gradient-mobile" cx="0.3" cy="1.2" r="1.2">
-                              <stop offset="0" stopColor="#F58529" />
-                              <stop offset="0.2" stopColor="#FEDA77" />
-                              <stop offset="0.4" stopColor="#DD2A7B" />
-                              <stop offset="0.7" stopColor="#8134AF" />
-                              <stop offset="1" stopColor="#515BD4" />
-                          </radialGradient>
-                      </defs>
-                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" fill="url(#instagram-gradient-mobile)"></rect>
-                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke="white" strokeWidth="2"></path>
-                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="white" strokeWidth="2"></line>
-                  </svg>
-                  <span>Instagram</span>
-                </Link>
+                  >
+                    <Download className="mr-4 h-5 w-5" />
+                    {t("installApp")}
+                  </button>
 
-                <Link
-                    href="https://wa.me/27725953421"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => {
+                      handleLanguageToggle();
+                      setIsMobileMenuOpen(false);
+                    }}
                     className={cn(
                         "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
                     )}
+                  >
+                    <Languages className="mr-4 h-5 w-5" />
+                    <span>{language === 'en' ? 'Switch to Afrikaans' : 'Switch to English'}</span>
+                  </button>
+
+                  <Link
+                    href="https://web.facebook.com/groups/1596188941091215/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                    )}
                     onClick={() => setIsMobileMenuOpen(false)}
-                >
-                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#25D366" className="mr-4 h-6 w-6">
-                        <title>WhatsApp</title>
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.861 9.861 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.204-1.64a11.816 11.816 0 005.783 1.47h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877F2" className="mr-4 h-6 w-6">
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                     </svg>
-                    <span>{t('whatsapp')}</span>
-                </Link>
+                    <span>Facebook</span>
+                  </Link>
 
-                <Link
-                  href="tel:+27725953421"
-                  className={cn(
-                    "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Phone className="mr-4 h-5 w-5" />
-                  <span>{t("callUs")}</span>
-                </Link>
+                  <Link
+                      href="https://www.instagram.com/blink.ogies?utm_source=qr&igsh=Yjh6cDNwd2xldzNv"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                      "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mr-4 h-6 w-6" fill="none">
+                        <defs>
+                            <radialGradient id="instagram-gradient-mobile" cx="0.3" cy="1.2" r="1.2">
+                                <stop offset="0" stopColor="#F58529" />
+                                <stop offset="0.2" stopColor="#FEDA77" />
+                                <stop offset="0.4" stopColor="#DD2A7B" />
+                                <stop offset="0.7" stopColor="#8134AF" />
+                                <stop offset="1" stopColor="#515BD4" />
+                            </radialGradient>
+                        </defs>
+                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" fill="url(#instagram-gradient-mobile)"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke="white" strokeWidth="2"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="white" strokeWidth="2"></line>
+                    </svg>
+                    <span>Instagram</span>
+                  </Link>
 
-                 <div className="border-t pt-4 mt-4 flex flex-col items-start space-y-4">
-                    <Link
-                    href="/parent-login"
+                  <Link
+                      href="https://wa.me/27725953421"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                          "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                      <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#25D366" className="mr-4 h-6 w-6">
+                          <title>WhatsApp</title>
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.861 9.861 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.204-1.64a11.816 11.816 0 005.783 1.47h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                      </svg>
+                      <span>{t('whatsapp')}</span>
+                  </Link>
+
+                  <Link
+                    href="tel:+27725953421"
                     className={cn(
-                        "text-lg font-medium transition-colors hover:text-primary",
-                        pathname.startsWith('/parent-login')
-                        ? "text-primary"
-                        : "text-foreground/60"
+                      "flex items-center text-lg font-medium transition-colors hover:text-primary text-foreground/60"
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                    {t("parentLoginNav")}
-                    </Link>
-
-                    <Link
-                    href="/admin"
-                    className={cn(
-                        "text-lg font-medium transition-colors hover:text-primary",
-                        pathname.startsWith('/admin')
-                        ? "text-primary"
-                        : "text-foreground/60"
-                    )}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                    {t("adminLoginNav")}
-                    </Link>
-                 </div>
-              </nav>
+                  >
+                    <Phone className="mr-4 h-5 w-5" />
+                    <span>{t("callUs")}</span>
+                  </Link>
+                </nav>
+                <div className="mt-auto border-t pt-4">
+                  <div className="flex flex-col items-start space-y-4">
+                      <Link
+                          href="/parent-login"
+                          className={cn(
+                              "text-lg font-medium transition-colors hover:text-primary",
+                              pathname.startsWith('/parent-login')
+                              ? "text-primary"
+                              : "text-foreground/60"
+                          )}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                          {t("parentLoginNav")}
+                      </Link>
+                      <Link
+                          href="/admin"
+                          className={cn(
+                              "text-lg font-medium transition-colors hover:text-primary",
+                              pathname.startsWith('/admin')
+                              ? "text-primary"
+                              : "text-foreground/60"
+                          )}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                          {t("adminLoginNav")}
+                      </Link>
+                  </div>
+                </div>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
@@ -360,5 +364,3 @@ export function Header() {
     </>
   );
 }
-
-  
