@@ -1,7 +1,6 @@
 
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { CallableRequest } from "firebase-functions/v2/https";
 
 // Initialize the Firebase Admin SDK.
 admin.initializeApp();
@@ -16,15 +15,26 @@ const messaging = admin.messaging();
  * It fetches all FCM tokens from the `fcmTokens` collection, sends the
  * notification to each device in batches, and handles cleanup of invalid tokens.
  */
-export const sendBulkNotification = functions.https.onCall(async (request: CallableRequest<{ title: string, body: string, url?: string }>) => {
+export const sendBulkNotification = functions.https.onCall(async (data, context) => {
   functions.logger.log("sendBulkNotification function triggered.");
 
   // For a real app, you would want to add authentication checks here.
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+  }
 
-  const { title, body, url } = request.data;
+  const callerUid = context.auth.uid;
+  const callerDoc = await db.collection('teachers').doc(callerUid).get();
+  
+  if (!callerDoc.exists || callerDoc.data()?.role !== 'admin') {
+     throw new functions.https.HttpsError('permission-denied', 'Only admins can send notifications.');
+  }
+
+
+  const { title, body, url } = data;
 
   if (!title || !body) {
-    functions.logger.error("Function called with invalid arguments. Title or body is missing.", { data: request.data });
+    functions.logger.error("Function called with invalid arguments. Title or body is missing.", { data: data });
     throw new functions.https.HttpsError(
       "invalid-argument",
       'The function must be called with "title" and "body" arguments.'
@@ -126,13 +136,13 @@ export const sendBulkNotification = functions.https.onCall(async (request: Calla
 /**
  * A callable Cloud Function to delete a teacher's auth credentials and Firestore profile.
  */
-export const deleteTeacherUser = functions.https.onCall(async (request: CallableRequest<{ uid: string }>) => {
+export const deleteTeacherUser = functions.https.onCall(async (data, context) => {
   // 1. Check if the user is authenticated and is an admin.
-  if (!request.auth) {
+  if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
 
-  const callerUid = request.auth.uid;
+  const callerUid = context.auth.uid;
   const callerDoc = await db.collection('teachers').doc(callerUid).get();
   
   if (!callerDoc.exists || callerDoc.data()?.role !== 'admin') {
@@ -140,7 +150,7 @@ export const deleteTeacherUser = functions.https.onCall(async (request: Callable
   }
 
   // 2. Get the UID of the user to delete from the data payload.
-  const uidToDelete = request.data.uid;
+  const uidToDelete = data.uid;
   if (!uidToDelete) {
       throw new functions.https.HttpsError('invalid-argument', 'The function must be called with a "uid" argument.');
   }
