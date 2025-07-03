@@ -131,7 +131,7 @@ export default function ChildrenPage() {
 
     const headers = [
       "name", "dateOfBirth", "gender", "address", "parent", "parentEmail", 
-      "parentPhone", "photo", "medicalConditions", "emergencyContactName", 
+      "parentPhone", "medicalConditions", "emergencyContactName", 
       "emergencyContactPhone", "previousPreschool", "additionalNotes"
     ];
     
@@ -160,7 +160,7 @@ export default function ChildrenPage() {
     document.body.removeChild(link);
   };
 
-  const headers = "name,dateOfBirth,gender,address,parent,parentEmail,parentPhone,photo,medicalConditions,emergencyContactName,emergencyContactPhone,previousPreschool,additionalNotes";
+  const headers = "name,dateOfBirth,gender,address,parent,parentEmail,parentPhone,medicalConditions,emergencyContactName,emergencyContactPhone,previousPreschool,additionalNotes";
 
   const handleCopyHeaders = () => {
     navigator.clipboard.writeText(headers);
@@ -228,7 +228,7 @@ export default function ChildrenPage() {
                     parent: childObject.parent || '',
                     parentEmail: childObject.parentEmail || '',
                     parentPhone: childObject.parentPhone || '',
-                    photo: childObject.photo && childObject.photo.startsWith('http') ? childObject.photo : 'https://placehold.co/100x100.png',
+                    photo: 'https://placehold.co/100x100.png',
                     medicalConditions: childObject.medicalConditions || '',
                     emergencyContactName: childObject.emergencyContactName || '',
                     emergencyContactPhone: childObject.emergencyContactPhone || '',
