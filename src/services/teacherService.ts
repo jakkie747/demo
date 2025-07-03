@@ -1,8 +1,9 @@
 
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import type { Teacher } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
+import { deleteImageFromUrl } from './storageService';
 
 const TIMEOUT_DURATION = 15000;
 
@@ -47,4 +48,33 @@ export const getTeacherByUid = async (uid: string): Promise<Teacher | null> => {
     } else {
         return null;
     }
+};
+
+/**
+ * Deletes a teacher's profile from Firestore and their photo from Storage.
+ * This does NOT delete their Firebase Authentication record.
+ */
+export const deleteTeacherProfile = async (teacherId: string): Promise<void> => {
+    if (!db) throw new Error("Firebase is not configured.");
+    const teacherDocRef = doc(db, 'teachers', teacherId);
+
+    try {
+        const docSnap = await getDoc(teacherDocRef);
+        if (docSnap.exists()) {
+            const teacherData = docSnap.data() as Teacher;
+            if (teacherData.photo) {
+                // This will attempt to delete the photo but won't throw an error if it fails
+                await deleteImageFromUrl(teacherData.photo);
+            }
+        }
+    } catch (error) {
+        console.error("Could not fetch teacher doc for photo deletion, but proceeding with Firestore delete.", error);
+    }
+    
+    // Delete the Firestore document
+    await promiseWithTimeout(
+        deleteDoc(teacherDocRef),
+        TIMEOUT_DURATION,
+        new Error(`Deleting teacher profile for ${teacherId} timed out.`)
+    );
 };

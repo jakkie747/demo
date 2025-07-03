@@ -32,20 +32,20 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers } from "@/services/teacherService";
+import { getTeachers, deleteTeacherProfile } from "@/services/teacherService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/AdminAuthContext";
-import { httpsCallable } from "firebase/functions";
 
 export default function ManageTeachersPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
+  const [showManualDeleteNotice, setShowManualDeleteNotice] = useState<Teacher | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConfigured] = useState(isFirebaseConfigured());
 
@@ -81,35 +81,29 @@ export default function ManageTeachersPage() {
   };
 
   const confirmDelete = async () => {
-    if (!teacherToDelete || !currentUser || !functions) {
-       toast({ 
-          variant: "destructive", 
-          title: "Error", 
-          description: "Cannot delete teacher. Auth or Functions service not available."
-      });
-      setTeacherToDelete(null);
-      return;
-    };
+    if (!teacherToDelete || !currentUser) return;
 
     try {
-        const deleteTeacherFunction = httpsCallable(functions, 'deleteTeacherUser');
-        await deleteTeacherFunction({ uid: teacherToDelete.id });
+        // This function now only deletes from Firestore and Storage
+        await deleteTeacherProfile(teacherToDelete.id);
         
-        await fetchTeachers();
         toast({
-          title: t('teacherDeleted'),
-          description: t('teacherDeletedAndAuthDesc', { name: teacherToDelete.name }),
+          title: "Profile Removed",
+          description: `The profile for ${teacherToDelete.name} has been removed from the app.`,
           variant: "destructive",
         });
+
+        await fetchTeachers();
+        setShowManualDeleteNotice(teacherToDelete); // Trigger the notification dialog
     } catch (error: any) {
-      console.error("Error deleting teacher:", error);
+      console.error("Error deleting teacher profile:", error);
       toast({ 
           variant: "destructive", 
-          title: "Error Deleting Teacher", 
+          title: "Error Deleting Profile", 
           description: error.message || "An unexpected error occurred."
       });
     } finally {
-      setTeacherToDelete(null);
+      setTeacherToDelete(null); // Close the initial confirmation dialog
     }
   };
 
@@ -117,7 +111,6 @@ export default function ManageTeachersPage() {
     return (
       <div className="py-6 space-y-4">
         <Skeleton className="h-8 w-1/3 mb-4" />
-        <Skeleton className="h-48 w-full" />
         <Skeleton className="h-48 w-full" />
       </div>
     );
@@ -145,7 +138,6 @@ export default function ManageTeachersPage() {
           <AlertTitle>Firebase Configuration Error</AlertTitle>
           <AlertDescription>
             <p>Cannot manage teachers because the application is not connected to Firebase.</p>
-            <p className="mt-2 font-bold">Please open the file <code>src/lib/firebase.ts</code> and follow the instructions to add your Firebase credentials.</p>
           </AlertDescription>
         </Alert>
       </div>
@@ -158,7 +150,6 @@ export default function ManageTeachersPage() {
         <h2 className="text-3xl font-bold tracking-tight mb-4">
           {t('manageTeachers')}
         </h2>
-        
         <Card className="mb-8">
             <CardHeader>
                 <CardTitle>Important: How to Add New Teachers</CardTitle>
@@ -168,7 +159,7 @@ export default function ManageTeachersPage() {
                     <UserPlus className="h-4 w-4" />
                     <AlertTitle>User management is handled in the Firebase Console.</AlertTitle>
                     <AlertDescription>
-                        For security, new teachers must be added directly through the Firebase Authentication service. This page only displays and allows editing of teacher information stored in the database.
+                        For security, new teachers must be added directly through the Firebase Authentication service.
                     </AlertDescription>
                 </Alert>
                 <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/users`} target="_blank" rel="noopener noreferrer">
@@ -176,7 +167,6 @@ export default function ManageTeachersPage() {
                         Go to Firebase Console to Add Users
                     </Button>
                 </a>
-                <p className="text-sm text-muted-foreground">After adding a user in the console, their details will appear here once they log in for the first time. You can then edit their profile to add more details.</p>
             </CardContent>
         </Card>
       </div>
@@ -261,19 +251,52 @@ export default function ManageTeachersPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Profile Deletion</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure? This action cannot be undone.
+              Are you sure you want to delete the profile for {teacherToDelete?.name}? Their login will remain active until you manually delete it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>
-              Confirm
+              Yes, Delete Profile
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog
+        open={!!showManualDeleteNotice}
+        onOpenChange={(open) => !open && setShowManualDeleteNotice(null)}
+      >
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Action Required: Final Deletion Step</AlertDialogTitle>
+                <AlertDialogDescription>
+                    <div className="space-y-4">
+                        <p>The profile for <strong>{showManualDeleteNotice?.name}</strong> has been removed from the app.</p>
+                        <Alert variant="destructive">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Important Final Step</AlertTitle>
+                            <AlertDescription>
+                                To permanently remove their login access, you must now delete the user from the Firebase Authentication console.
+                            </AlertDescription>
+                        </Alert>
+                         <p>User to delete: <strong>{showManualDeleteNotice?.email}</strong></p>
+                    </div>
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Close</AlertDialogCancel>
+                <AlertDialogAction asChild>
+                    <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/users`} target="_blank" rel="noopener noreferrer">
+                        Open Firebase Console
+                    </a>
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
