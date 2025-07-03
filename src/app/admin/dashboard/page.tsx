@@ -382,7 +382,7 @@ export default function DashboardPage() {
                     <CardTitle>Import / Export</CardTitle>
                     <CardDescription>Bulk import or export children's data.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex gap-2">
+                <CardContent className="flex flex-wrap gap-2">
                     <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
                         <DialogTrigger asChild>
                             <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
