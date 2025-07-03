@@ -178,7 +178,8 @@ export default function ParentDashboardPage() {
           const fetchedChildren = await getChildrenByParentEmail(user.email);
           setChildren(fetchedChildren);
         } catch (err) {
-          setError("Could not load your child's information. Please try again later.");
+          console.error("Error fetching child data:", err);
+          setError((err as Error).message);
         } finally {
           setIsLoading(false);
         }
@@ -203,10 +204,30 @@ export default function ParentDashboardPage() {
   }
 
   if (error) {
+    const urlRegex = /(https?:\/\/[^\s]+)/;
+    const match = error.match(urlRegex);
+    const indexUrl = match ? match[0].replace(/\\?$/, "") : null;
+
+    if (indexUrl) {
+        return (
+            <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>System Configuration Needed</AlertTitle>
+                <AlertDescription>
+                    <p>The parent dashboard is not yet configured. An administrator must complete a one-time database setup.</p>
+                    <p className="mt-2">If you are an administrator, please click the link below to create the required database index, then refresh this page.</p>
+                    <Button asChild variant="link" className="p-0 h-auto mt-2 text-left whitespace-normal">
+                        <a href={indexUrl} target="_blank" rel="noopener noreferrer" className="break-all">{indexUrl}</a>
+                    </Button>
+                </AlertDescription>
+            </Alert>
+        );
+    }
+    
     return (
         <Alert variant="destructive">
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
+            <AlertTitle>Error Loading Information</AlertTitle>
+            <AlertDescription>We could not load your child's information. Please try again later or contact the school if the problem persists.</AlertDescription>
         </Alert>
     );
   }
