@@ -85,7 +85,7 @@ export const sendBulkNotification = onCall(async (request) => {
             tokens,
           };
 
-        const batchResponse = await messaging.sendEachForMulticast(message);
+        const batchResponse = await messaging.sendMulticast(message);
         logger.log(`${batchResponse.successCount} messages were sent successfully in this batch.`);
         
         totalSuccessCount += batchResponse.successCount;
