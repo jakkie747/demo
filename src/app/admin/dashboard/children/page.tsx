@@ -464,8 +464,8 @@ export default function ChildrenPage() {
   }
 
   return (
-    <div className="py-6 grid grid-cols-1">
-       <div className="flex justify-between items-center mb-6">
+    <div className="py-6 space-y-6">
+       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">
             {t('registeredChildrenTitle')}
         </h2>
@@ -494,87 +494,89 @@ export default function ChildrenPage() {
             <Button onClick={handleExportCSV}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
         </div>
       </div>
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('childsName')}</TableHead>
-                <TableHead className="hidden sm:table-cell">{t('parentDetails')}</TableHead>
-                <TableHead className="hidden md:table-cell">{t('ageInTable')}</TableHead>
-                <TableHead className="text-right">{t('actions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-            {isLoading ? (
-                Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={index}>
-                    <TableCell><Skeleton className="h-6 w-40" /></TableCell>
-                    <TableCell className="hidden sm:table-cell"><Skeleton className="h-6 w-48" /></TableCell>
-                    <TableCell className="hidden md:table-cell"><Skeleton className="h-6 w-24" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-24 inline-block" /></TableCell>
-                </TableRow>
-                ))
-            ) : children.length === 0 ? (
+      <div className="w-full overflow-x-auto">
+        <Card>
+            <CardContent className="p-0">
+            <Table>
+                <TableHeader>
                 <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center">
-                        No children registered yet.
-                    </TableCell>
+                    <TableHead>{t('childsName')}</TableHead>
+                    <TableHead>{t('parentDetails')}</TableHead>
+                    <TableHead>{t('ageInTable')}</TableHead>
+                    <TableHead className="text-right">{t('actions')}</TableHead>
                 </TableRow>
-            ) : (
-                <TooltipProvider>
-                {children.map((child) => (
-                <TableRow key={child.id}>
-                    <TableCell>
-                        <div className="flex items-center gap-3">
-                            <Avatar>
-                                <AvatarImage src={child.photo} alt={child.name} />
-                                <AvatarFallback>{child.name.charAt(0).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <span className="font-medium">{child.name}</span>
-                        </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                        <div className="flex flex-col text-sm">
-                            <span className="font-medium">{child.parent}</span>
-                            <span className="text-muted-foreground">{child.parentEmail}</span>
-                        </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                        {child.dateOfBirth ? <ChildAge dobString={child.dateOfBirth} /> : "N/A"}
-                    </TableCell>
-                    <TableCell>
-                        <div className="flex gap-1 justify-end">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button asChild variant="ghost" size="icon">
-                                        <Link href={`/admin/dashboard/children/${child.id}/reports`}><FileText className="h-4 w-4" /></Link>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent><p>Manage Daily Reports</p></TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(child)}><Edit className="h-4 w-4" /></Button>
-                                </TooltipTrigger>
-                                <TooltipContent><p>Edit Child Profile</p></TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}><Trash2 className="h-4 w-4" /></Button>
-                                </TooltipTrigger>
-                                <TooltipContent><p>Delete Child Profile</p></TooltipContent>
-                            </Tooltip>
-                        </div>
-                    </TableCell>
-                </TableRow>
-                ))}
-                </TooltipProvider>
-            )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                {isLoading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={index}>
+                        <TableCell><Skeleton className="h-6 w-40" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-48" /></TableCell>
+                        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-8 w-24 inline-block" /></TableCell>
+                    </TableRow>
+                    ))
+                ) : children.length === 0 ? (
+                    <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center">
+                            No children registered yet.
+                        </TableCell>
+                    </TableRow>
+                ) : (
+                    <TooltipProvider>
+                    {children.map((child) => (
+                    <TableRow key={child.id}>
+                        <TableCell>
+                            <div className="flex items-center gap-3">
+                                <Avatar>
+                                    <AvatarImage src={child.photo} alt={child.name} />
+                                    <AvatarFallback>{child.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                                <span className="font-medium">{child.name}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            <div className="flex flex-col text-sm">
+                                <span className="font-medium">{child.parent}</span>
+                                <span className="text-muted-foreground">{child.parentEmail}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell>
+                            {child.dateOfBirth ? <ChildAge dobString={child.dateOfBirth} /> : "N/A"}
+                        </TableCell>
+                        <TableCell>
+                            <div className="flex gap-1 justify-end">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button asChild variant="ghost" size="icon">
+                                            <Link href={`/admin/dashboard/children/${child.id}/reports`}><FileText className="h-4 w-4" /></Link>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent><p>Manage Daily Reports</p></TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(child)}><Edit className="h-4 w-4" /></Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent><p>Edit Child Profile</p></TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(child)}><Trash2 className="h-4 w-4" /></Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent><p>Delete Child Profile</p></TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                    ))}
+                    </TooltipProvider>
+                )}
+                </TableBody>
+            </Table>
+            </CardContent>
+        </Card>
+      </div>
       
       {/* Delete Child Alert Dialog */}
       <AlertDialog open={!!deletingChild} onOpenChange={(open) => { if (!open) setDeletingChild(null); }}>
@@ -704,5 +706,7 @@ export default function ChildrenPage() {
     </div>
   );
 }
+
+    
 
     

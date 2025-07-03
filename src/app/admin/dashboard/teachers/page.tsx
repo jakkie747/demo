@@ -279,7 +279,7 @@ export default function ManageTeachersPage() {
   }
 
   return (
-    <div className="py-6 grid grid-cols-1">
+    <div className="py-6 space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-4">
           {t('manageTeachers')}
@@ -307,83 +307,82 @@ export default function ManageTeachersPage() {
         </Card>
       </div>
       
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold tracking-tight">
           {t('existingTeachers')}
         </h2>
-        <Card>
-            <CardContent className="p-0">
-              <Table>
-              <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('teacherName')}</TableHead>
-                    <TableHead className="hidden sm:table-cell">{t('teacherEmail')}</TableHead>
-                    <TableHead className="hidden sm:table-cell">{t('role')}</TableHead>
-                    <TableHead className="text-right">{t('actions')}</TableHead>
-                  </TableRow>
-              </TableHeader>
-              <TableBody>
-                  {isLoading ? (
-                  Array.from({ length: 2 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell><Skeleton className="h-6 w-40" /></TableCell>
-                        <TableCell className="hidden sm:table-cell"><Skeleton className="h-6 w-48" /></TableCell>
-                        <TableCell className="hidden sm:table-cell"><Skeleton className="h-6 w-16" /></TableCell>
-                        <TableCell className="text-right"><Skeleton className="h-8 w-20 inline-block" /></TableCell>
-                      </TableRow>
-                  ))
-                  ) : teachers.length === 0 ? (
-                  <TableRow>
-                      <TableCell colSpan={4} className="h-24 text-center">
-                      No teachers enrolled yet.
-                      </TableCell>
-                  </TableRow>
-                  ) : (
-                  teachers.map((teacher) => (
-                      <TableRow key={teacher.id}>
-                        <TableCell>
-                            <div className="flex items-center gap-3">
-                                <Avatar>
-                                    <AvatarImage src={teacher.photo} alt={teacher.name} />
-                                    <AvatarFallback>{teacher.name.charAt(0).toUpperCase()}</AvatarFallback>
-                                </Avatar>
-                                <div>
+        <div className="w-full overflow-x-auto">
+            <Card>
+                <CardContent className="p-0">
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('teacherName')}</TableHead>
+                        <TableHead>{t('teacherEmail')}</TableHead>
+                        <TableHead>{t('role')}</TableHead>
+                        <TableHead className="text-right">{t('actions')}</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {isLoading ? (
+                    Array.from({ length: 2 }).map((_, i) => (
+                        <TableRow key={i}>
+                            <TableCell><Skeleton className="h-6 w-40" /></TableCell>
+                            <TableCell><Skeleton className="h-6 w-48" /></TableCell>
+                            <TableCell><Skeleton className="h-6 w-16" /></TableCell>
+                            <TableCell className="text-right"><Skeleton className="h-8 w-20 inline-block" /></TableCell>
+                        </TableRow>
+                    ))
+                    ) : teachers.length === 0 ? (
+                    <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center">
+                        No teachers enrolled yet.
+                        </TableCell>
+                    </TableRow>
+                    ) : (
+                    teachers.map((teacher) => (
+                        <TableRow key={teacher.id}>
+                            <TableCell>
+                                <div className="flex items-center gap-3">
+                                    <Avatar>
+                                        <AvatarImage src={teacher.photo} alt={teacher.name} />
+                                        <AvatarFallback>{teacher.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                    </Avatar>
                                     <div className="font-medium">{teacher.name}</div>
-                                    <div className="text-muted-foreground text-sm sm:hidden">{teacher.role}</div>
                                 </div>
+                            </TableCell>
+                            <TableCell>{teacher.email}</TableCell>
+                            <TableCell>
+                                <Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                            <div className="flex gap-1 justify-end">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEditClick(teacher)}
+                                >
+                                    <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-destructive hover:text-destructive"
+                                    onClick={() => handleDeleteClick(teacher)}
+                                    disabled={teacher.id === currentUser?.uid}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
                             </div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">{teacher.email}</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                            <Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex gap-1 justify-end">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEditClick(teacher)}
-                            >
-                                <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-destructive hover:text-destructive"
-                                onClick={() => handleDeleteClick(teacher)}
-                                disabled={teacher.id === currentUser?.uid}
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                  ))
-                  )}
-              </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                            </TableCell>
+                        </TableRow>
+                    ))
+                    )}
+                </TableBody>
+                </Table>
+                </CardContent>
+            </Card>
+        </div>
       </div>
       
       {/* Edit Dialog */}
@@ -519,5 +518,7 @@ export default function ManageTeachersPage() {
     </div>
   );
 }
+
+    
 
     
