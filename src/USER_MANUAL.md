@@ -109,16 +109,24 @@ After logging in, you will land on the Admin Dashboard. This page gives you a qu
 
 ![Screenshot of the Admin Dashboard.](PASTE_YOUR_ADMIN_DASHBOARD_SCREENSHOT_URL_HERE)
 
+### How to Import and Export Children (Desktop Only)
+
+On the main Admin Dashboard, you will find an "Import / Export" card. This feature is available on desktop computers and allows you to manage children's data in bulk.
+
+1.  **To Import Children:**
+    *   Click the **"Import Children"** button. A dialog box will appear.
+    *   This dialog provides the exact CSV header format required for the import. You can copy these headers to prepare your file.
+    *   Select your prepared CSV file and click **"Confirm Import"**. New child profiles will be created from the data in your file.
+
+2.  **To Export Children:**
+    *   Click the **"Export Children"** button.
+    *   A CSV file containing all registered children's data will be downloaded to your computer.
+
 ### How to Manage Child Profiles
 
 1.  From the dashboard, navigate to the **"Children Profiles"** page using the sidebar menu.
 2.  Here you will see a table of all registered children.
-3.  **Importing Children:** You can bulk-add children using a CSV file.
-    *   Click the **"Import Children"** button.
-    *   Select your CSV file. **Note:** The file must have headers that exactly match the child profile fields (e.g., `name`, `dateOfBirth`, `parentEmail`, etc.).
-    *   Confirm the import.
-4.  **Exporting Children:** You can download a CSV file of all registered children by clicking the **"Export Children"** button.
-5.  **Deleting a Child:** To remove a child's profile, click the **trash can icon** in the "Actions" column for that child. You will be asked to confirm the deletion.
+3.  **Deleting a Child:** To remove a child's profile, click the **trash can icon** in the "Actions" column for that child. You will be asked to confirm the deletion.
 
 ### How to Create Daily Reports for a Child
 
