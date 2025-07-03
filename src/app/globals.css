@@ -4,97 +4,97 @@
 
 @layer base {
   :root {
-    /* Blinkogies Brand Palette */
-    --background: 200 92% 95%; /* Very Light Blue from website */
-    --foreground: 215 28% 17%; /* Dark Blue/Gray */
+    /* New Vibrant Brand Palette */
+    --background: 210 40% 98%;      /* Clean Off-White */
+    --foreground: 222 47% 11%;      /* Dark Slate */
 
     --card: 0 0% 100%;
-    --card-foreground: 215 28% 17%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 28% 17%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 207 82% 64%;      /* Cheerful Light Blue (#59ABEF) */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 217 91% 60%;         /* Vibrant Blue */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 207 70% 90%;     /* Lighter Blue */
-    --secondary-foreground: 207 82% 34%; /* Darker Blue */
+    --secondary: 217 91% 90%;       /* Lighter variant of primary */
+    --secondary-foreground: 217 91% 30%;
 
-    --muted: 200 50% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 47 98% 70%;         /* Warm Yellow (#FDD764) */
-    --accent-foreground: 45 98% 15%;
+    --accent: 25 95% 53%;           /* Sunny Orange */
+    --accent-foreground: 0 0% 100%; /* White text on orange */
 
-    --destructive: 0 84% 60%;     /* Softer Red */
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 40% 90%;
-    --input: 0 0% 100%;
-    --ring: 207 82% 64%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 60%;
 
-    --chart-1: 207 82% 64%; /* Blue */
-    --chart-2: 47 98% 70%;  /* Yellow */
-    --chart-3: 0 84% 60%;   /* Red */
-    --chart-4: 275 59% 66%; /* A purple for contrast */
-    --chart-5: 140 50% 60%; /* A green for contrast */
+    --chart-1: 217 91% 60%; /* primary */
+    --chart-2: 25 95% 53%;  /* accent */
+    --chart-3: 142 76% 36%; /* green */
+    --chart-4: 262 83% 58%; /* purple */
+    --chart-5: 0 84% 60%;   /* red */
 
     --radius: 0.8rem;
 
     /* Sidebar colors - Let's make it the brand blue */
-    --sidebar-background: 207 82% 64%;
+    --sidebar-background: 217 91% 60%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 207 82% 64%;
-    --sidebar-accent: 207 82% 58%;
+    --sidebar-primary-foreground: 217 91% 60%;
+    --sidebar-accent: 217 91% 55%; /* Darker blue for hover */
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 207 82% 54%;
-    --sidebar-ring: 47 98% 70%;
+    --sidebar-border: 217 91% 50%;
+    --sidebar-ring: 25 95% 53%;
   }
 
   .dark {
-    /* Dark version of the Blinkogies palette */
-    --background: 215 28% 10%;
+    /* Dark version of the vibrant palette */
+    --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    --card: 215 28% 15%;
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    --popover: 215 28% 15%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 207 82% 64%;      /* Cheerful Light Blue */
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 28% 22%;     /* Darker subtle blue */
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 215 28% 22%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215.4 16.3% 56.9%;
 
-    --accent: 47 98% 70%;         /* Warm Yellow */
-    --accent-foreground: 45 98% 15%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 70% 55%;       /* Red */
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 215 28% 25%;
-    --input: 215 28% 25%;
-    --ring: 207 82% 64%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217 91% 60%;
 
-    --chart-1: 207 82% 64%; /* Blue */
-    --chart-2: 47 98% 70%;  /* Yellow */
-    --chart-3: 0 70% 55%;   /* Red */
-    --chart-4: 275 59% 66%; /* Purple */
-    --chart-5: 140 50% 60%; /* Green */
+    --chart-1: 217 91% 60%;
+    --chart-2: 25 95% 53%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 0 63% 31%;
 
     /* Dark Sidebar colors */
-    --sidebar-background: 215 28% 17%;
+    --sidebar-background: 222.2 84% 4.9%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 207 82% 64%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 28% 22%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 215 28% 25%;
-    --sidebar-ring: 47 98% 70%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
