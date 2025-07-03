@@ -2,6 +2,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -31,51 +32,26 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
-import { getTeachers, updateTeacher } from "@/services/teacherService";
-import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+import { getTeachers } from "@/services/teacherService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
 import { httpsCallable } from "firebase/functions";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import Image from "next/image";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { Label } from "@/components/ui/label";
 import { useAdminAuth } from "@/context/AdminAuthContext";
-
-const teacherFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  contactNumber: z.string().optional(),
-  homeAddress: z.string().optional(),
-  photo: z.any().optional(),
-});
 
 export default function ManageTeachersPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
-  const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [isConfigured] = useState(isFirebaseConfigured());
-  const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
 
   const { teacher, user, loading: authLoading } = useAdminAuth();
   const isAuthorized = teacher?.role === 'admin';
   const currentUser = user;
-
-  const form = useForm<z.infer<typeof teacherFormSchema>>({
-    resolver: zodResolver(teacherFormSchema),
-  });
 
   const fetchTeachers = useCallback(async () => {
     setIsLoading(true);
@@ -99,18 +75,6 @@ export default function ManageTeachersPage() {
       setIsLoading(false);
     }
   }, [isConfigured, fetchTeachers, isAuthorized, authLoading]);
-
-  const handleEditClick = (teacher: Teacher) => {
-    setEditingTeacher(teacher);
-    form.reset({
-      name: teacher.name,
-      contactNumber: teacher.contactNumber || "",
-      homeAddress: teacher.homeAddress || "",
-      photo: undefined,
-    });
-    setSubmissionError(null);
-    setIsDialogOpen(true);
-  };
 
   const handleDeleteClick = (teacher: Teacher) => {
     setTeacherToDelete(teacher);
@@ -145,97 +109,6 @@ export default function ManageTeachersPage() {
       console.error("Error deleting teacher:", error);
     } finally {
       setTeacherToDelete(null);
-    }
-  };
-
-  const onEditSubmit = async (values: z.infer<typeof teacherFormSchema>) => {
-    if (!editingTeacher) return;
-    setSubmissionError(null);
-    setIsSaving(true);
-    try {
-      let photoUrl = editingTeacher.photo;
-      const file = values.photo?.[0];
-
-      if (file) {
-        photoUrl = await uploadImage(file, 'teachers');
-        if (editingTeacher.photo && editingTeacher.photo.includes('firebasestorage')) {
-          await deleteImageFromUrl(editingTeacher.photo);
-        }
-      }
-
-      const updatedData: Partial<Teacher> = {
-        name: values.name,
-        contactNumber: values.contactNumber,
-        homeAddress: values.homeAddress,
-        photo: photoUrl,
-      };
-
-      await updateTeacher(editingTeacher.id, updatedData);
-      await fetchTeachers();
-      toast({ title: t('teacherUpdated'), description: t('teacherUpdatedDesc', { name: values.name }) });
-      setIsDialogOpen(false);
-      setEditingTeacher(null);
-
-    } catch (error) {
-       const errorMessage = (error as Error).message;
-       let errorTitle = "Error updating teacher.";
-       if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
-          errorTitle = "Update Failed: Firebase Storage Not Ready";
-          setSubmissionError({
-            title: errorTitle,
-            description: (
-              <div className="space-y-4 text-sm">
-                <p className="font-bold text-base">
-                  This error usually means your Firebase project is not fully configured for file uploads.
-                </p>
-                 <p className="mb-2">Please complete the following one-time setup steps.</p>
-                <ol className="list-decimal list-inside space-y-4 pl-2">
-                  <li>
-                    <strong>Crucial First Step: Enable Firebase Storage.</strong>
-                     <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
-                      <li>
-                        Go to your{' '}
-                        <a href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
-                          Firebase Console Storage section
-                        </a>.
-                      </li>
-                      <li>If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket.</li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Set Storage CORS Policy using Cloud Shell.</strong>
-                     <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
-                      <li>
-                        Open the{' '}
-                        <a href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`} target="_blank" rel="noopener noreferrer" className="underline">
-                          Google Cloud Shell
-                        </a>.
-                      </li>
-                      <li>
-                        Run these two commands one by one. Copy them exactly.
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
-                          {`echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`}
-                        </pre>
-                        <p className="mt-2 font-semibold">
-                          Crucial Note: For the next command, the Cloud Shell needs your bucket name in the format <code>gs://project-id.appspot.com</code>. Your Firebase Console may show a different URL (ending in `firebasestorage.app`), but for this command to work, you must use the `.appspot.com` version. Copy the command below exactly as it is:
-                        </p>
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.projectId}.appspot.com`}</pre>
-                      </li>
-                    </ul>
-                  </li>
-                   <li>
-                      <strong>Try Again.</strong>
-                       <p>After completing all these steps, refresh this page and try saving again.</p>
-                  </li>
-                </ol>
-              </div>
-            )
-          });
-        } else {
-           setSubmissionError({ title: errorTitle, description: errorMessage });
-        }
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -318,7 +191,7 @@ export default function ManageTeachersPage() {
                 <TableHeader>
                     <TableRow>
                         <TableHead>{t('teacherName')}</TableHead>
-                        <TableHead>{t('teacherEmail')}</TableHead>
+                        <TableHead className="hidden sm:table-cell">{t('teacherEmail')}</TableHead>
                         <TableHead>{t('role')}</TableHead>
                         <TableHead className="text-right">{t('actions')}</TableHead>
                     </TableRow>
@@ -328,7 +201,7 @@ export default function ManageTeachersPage() {
                     Array.from({ length: 2 }).map((_, i) => (
                         <TableRow key={i}>
                             <TableCell><Skeleton className="h-6 w-40" /></TableCell>
-                            <TableCell><Skeleton className="h-6 w-48" /></TableCell>
+                            <TableCell className="hidden sm:table-cell"><Skeleton className="h-6 w-48" /></TableCell>
                             <TableCell><Skeleton className="h-6 w-16" /></TableCell>
                             <TableCell className="text-right"><Skeleton className="h-8 w-20 inline-block" /></TableCell>
                         </TableRow>
@@ -351,18 +224,14 @@ export default function ManageTeachersPage() {
                                     <div className="font-medium">{teacher.name}</div>
                                 </div>
                             </TableCell>
-                            <TableCell>{teacher.email}</TableCell>
+                            <TableCell className="hidden sm:table-cell">{teacher.email}</TableCell>
                             <TableCell>
                                 <Badge variant={teacher.role === 'admin' ? 'default' : 'secondary'}>{teacher.role}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
                             <div className="flex gap-1 justify-end">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleEditClick(teacher)}
-                                >
-                                    <Edit className="h-4 w-4" />
+                                <Button asChild variant="ghost" size="icon">
+                                    <Link href={`/admin/dashboard/teachers/${teacher.id}/edit`}><Edit className="h-4 w-4" /></Link>
                                 </Button>
                                 <Button
                                     variant="ghost"
@@ -385,117 +254,6 @@ export default function ManageTeachersPage() {
         </div>
       </div>
       
-      {/* Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={(open) => { if(!open) { setIsDialogOpen(false); setSubmissionError(null); }}}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{t('editTeacherProfile')}</DialogTitle>
-            <DialogDescription>
-              {t('updateTeacherProfileDesc')}
-            </DialogDescription>
-          </DialogHeader>
-          {editingTeacher && (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onEditSubmit)} className="space-y-4 py-4">
-                 <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('teacherName')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={isSaving} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="contactNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('contactNumber')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={isSaving} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="homeAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('homeAddress')}</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} disabled={isSaving} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {editingTeacher.photo && (
-                  <div className="space-y-2">
-                    <Label>{t('currentImage')}</Label>
-                    <Image
-                      src={editingTeacher.photo}
-                      alt={editingTeacher.name}
-                      width={80}
-                      height={80}
-                      className="rounded-md object-cover border"
-                    />
-                  </div>
-                )}
-                <FormField
-                  control={form.control}
-                  name="photo"
-                  render={({ field: { onChange, onBlur, name, ref } }) => (
-                    <FormItem>
-                      <FormLabel>{t('teacherPhoto')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => onChange(e.target.files)}
-                          disabled={isSaving}
-                        />
-                      </FormControl>
-                       <FormDescription>
-                        {editingTeacher.photo ? t('replaceImage') : t('uploadImage')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {submissionError && (
-                    <Alert variant="destructive">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>{submissionError.title}</AlertTitle>
-                        <AlertDescription>
-                        {submissionError.description}
-                        </AlertDescription>
-                    </Alert>
-                )}
-
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
-                    {t('cancel')}
-                  </Button>
-                  <Button type="submit" disabled={isSaving}>
-                    {isSaving ? "Saving..." : t('saveChanges')}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          )}
-        </DialogContent>
-      </Dialog>
-
-
-      {/* Delete Teacher Alert Dialog */}
       <AlertDialog
         open={!!teacherToDelete}
         onOpenChange={(open) => !open && setTeacherToDelete(null)}
@@ -518,7 +276,3 @@ export default function ManageTeachersPage() {
     </div>
   );
 }
-
-    
-
-    
