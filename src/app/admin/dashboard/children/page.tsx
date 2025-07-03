@@ -154,11 +154,9 @@ export default function ChildrenPage() {
 
   return (
     <div className="py-6 space-y-6">
-       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">
+       <h2 className="text-3xl font-bold tracking-tight">
             {t('registeredChildrenTitle')}
-        </h2>
-      </div>
+       </h2>
       <div className="w-full overflow-x-auto">
         <Card>
             <CardContent className="p-0">
