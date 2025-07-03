@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -40,7 +39,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { addChild } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
 import { uploadImage } from "@/services/storageService";
-import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -92,8 +91,8 @@ export default function RegisterPage() {
     setSubmissionError(null);
     if (!isConfigured) {
       setSubmissionError({
-        title: "Firebase Not Configured",
-        description: "Please configure your Firebase credentials in src/lib/firebase.ts before saving.",
+        title: "Registration System Unavailable",
+        description: "The registration system is currently offline. Please contact the school directly to register.",
       });
       return;
     }
@@ -132,97 +131,11 @@ export default function RegisterPage() {
       form.reset();
 
     } catch (error) {
-      const errorMessage = (error as Error).message || "There was a problem saving the registration.";
-      let errorTitle = "Uh oh! Something went wrong.";
-      
-      if (errorMessage.includes("timed out") || errorMessage.includes("storage/object-not-found") || errorMessage.toLowerCase().includes('network')) {
-        errorTitle = "Save Failed: Firebase Storage Not Ready";
+        console.error("Child Registration Error:", error);
         setSubmissionError({
-          title: errorTitle,
-          description: (
-             <div className="space-y-4 text-sm">
-                <p className="font-bold text-base">
-                  This error usually means your Firebase project is not fully configured for file uploads.
-                </p>
-                <p className="mb-2">Please complete the following one-time setup steps.</p>
-                <ol className="list-decimal list-inside space-y-4 pl-2">
-                  <li>
-                    <strong>Crucial First Step: Enable Firebase Storage.</strong>
-                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
-                      <li>
-                        Go to your{' '}
-                        <a
-                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline font-semibold"
-                        >
-                          Firebase Console Storage section
-                        </a>
-                        .
-                      </li>
-                      <li>
-                        If you see a "Get Started" screen, you **must** click through the prompts to enable it. This creates the storage bucket.
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Update Your Security Rules.</strong>
-                    <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
-                      <li>
-                         Open your{' '}
-                        <a
-                          href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/storage/rules`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          Storage Rules
-                        </a> and replace the content with the rules from the `storage.rules` file in your project. Click <strong>Publish</strong>.
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                    <strong>Set Storage CORS Policy using Cloud Shell.</strong>
-                    <ul className="list-disc list-inside pl-4 mt-1 space-y-2">
-                      <li>
-                        This step is required to allow your web app to upload files. Open the{' '}
-                        <a
-                          href={`https://console.cloud.google.com/home/dashboard?project=${firebaseConfig.projectId}&cloudshell=true`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          Google Cloud Shell
-                        </a>
-                        .
-                      </li>
-                      <li>
-                        Run these two commands one by one. Copy them exactly.
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-2 select-all">
-                          {
-                            `echo '[{"origin": ["*"], "method": ["GET", "PUT", "POST"], "responseHeader": ["Content-Type"], "maxAgeSeconds": 3600}]' > cors.json`
-                          }
-                        </pre>
-                        <p className="mt-2 font-semibold">
-                          Crucial Note: For the next command, the Cloud Shell needs your bucket name in the format <code>gs://project-id.appspot.com</code>. Your Firebase Console may show a different URL (ending in `firebasestorage.app`), but for this command to work, you must use the `.appspot.com` version. Copy the command below exactly as it is:
-                        </p>
-                        <pre className="text-xs bg-muted p-2 rounded-md overflow-x-auto mt-1 select-all">{`gsutil cors set cors.json gs://${firebaseConfig.projectId}.appspot.com`}</pre>
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                      <strong>Try Again.</strong>
-                       <p>After completing all these steps, refresh this page and try submitting the registration again.</p>
-                  </li>
-                </ol>
-              </div>
-          )
+            title: "Registration Failed",
+            description: "An unexpected error occurred while submitting your registration. This might be a temporary network issue. Please check your connection and try again in a few moments. If the problem persists, please contact the school directly for assistance.",
         });
-      } else {
-        setSubmissionError({ title: errorTitle, description: errorMessage });
-      }
-
     } finally {
       setIsSubmitting(false);
     }
@@ -243,10 +156,10 @@ export default function RegisterPage() {
           {!isConfigured && (
               <Alert variant="destructive" className="mb-8">
                   <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Firebase Configuration Error</AlertTitle>
+                  <AlertTitle>System Currently Unavailable</AlertTitle>
                   <AlertDescription>
-                      <p>Cannot submit registration because the application is not connected to the database.</p>
-                      <p className="mt-2 font-bold">Please contact the administrator or, if you are the admin, update <code>src/lib/firebase.ts</code> with your project credentials.</p>
+                      <p>The online registration form is currently unavailable.</p>
+                      <p className="mt-2 font-bold">Please contact the school directly to register your child.</p>
                   </AlertDescription>
               </Alert>
           )}
