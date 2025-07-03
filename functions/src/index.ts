@@ -1,38 +1,48 @@
 
 /**
- * @fileoverview Cloud Functions for Firebase.
- * This file uses the v1 API for Cloud Functions for stability.
+ * @fileoverview Cloud Functions for Firebase (v1 syntax).
+ * This file uses the v1 API for Cloud Functions for maximum stability.
  */
 
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-// Initialize the Admin SDK once
-admin.initializeApp();
+// Initialize the Admin SDK once.
+// This is a global initialization.
+try {
+  admin.initializeApp();
+  functions.logger.log('Firebase Admin SDK initialized successfully.');
+} catch (e) {
+  functions.logger.error('Error initializing Firebase Admin SDK:', e);
+}
+
 
 const db = admin.firestore();
 const authAdmin = admin.auth();
-const storage = admin.storage();
 
 /**
  * A v1 callable Cloud Function to delete a teacher's auth credentials and Firestore profile.
- * This function also handles deleting the teacher's profile photo from Firebase Storage.
  */
 export const deleteTeacherUser = functions.https.onCall(async (data, context) => {
+  functions.logger.log('--- Starting deleteTeacherUser function execution ---');
+  
   // 1. Authentication Check: Ensure the user calling the function is authenticated.
   if (!context.auth) {
-    functions.logger.warn('Unauthenticated user tried to call deleteTeacherUser');
+    functions.logger.warn('Unauthenticated call to deleteTeacherUser.');
     throw new functions.https.HttpsError(
       'unauthenticated',
       'The function must be called while authenticated.'
     );
   }
-
+  
   const callerUid = context.auth.uid;
   const uidToDelete = data.uid;
+  
+  functions.logger.log(`Caller UID: ${callerUid}, UID to delete: ${uidToDelete}`);
 
   // 2. Input Validation: Ensure the UID to delete is a valid string.
   if (typeof uidToDelete !== 'string' || uidToDelete.length === 0) {
+    functions.logger.error('Invalid argument: "uid" is not a valid string.', data);
     throw new functions.https.HttpsError(
       'invalid-argument',
       'The function must be called with a valid "uid" string argument.'
@@ -41,6 +51,7 @@ export const deleteTeacherUser = functions.https.onCall(async (data, context) =>
 
   // 3. Self-Deletion Check: Prevent admins from deleting themselves.
   if (callerUid === uidToDelete) {
+    functions.logger.warn(`User ${callerUid} attempted to delete themselves.`);
     throw new functions.https.HttpsError(
       'permission-denied',
       'Admins cannot delete their own accounts.'
@@ -49,108 +60,62 @@ export const deleteTeacherUser = functions.https.onCall(async (data, context) =>
 
   // 4. Authorization Check: Ensure the caller is an admin.
   try {
-    const callerDoc = await db.collection('teachers').doc(callerUid).get();
+    const callerDocRef = db.collection('teachers').doc(callerUid);
+    const callerDoc = await callerDocRef.get();
+    
     if (!callerDoc.exists || callerDoc.data()?.role !== 'admin') {
-      functions.logger.warn(
-        `User ${callerUid} without admin role attempted to delete user ${uidToDelete}.`
-      );
+      functions.logger.warn(`User ${callerUid} (role: ${callerDoc.data()?.role}) attempted to delete user ${uidToDelete}. Permission denied.`);
       throw new functions.https.HttpsError(
         'permission-denied',
         'Only admins can delete users.'
       );
     }
+    functions.logger.log(`Caller ${callerUid} is authorized as admin.`);
   } catch (e: any) {
-    functions.logger.error(`Error checking admin role for ${callerUid}`, e);
+    functions.logger.error(`Error during authorization check for ${callerUid}`, e);
     throw new functions.https.HttpsError('internal', 'Could not verify admin permissions.');
   }
 
-  functions.logger.log(
-    `Admin ${callerUid} is attempting to delete user ${uidToDelete}.`
-  );
-
   // 5. Deletion Logic
+  const teacherDocRef = db.collection('teachers').doc(uidToDelete);
+  
   try {
-    // 5a. Delete Photo from Storage (if it exists)
-    const teacherDocRef = db.collection('teachers').doc(uidToDelete);
-    const teacherDocToDelete = await teacherDocRef.get();
-
-    if (teacherDocToDelete.exists()) {
-      const teacherData = teacherDocToDelete.data();
-      if (
-        teacherData?.photo &&
-        teacherData.photo.includes('firebasestorage.googleapis.com')
-      ) {
-        try {
-          // Extract the file path from the full URL
-          const fileUrl = new URL(teacherData.photo);
-          const filePath = decodeURIComponent(fileUrl.pathname.split('/o/')[1].split('?')[0]);
-          const file = storage.bucket().file(filePath);
-
-          await file.delete();
-          functions.logger.log(
-            `Successfully deleted photo for user ${uidToDelete} at path ${filePath}`
-          );
-        } catch (storageError: any) {
-          // If the file is not found, it's not a critical error, just log it.
-          if (storageError.code === 404) {
-            functions.logger.warn(
-              `Photo for user ${uidToDelete} not found in Storage. It may have already been deleted.`
-            );
-          } else {
-            functions.logger.error(
-              `Failed to delete photo for user ${uidToDelete}.`,
-              storageError
-            );
-            // Non-fatal, continue with user deletion.
-          }
-        }
-      }
-    }
-
-    // 5b. Delete Firebase Auth user
+    // Step 5a: Delete Firebase Auth user
+    functions.logger.log(`Attempting to delete auth user for UID: ${uidToDelete}`);
     await authAdmin.deleteUser(uidToDelete);
-    functions.logger.log(
-      `Successfully deleted user ${uidToDelete} from Firebase Authentication.`
-    );
-
-    // 5c. Delete Firestore document
+    functions.logger.log(`Successfully deleted auth user for UID: ${uidToDelete}`);
+    
+    // Step 5b: Delete Firestore document
+    functions.logger.log(`Attempting to delete Firestore document for UID: ${uidToDelete}`);
     await teacherDocRef.delete();
-    functions.logger.log(
-      `Successfully deleted teacher document for ${uidToDelete} from Firestore.`
-    );
+    functions.logger.log(`Successfully deleted Firestore document for UID: ${uidToDelete}`);
 
-    return {status: 'success', message: `Successfully deleted user ${uidToDelete}`};
+    functions.logger.log('--- deleteTeacherUser function execution successful ---');
+    return { status: 'success', message: `Successfully deleted user ${uidToDelete}` };
+
   } catch (error: any) {
     functions.logger.error(`Error during deletion process for user ${uidToDelete}:`, error);
 
-    // Handle case where auth user might not exist but Firestore doc does.
+    // Clean up Firestore doc if auth user was already deleted
     if (error.code === 'auth/user-not-found') {
+      functions.logger.warn(`Auth user ${uidToDelete} not found, attempting to clean up Firestore document.`);
       try {
-        await db.collection('teachers').doc(uidToDelete).delete();
-        functions.logger.log(
-          `Auth user not found for ${uidToDelete}, but cleaned up Firestore document.`
-        );
-        return {
-          status: 'success',
-          message: `User auth not found, but Firestore document for ${uidToDelete} was cleaned up.`,
-        };
+        await teacherDocRef.delete();
+        functions.logger.log(`Successfully cleaned up Firestore doc for ${uidToDelete}.`);
+        return { status: 'success', message: 'User auth not found, but Firestore document was cleaned up.' };
       } catch (dbError) {
-        functions.logger.error(
-          `Error deleting Firestore doc for user ${uidToDelete} after auth/user-not-found error:`,
-          dbError
-        );
+        functions.logger.error(`Failed to clean up Firestore doc for ${uidToDelete} after auth error.`, dbError);
       }
     }
-
-    // Re-throw HttpsError if it's already in the correct format
+    
     if (error instanceof functions.https.HttpsError) {
       throw error;
     }
-
-    // Throw a generic internal error for all other cases
+    
     throw new functions.https.HttpsError(
       'internal',
-      'An unexpected error occurred while deleting the user.'
+      'An unexpected error occurred while deleting the user.',
+      error.message
     );
   }
 });
