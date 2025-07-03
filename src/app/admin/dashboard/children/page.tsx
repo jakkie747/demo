@@ -299,7 +299,7 @@ export default function ChildrenPage() {
         <h2 className="text-3xl font-bold tracking-tight">
             {t('registeredChildrenTitle')}
         </h2>
-        <div className="hidden sm:flex gap-2">
+        <div className="hidden md:flex gap-2">
             <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
                 <DialogTrigger asChild>
                     <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
