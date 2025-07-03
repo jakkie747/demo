@@ -39,7 +39,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 
 const ChildAge = ({ dobString }: { dobString: string }) => {
@@ -94,12 +93,6 @@ export default function ChildrenPage() {
 
   const [deletingChild, setDeletingChild] = useState<Child | null>(null);
   
-  const [isMounted, setIsMounted] = useState(false);
-  const isMobile = useIsMobile();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const fetchChildren = useCallback(async () => {
     setIsLoading(true);
@@ -307,58 +300,56 @@ export default function ChildrenPage() {
         <h2 className="text-3xl font-bold tracking-tight">
             {t('registeredChildrenTitle')}
         </h2>
-        {isMounted && (
-          <div className="flex gap-2">
-              <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-                  <DialogTrigger asChild>
-                      <Button variant="outline" disabled={isMobile}><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>{t('importFromCSV')}</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                        <p className="text-sm text-muted-foreground">{t('importCSVDesc')}</p>
-                        <div>
-                            <div className="flex justify-between items-center mb-1">
-                                <p className="text-sm font-semibold text-foreground">Required CSV Header:</p>
-                                <Button variant="ghost" size="sm" onClick={handleCopyHeaders} className="h-7">
-                                    <Copy className="mr-2 h-3 w-3" />
-                                    Copy
-                                </Button>
-                            </div>
-                            <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md block break-all">
-                                {headers}
-                            </code>
-                        </div>
-                        <Alert variant="default" className="text-sm">
-                            <AlertTriangle className="h-4 w-4" />
-                            <AlertTitle>Field Values</AlertTitle>
-                            <AlertDescription>
-                                The <code className="text-xs bg-muted p-1 rounded-sm">gender</code> column must be one of <code className="text-xs bg-muted p-1 rounded-sm">male</code>, <code className="text-xs bg-muted p-1 rounded-sm">female</code>, or <code className="text-xs bg-muted p-1 rounded-sm">other</code>.<br/>
-                                The <code className="text-xs bg-muted p-1 rounded-sm">previousPreschool</code> column must be <code className="text-xs bg-muted p-1 rounded-sm">yes</code> or <code className="text-xs bg-muted p-1 rounded-sm">no</code>.
-                            </AlertDescription>
-                        </Alert>
-                    </div>
-                    <div className="grid w-full items-center gap-1.5 mt-4">
-                        <Label htmlFor="csv-file">{t('selectFile')}</Label>
-                        <Input id="csv-file" type="file" accept=".csv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
-                    </div>
-                    <DialogFooter className="sm:justify-start mt-4">
-                        <Button onClick={handleImportCSV} disabled={!importFile || isImporting}>
-                            {isImporting ? "Importing..." : t('confirmImport')}
+        <div className="hidden md:flex gap-2">
+            <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                      <DialogTitle>{t('importFromCSV')}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">{t('importCSVDesc')}</p>
+                      <div>
+                          <div className="flex justify-between items-center mb-1">
+                              <p className="text-sm font-semibold text-foreground">Required CSV Header:</p>
+                              <Button variant="ghost" size="sm" onClick={handleCopyHeaders} className="h-7">
+                                  <Copy className="mr-2 h-3 w-3" />
+                                  Copy
+                              </Button>
+                          </div>
+                          <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md block break-all">
+                              {headers}
+                          </code>
+                      </div>
+                      <Alert variant="default" className="text-sm">
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertTitle>Field Values</AlertTitle>
+                          <AlertDescription>
+                              The <code className="text-xs bg-muted p-1 rounded-sm">gender</code> column must be one of <code className="text-xs bg-muted p-1 rounded-sm">male</code>, <code className="text-xs bg-muted p-1 rounded-sm">female</code>, or <code className="text-xs bg-muted p-1 rounded-sm">other</code>.<br/>
+                              The <code className="text-xs bg-muted p-1 rounded-sm">previousPreschool</code> column must be <code className="text-xs bg-muted p-1 rounded-sm">yes</code> or <code className="text-xs bg-muted p-1 rounded-sm">no</code>.
+                          </AlertDescription>
+                      </Alert>
+                  </div>
+                  <div className="grid w-full items-center gap-1.5 mt-4">
+                      <Label htmlFor="csv-file">{t('selectFile')}</Label>
+                      <Input id="csv-file" type="file" accept=".csv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
+                  </div>
+                  <DialogFooter className="sm:justify-start mt-4">
+                      <Button onClick={handleImportCSV} disabled={!importFile || isImporting}>
+                          {isImporting ? "Importing..." : t('confirmImport')}
+                      </Button>
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                          Close
                         </Button>
-                        <DialogClose asChild>
-                          <Button type="button" variant="secondary">
-                            Close
-                          </Button>
-                        </DialogClose>
-                    </DialogFooter>
-                  </DialogContent>
-              </Dialog>
-              <Button onClick={handleExportCSV} disabled={isMobile}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
-          </div>
-        )}
+                      </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            <Button onClick={handleExportCSV}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
+        </div>
       </div>
       <div className="w-full overflow-x-auto">
         <Card>
