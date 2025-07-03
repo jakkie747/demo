@@ -1,3 +1,4 @@
+
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -33,11 +34,12 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
 import { getTeachers } from "@/services/teacherService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
+import { isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { httpsCallable } from "firebase/functions";
 
 export default function ManageTeachersPage() {
   const { toast } = useToast();
@@ -79,39 +81,33 @@ export default function ManageTeachersPage() {
   };
 
   const confirmDelete = async () => {
-    if (!teacherToDelete || !currentUser) return;
-
-    try {
-        const token = await currentUser.getIdToken();
-        const functionUrl = `https://us-central1-${firebaseConfig.projectId}.cloudfunctions.net/deleteTeacherUser`;
-        
-        const response = await fetch(functionUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ data: { uid: teacherToDelete.id } })
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error.message || `Request failed with status ${response.status}`);
-        }
-      
-      await fetchTeachers();
-      toast({
-        title: t('teacherDeleted'),
-        description: t('teacherDeletedAndAuthDesc', { name: teacherToDelete.name }),
-        variant: "destructive",
-      });
-    } catch (error: any) {
-      toast({ 
+    if (!teacherToDelete || !currentUser || !functions) {
+       toast({ 
           variant: "destructive", 
           title: "Error", 
-          description: error.message || "Could not delete teacher."
+          description: "Cannot delete teacher. Auth or Functions service not available."
       });
+      setTeacherToDelete(null);
+      return;
+    };
+
+    try {
+        const deleteTeacherFunction = httpsCallable(functions, 'deleteTeacherUser');
+        await deleteTeacherFunction({ uid: teacherToDelete.id });
+        
+        await fetchTeachers();
+        toast({
+          title: t('teacherDeleted'),
+          description: t('teacherDeletedAndAuthDesc', { name: teacherToDelete.name }),
+          variant: "destructive",
+        });
+    } catch (error: any) {
       console.error("Error deleting teacher:", error);
+      toast({ 
+          variant: "destructive", 
+          title: "Error Deleting Teacher", 
+          description: error.message || "An unexpected error occurred."
+      });
     } finally {
       setTeacherToDelete(null);
     }
