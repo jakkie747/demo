@@ -20,12 +20,19 @@ export default function Home() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isConfigured] = useState(isFirebaseConfigured());
+  const [heroImage, setHeroImage] = useState<Activity | null>(null);
 
-  const fetchActivities = useCallback(async () => {
+  const fetchActivitiesAndSetHero = useCallback(async () => {
     setIsLoading(true);
     try {
       const fetchedActivities = await getActivities();
       setActivities(fetchedActivities);
+
+      if (fetchedActivities.length > 0) {
+        // Select a random image client-side to avoid hydration mismatch
+        const randomIndex = Math.floor(Math.random() * fetchedActivities.length);
+        setHeroImage(fetchedActivities[randomIndex]);
+      }
     } catch (error: any) {
       toast({ variant: "destructive", title: "Error", description: error.message || "Could not load activities." });
       setActivities([]);
@@ -36,11 +43,11 @@ export default function Home() {
 
   useEffect(() => {
     if (isConfigured) {
-      fetchActivities();
+      fetchActivitiesAndSetHero();
     } else {
       setIsLoading(false);
     }
-  }, [isConfigured, fetchActivities]);
+  }, [isConfigured, fetchActivitiesAndSetHero]);
 
   const renderRecentActivities = () => {
     if (isLoading) {
@@ -128,12 +135,12 @@ export default function Home() {
               <Skeleton className="mx-auto aspect-square w-full max-w-[600px] rounded-full object-cover lg:order-last" />
             ) : (
               <Image
-                src={activities[0]?.image || "https://placehold.co/600x600.png"}
-                alt={activities[0]?.title || "Children drawing at a table"}
+                src={heroImage?.image || "https://placehold.co/600x600.png"}
+                alt={heroImage?.title || "Children playing at a table"}
                 width={600}
                 height={600}
                 className="mx-auto aspect-square w-full rounded-full object-cover lg:order-last"
-                data-ai-hint={activities[0]?.aiHint || "children drawing"}
+                data-ai-hint={heroImage?.aiHint || "children playing"}
                 priority
               />
             )}
