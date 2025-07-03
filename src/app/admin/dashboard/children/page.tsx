@@ -23,10 +23,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { isFirebaseConfigured } from "@/lib/firebase";
-import { AlertTriangle, FileDown, FileUp, Trash2, Edit, FileText } from "lucide-react";
+import { AlertTriangle, FileDown, FileUp, Trash2, Edit, FileText, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -158,6 +159,13 @@ export default function ChildrenPage() {
     link.click();
     document.body.removeChild(link);
   };
+
+  const headers = "name,dateOfBirth,gender,address,parent,parentEmail,parentPhone,photo,medicalConditions,emergencyContactName,emergencyContactPhone,previousPreschool,additionalNotes";
+
+  const handleCopyHeaders = () => {
+    navigator.clipboard.writeText(headers);
+    toast({ title: "Copied!", description: "CSV headers copied to clipboard." });
+  };
   
   const handleImportCSV = async () => {
     if (!importFile) {
@@ -167,23 +175,31 @@ export default function ChildrenPage() {
     setIsImporting(true);
 
     const parseCsvRow = (row: string): string[] => {
-        const result: string[] = [];
-        let current = '';
-        let inQuotes = false;
-        for (let i = 0; i < row.length; i++) {
-            const char = row[i];
-            if (char === '"' && (i === 0 || row[i-1] !== '"')) {
-                inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                result.push(current);
-                current = '';
-            } else {
-                current += char;
-            }
+      const result: string[] = [];
+      let field = '';
+      let inQuotes = false;
+      for (let i = 0; i < row.length; i++) {
+        const char = row[i];
+        const nextChar = row[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            field += '"'; // This is an escaped quote
+            i++; // Skip the next quote
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(field);
+          field = '';
+        } else {
+          field += char;
         }
-        result.push(current);
-        return result.map(val => val.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+      }
+      result.push(field);
+      return result;
     };
+
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -194,11 +210,11 @@ export default function ChildrenPage() {
                 throw new Error("CSV file must have a header row and at least one data row.");
             }
             
-            const header = parseCsvRow(lines[0].trim());
+            const header = parseCsvRow(lines[0].trim().replace(/\r/g, ''));
             const dataRows = lines.slice(1);
 
             const newChildren: Omit<Child, 'id'>[] = dataRows.map(rowStr => {
-                const values = parseCsvRow(rowStr.trim());
+                const values = parseCsvRow(rowStr.trim().replace(/\r/g, ''));
                 const childObject: any = {};
                 header.forEach((h, i) => {
                     childObject[h.trim()] = values[i] || '';
@@ -288,21 +304,47 @@ export default function ChildrenPage() {
                 <DialogTrigger asChild>
                     <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
                 </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>{t('importFromCSV')}</DialogTitle>
-                        <DialogDescription>{t('importCSVDesc')}</DialogDescription>
-                    </DialogHeader>
-                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="csv-file">{t('selectFile')}</Label>
-                        <Input id="csv-file" type="file" accept=".csv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsImportModalOpen(false)}>{t('cancel')}</Button>
-                        <Button onClick={handleImportCSV} disabled={!importFile || isImporting}>
-                            {isImporting ? "Importing..." : t('confirmImport')}
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                      <DialogTitle>{t('importFromCSV')}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">{t('importCSVDesc')}</p>
+                      <div>
+                          <div className="flex justify-between items-center mb-1">
+                              <p className="text-sm font-semibold text-foreground">Required CSV Header:</p>
+                              <Button variant="ghost" size="sm" onClick={handleCopyHeaders} className="h-7">
+                                  <Copy className="mr-2 h-3 w-3" />
+                                  Copy
+                              </Button>
+                          </div>
+                          <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md block overflow-x-auto w-full">
+                              {headers}
+                          </code>
+                      </div>
+                      <Alert variant="default" className="text-sm">
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertTitle>Field Values</AlertTitle>
+                          <AlertDescription>
+                              The <code className="text-xs bg-muted p-1 rounded-sm">gender</code> column must be one of <code className="text-xs bg-muted p-1 rounded-sm">male</code>, <code className="text-xs bg-muted p-1 rounded-sm">female</code>, or <code className="text-xs bg-muted p-1 rounded-sm">other</code>.<br/>
+                              The <code className="text-xs bg-muted p-1 rounded-sm">previousPreschool</code> column must be <code className="text-xs bg-muted p-1 rounded-sm">yes</code> or <code className="text-xs bg-muted p-1 rounded-sm">no</code>.
+                          </AlertDescription>
+                      </Alert>
+                  </div>
+                  <div className="grid w-full items-center gap-1.5 mt-4">
+                      <Label htmlFor="csv-file">{t('selectFile')}</Label>
+                      <Input id="csv-file" type="file" accept=".csv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
+                  </div>
+                  <DialogFooter className="sm:justify-start mt-4">
+                      <Button onClick={handleImportCSV} disabled={!importFile || isImporting}>
+                          {isImporting ? "Importing..." : t('confirmImport')}
+                      </Button>
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                          Close
                         </Button>
-                    </DialogFooter>
+                      </DialogClose>
+                  </DialogFooter>
                 </DialogContent>
             </Dialog>
             <Button onClick={handleExportCSV}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
