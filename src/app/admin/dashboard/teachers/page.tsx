@@ -1,4 +1,3 @@
-
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -34,8 +33,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { Teacher } from "@/lib/types";
 import { getTeachers } from "@/services/teacherService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isFirebaseConfigured, firebaseConfig, functions } from "@/lib/firebase";
-import { httpsCallable } from "firebase/functions";
+import { isFirebaseConfigured, firebaseConfig } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -81,11 +79,25 @@ export default function ManageTeachersPage() {
   };
 
   const confirmDelete = async () => {
-    if (!teacherToDelete || !functions) return;
+    if (!teacherToDelete || !currentUser) return;
 
     try {
-      const deleteTeacherUser = httpsCallable(functions, 'deleteTeacherUser');
-      await deleteTeacherUser({ uid: teacherToDelete.id });
+        const token = await currentUser.getIdToken();
+        const functionUrl = `https://us-central1-${firebaseConfig.projectId}.cloudfunctions.net/deleteTeacherUser`;
+        
+        const response = await fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ data: { uid: teacherToDelete.id } })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error.message || `Request failed with status ${response.status}`);
+        }
       
       await fetchTeachers();
       toast({
@@ -94,17 +106,10 @@ export default function ManageTeachersPage() {
         variant: "destructive",
       });
     } catch (error: any) {
-      let errorMessage = "Could not delete teacher.";
-      if (error.code === 'functions/permission-denied') {
-          errorMessage = "Permission denied. You cannot delete this user.";
-      } else if (error.message) {
-          errorMessage = error.message;
-      }
-      
       toast({ 
           variant: "destructive", 
           title: "Error", 
-          description: errorMessage
+          description: error.message || "Could not delete teacher."
       });
       console.error("Error deleting teacher:", error);
     } finally {
