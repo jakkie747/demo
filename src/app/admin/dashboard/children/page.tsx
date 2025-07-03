@@ -307,11 +307,11 @@ export default function ChildrenPage() {
         <h2 className="text-3xl font-bold tracking-tight">
             {t('registeredChildrenTitle')}
         </h2>
-        {isMounted && !isMobile && (
+        {isMounted && (
           <div className="flex gap-2">
               <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
                   <DialogTrigger asChild>
-                      <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
+                      <Button variant="outline" disabled={isMobile}><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
@@ -356,7 +356,7 @@ export default function ChildrenPage() {
                     </DialogFooter>
                   </DialogContent>
               </Dialog>
-              <Button onClick={handleExportCSV}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
+              <Button onClick={handleExportCSV} disabled={isMobile}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
           </div>
         )}
       </div>
