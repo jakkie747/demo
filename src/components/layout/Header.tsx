@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -291,7 +292,7 @@ export function Header() {
                   <span>{t("callUs")}</span>
                 </Link>
 
-                 <div className="border-t pt-4 mt-4 space-y-4">
+                 <div className="border-t pt-4 mt-4 flex flex-col items-start space-y-4">
                     <Link
                     href="/parent-login"
                     className={cn(
@@ -359,3 +360,5 @@ export function Header() {
     </>
   );
 }
+
+  
