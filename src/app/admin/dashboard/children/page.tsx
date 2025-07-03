@@ -318,7 +318,7 @@ export default function ChildrenPage() {
                                   Copy
                               </Button>
                           </div>
-                          <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md block w-full break-words">
+                          <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md block w-full break-all">
                               {headers}
                           </code>
                       </div>
