@@ -1,6 +1,6 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions";
+import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
@@ -157,7 +157,7 @@ export const deleteTeacherUser = onCall(async (request) => {
     logger.log(`Admin ${callerUid} is attempting to delete user ${uidToDelete}`);
 
     const teacherDocToDelete = await db.collection('teachers').doc(uidToDelete).get();
-    if (teacherDocToDelete.exists) {
+    if (teacherDocToDelete.exists()) {
         const teacherData = teacherDocToDelete.data();
         if (teacherData?.photo && teacherData.photo.includes('firebasestorage.googleapis.com')) {
             try {
