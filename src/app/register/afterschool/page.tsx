@@ -250,7 +250,7 @@ export default function AfterschoolRegisterPage() {
                               <Calendar
                                 mode="single"
                                 captionLayout="dropdown"
-                                fromYear={new Date().getFullYear() - 18}
+                                fromYear={new Date().getFullYear() - 20}
                                 toYear={new Date().getFullYear() - 4}
                                 selected={field.value ? new Date(field.value) : undefined}
                                 onSelect={(date) => {

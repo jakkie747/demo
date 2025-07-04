@@ -250,7 +250,7 @@ export default function PreschoolRegisterPage() {
                               <Calendar
                                 mode="single"
                                 captionLayout="dropdown"
-                                fromYear={new Date().getFullYear() - 7}
+                                fromYear={new Date().getFullYear() - 10}
                                 toYear={new Date().getFullYear()}
                                 selected={field.value ? new Date(field.value) : undefined}
                                 onSelect={(date) => {
