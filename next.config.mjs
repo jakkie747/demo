@@ -1,16 +1,38 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
-    // This is a workaround for a build error related to the 'handlebars' library,
-    // a dependency of Genkit. Handlebars attempts to use Node.js's 'fs' module,
-    // which is not available in the browser and causes the client-side build to fail.
-    // By setting `config.resolve.fallback.fs = false`, we instruct Webpack to
-    // exclude this module from the client bundle, resolving the build error.
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-    };
-
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+    ],
+  },
+  webpack: (config, { isServer }) => {
+    // Fix for the 'handlebars' issue with Next.js App Router
+    if (!isServer) {
+      config.resolve = {
+        ...config.resolve,
+        fallback: {
+          ...config.resolve.fallback,
+          fs: false,
+        },
+      };
+    }
+    // This is needed for 'require.extensions' to not throw an error
+    config.module.rules.push({
+      test: /\.mjs$/,
+      include: /node_modules/,
+      type: 'javascript/auto',
+    });
     return config;
   },
 };
