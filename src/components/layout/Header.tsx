@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -166,8 +165,8 @@ export function Header() {
 
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden h-12 w-12">
-                <Menu className="h-8 w-8" />
+              <Button variant="ghost" size="icon" className="md:hidden h-14 w-14">
+                <Menu className="h-9 w-9" />
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
