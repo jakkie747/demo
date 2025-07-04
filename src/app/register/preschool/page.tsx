@@ -8,6 +8,7 @@ import * as z from "zod";
 import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle, HeartPulse, Shield, FileText, Calendar, LockKeyhole, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,8 @@ import { addChild } from "@/services/childrenService";
 import type { Child } from "@/lib/types";
 import { uploadImage } from "@/services/storageService";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -220,19 +223,47 @@ export default function PreschoolRegisterPage() {
                       control={form.control}
                       name="dateOfBirth"
                       render={({ field }) => (
-                          <FormItem>
+                        <FormItem className="flex flex-col pt-2">
                           <FormLabel>{t('dateOfBirth')}</FormLabel>
-                           <FormControl>
-                              <Input 
-                                type="date"
-                                placeholder={t('egDob')}
-                                {...field} 
-                                disabled={isSubmitting}
-                                className="w-full"
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                  disabled={isSubmitting}
+                                >
+                                  {field.value ? (
+                                    format(new Date(field.value), "PPP")
+                                  ) : (
+                                    <span>{t('egDob')}</span>
+                                  )}
+                                  <Calendar className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                captionLayout="dropdown-buttons"
+                                fromYear={new Date().getFullYear() - 7}
+                                toYear={new Date().getFullYear()}
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    field.onChange(format(date, 'yyyy-MM-dd'));
+                                  }
+                                }}
+                                disabled={(date) => date > new Date()}
+                                initialFocus
                               />
-                            </FormControl>
+                            </PopoverContent>
+                          </Popover>
                           <FormMessage />
-                          </FormItem>
+                        </FormItem>
                       )}
                     />
                 </div>
