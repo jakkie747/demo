@@ -391,7 +391,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
           
-          <div className="hidden md:block">
+          <div>
             <Card>
                 <CardHeader>
                     <CardTitle>Import / Export</CardTitle>
@@ -447,7 +447,7 @@ export default function DashboardPage() {
                     </Dialog>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                         <Button onClick={() => handleExport('csv')} variant="outline" disabled={isLoading}><FileDown className="mr-2 h-4 w-4" />Export Data</Button>
+                         <Button variant="outline" disabled={isLoading}><FileDown className="mr-2 h-4 w-4" />Export Data</Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem onClick={() => handleExport('csv')}>Export as CSV</DropdownMenuItem>
@@ -462,5 +462,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
