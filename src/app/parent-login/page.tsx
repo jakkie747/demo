@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, Info } from "lucide-react";
+import { AlertTriangle, Info, Eye, EyeOff } from "lucide-react";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -29,6 +29,7 @@ export default function ParentLoginPage() {
   const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isConfigured] = useState(isFirebaseConfigured());
 
@@ -117,14 +118,25 @@ export default function ParentLoginPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading || !isConfigured}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading || !isConfigured}
+                  />
+                  <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground"
+                      onClick={() => setShowPassword(!showPassword)}
+                  >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
               <Button
