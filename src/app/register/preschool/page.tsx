@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -6,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle, HeartPulse, Shield, FileText, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -67,6 +67,7 @@ const formSchema = z.object({
 export default function PreschoolRegisterPage() {
   const { toast } = useToast();
   const { t } = useLanguage();
+  const router = useRouter();
   const [isConfigured] = useState(isFirebaseConfigured());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<{title: string, description: React.ReactNode} | null>(null);
@@ -130,6 +131,7 @@ export default function PreschoolRegisterPage() {
         description: t('regSuccessDesc', { childName: values.childName }),
       });
       form.reset();
+      router.push('/');
 
     } catch (error) {
         console.error("Child Registration Error:", error);
