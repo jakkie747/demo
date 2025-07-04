@@ -44,12 +44,21 @@ export const getChildrenByParentEmail = async (email: string): Promise<Child[]> 
     if (!db) return [];
     try {
         const childrenCollectionRef = collection(db, 'children');
-        const q = query(childrenCollectionRef, where("parentEmail", "==", email));
-        const snapshot = await getDocs(q);
-        if (snapshot.empty) {
-            return [];
-        }
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Child));
+        const afterschoolCollectionRef = collection(db, 'afterschoolChildren');
+
+        const childrenQuery = query(childrenCollectionRef, where("parentEmail", "==", email));
+        const afterschoolQuery = query(afterschoolCollectionRef, where("parentEmail", "==", email));
+        
+        const [childrenSnapshot, afterschoolSnapshot] = await Promise.all([
+            getDocs(childrenQuery),
+            getDocs(afterschoolQuery)
+        ]);
+
+        const preschoolChildren = childrenSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Child));
+        const afterschoolChildren = afterschoolSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Child));
+        
+        return [...preschoolChildren, ...afterschoolChildren];
+
     } catch (error: any) {
          if ((error as any).code === 'failed-precondition') {
             const message = (error as Error).message;
