@@ -8,17 +8,23 @@ import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { ArrowLeft, Baby, HeartPulse, User, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Baby, HeartPulse, User, AlertTriangle, CalendarDays, FileText } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 import type { Child } from "@/lib/types";
 import { getChildById, updateChild } from "@/services/childrenService";
@@ -27,13 +33,19 @@ import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { serverTimestamp } from "firebase/firestore";
 
 const parentEditSchema = z.object({
+  name: z.string().min(2, "Name is too short"),
+  dateOfBirth: z.string().refine((dob) => dob && !isNaN(new Date(dob).getTime()), {
+    message: "Please enter a valid date of birth.",
+  }),
+  gender: z.enum(["male", "female", "other"]),
+  childPhoto: z.any().optional(),
   parentPhone: z.string().min(10, "Please enter a valid phone number"),
   address: z.string().min(10, "Please enter a valid address"),
   emergencyContactName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
   emergencyContactPhone: z.string().min(10, "Please enter a valid phone number"),
   medicalConditions: z.string().optional(),
+  previousPreschool: z.enum(["yes", "no"]),
   additionalNotes: z.string().optional(),
-  childPhoto: z.any().optional(),
 });
 
 type ParentEditFormData = z.infer<typeof parentEditSchema>;
@@ -70,11 +82,15 @@ export default function ParentEditChildPage() {
             if (childData && childData.parentEmail === user?.email) {
                 setChild(childData);
                 form.reset({
+                    name: childData.name || '',
+                    dateOfBirth: childData.dateOfBirth || '',
+                    gender: childData.gender || 'other',
                     parentPhone: childData.parentPhone || '',
                     address: childData.address || '',
                     emergencyContactName: childData.emergencyContactName || '',
                     emergencyContactPhone: childData.emergencyContactPhone || '',
                     medicalConditions: childData.medicalConditions || '',
+                    previousPreschool: childData.previousPreschool || 'no',
                     additionalNotes: childData.additionalNotes || '',
                 });
             } else {
@@ -110,11 +126,15 @@ export default function ParentEditChildPage() {
             }
 
             const updateData: Partial<Omit<Child, 'id'>> = {
+                name: values.name,
+                dateOfBirth: values.dateOfBirth,
+                gender: values.gender,
                 parentPhone: values.parentPhone,
                 address: values.address,
                 emergencyContactName: values.emergencyContactName,
                 emergencyContactPhone: values.emergencyContactPhone,
                 medicalConditions: values.medicalConditions,
+                previousPreschool: values.previousPreschool,
                 additionalNotes: values.additionalNotes,
                 photo: photoUrl,
                 updatedByParentAt: serverTimestamp(),
@@ -157,22 +177,64 @@ export default function ParentEditChildPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Child's Details</CardTitle>
-                    <CardDescription>Update your child's information below. Some fields can only be changed by the school administrator.</CardDescription>
+                    <CardDescription>You can update your child's information below. An administrator will be notified of any changes.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                            {/* Read-only Child Info */}
                             <div className="space-y-4">
                                 <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2"><Baby /> Child's Information</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <FormItem><FormLabel>Full Name</FormLabel><Input value={child.name} disabled /></FormItem>
-                                    <FormItem><FormLabel>Date of Birth</FormLabel><Input value={child.dateOfBirth} disabled /></FormItem>
-                                    <FormItem><FormLabel>Gender</FormLabel><Input value={child.gender} disabled className="capitalize"/></FormItem>
-                                    <div className="space-y-2">
-                                        <FormLabel>Current Photo</FormLabel>
-                                        <Image src={child.photo || ''} alt="Current photo" width={60} height={60} className="rounded-md object-cover"/>
-                                    </div>
+                                    <FormField control={form.control} name="name" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>)} />
+                                     <FormField
+                                      control={form.control}
+                                      name="dateOfBirth"
+                                      render={({ field }) => (
+                                        <FormItem className="flex flex-col pt-2">
+                                          <FormLabel>Date of Birth</FormLabel>
+                                          <Popover>
+                                            <PopoverTrigger asChild>
+                                              <FormControl>
+                                                <Button
+                                                  variant={"outline"}
+                                                  className={cn(
+                                                    "w-full pl-3 text-left font-normal",
+                                                    !field.value && "text-muted-foreground"
+                                                  )}
+                                                  disabled={isSaving}
+                                                >
+                                                  {field.value ? (
+                                                    format(new Date(field.value), "PPP")
+                                                  ) : (
+                                                    <span>Pick a date</span>
+                                                  )}
+                                                  <CalendarDays className="ml-auto h-4 w-4 opacity-50" />
+                                                </Button>
+                                              </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                              <Calendar
+                                                mode="single"
+                                                captionLayout="dropdown"
+                                                fromYear={new Date().getFullYear() - 20}
+                                                toYear={new Date().getFullYear()}
+                                                selected={field.value ? new Date(field.value) : undefined}
+                                                onSelect={(date) => {
+                                                  if (date) {
+                                                    field.onChange(format(date, 'yyyy-MM-dd'));
+                                                  }
+                                                }}
+                                                disabled={(date) => date > new Date()}
+                                                initialFocus
+                                              />
+                                            </PopoverContent>
+                                          </Popover>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField control={form.control} name="gender" render={({ field }) => (<FormItem><FormLabel>Gender</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSaving}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="male">Male</SelectItem><SelectItem value="female">Female</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                                    <FormField control={form.control} name="childPhoto" render={({ field: { onChange } }) => (<FormItem><FormLabel>Replace Photo</FormLabel>{child?.photo && <Image src={child.photo} alt="Current photo" width={60} height={60} className="rounded-md object-cover"/>}<FormControl><Input type="file" accept="image/*" onChange={(e) => onChange(e.target.files)} disabled={isSaving} /></FormControl><FormDescription>Upload a new photo to replace the old one.</FormDescription><FormMessage /></FormItem>)} />
                                 </div>
                             </div>
                             
@@ -191,13 +253,43 @@ export default function ParentEditChildPage() {
                             
                             {/* Editable Emergency, Medical & Other Info */}
                             <div className="space-y-4 pt-4">
-                                <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2"><HeartPulse /> Emergency, Medical & Other</h3>
-                                <FormField control={form.control} name="childPhoto" render={({ field: { onChange } }) => (<FormItem><FormLabel>Replace Photo</FormLabel><FormControl><Input type="file" accept="image/*" onChange={(e) => onChange(e.target.files)} disabled={isSaving} /></FormControl><FormDescription>Upload a new photo to replace the old one.</FormDescription><FormMessage /></FormItem>)} />
+                                <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2"><HeartPulse /> Emergency & Medical</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <FormField control={form.control} name="emergencyContactName" render={({ field }) => (<FormItem><FormLabel>Emergency Contact Name</FormLabel><FormControl><Input {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>)} />
                                     <FormField control={form.control} name="emergencyContactPhone" render={({ field }) => (<FormItem><FormLabel>Emergency Contact Phone</FormLabel><FormControl><Input type="tel" {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>)} />
                                 </div>
                                 <FormField control={form.control} name="medicalConditions" render={({ field }) => (<FormItem><FormLabel>Medical Conditions / Allergies</FormLabel><FormControl><Textarea {...field} placeholder="e.g. Peanut allergy" disabled={isSaving} /></FormControl><FormMessage /></FormItem>)} />
+                            </div>
+
+                             <div className="space-y-4 pt-4">
+                                <h3 className="text-xl font-headline text-primary/80 flex items-center gap-2"><FileText /> Other Information</h3>
+                                <FormField
+                                    control={form.control}
+                                    name="previousPreschool"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-3">
+                                            <FormLabel>Previous Preschool Experience?</FormLabel>
+                                            <FormControl>
+                                                <RadioGroup
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                    className="flex space-x-4"
+                                                    disabled={isSaving}
+                                                >
+                                                    <FormItem className="flex items-center space-x-2 space-y-0">
+                                                        <FormControl><RadioGroupItem value="yes" /></FormControl>
+                                                        <FormLabel className="font-normal">Yes</FormLabel>
+                                                    </FormItem>
+                                                    <FormItem className="flex items-center space-x-2 space-y-0">
+                                                        <FormControl><RadioGroupItem value="no" /></FormControl>
+                                                        <FormLabel className="font-normal">No</FormLabel>
+                                                    </FormItem>
+                                                </RadioGroup>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField control={form.control} name="additionalNotes" render={({ field }) => (<FormItem><FormLabel>Additional Notes</FormLabel><FormControl><Textarea {...field} placeholder="Anything else the teachers should know?" disabled={isSaving} /></FormControl><FormMessage /></FormItem>)} />
                             </div>
 
