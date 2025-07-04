@@ -18,6 +18,7 @@ export interface Child {
   previousPreschool: 'yes' | 'no';
   additionalNotes?: string;
   program?: 'preschool' | 'afterschool';
+  updatedByParentAt?: any; // For Firestore serverTimestamp
 }
 
 export interface LinkedChildInfo {

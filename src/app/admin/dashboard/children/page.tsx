@@ -23,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { isFirebaseConfigured } from "@/lib/firebase";
-import { AlertTriangle, Trash2, Edit, FileText } from "lucide-react";
+import { AlertTriangle, Trash2, Edit, FileText, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -198,7 +198,19 @@ export default function ChildrenPage() {
                                     <AvatarImage src={child.photo} alt={child.name} />
                                     <AvatarFallback>{child.name.charAt(0).toUpperCase()}</AvatarFallback>
                                 </Avatar>
-                                <span className="font-medium">{child.name}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{child.name}</span>
+                                  {child.updatedByParentAt && (
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <History className="h-4 w-4 text-accent" />
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Updated by parent on {new Date(child.updatedByParentAt.toDate()).toLocaleDateString()}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </div>
                             </div>
                         </TableCell>
                         <TableCell className="hidden md:table-cell">

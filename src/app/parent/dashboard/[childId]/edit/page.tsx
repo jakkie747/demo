@@ -24,6 +24,7 @@ import type { Child } from "@/lib/types";
 import { getChildById, updateChild } from "@/services/childrenService";
 import { getAfterschoolChildById, updateAfterschoolChild } from "@/services/afterschoolService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+import { serverTimestamp } from "firebase/firestore";
 
 const parentEditSchema = z.object({
   parentPhone: z.string().min(10, "Please enter a valid phone number"),
@@ -116,6 +117,7 @@ export default function ParentEditChildPage() {
                 medicalConditions: values.medicalConditions,
                 additionalNotes: values.additionalNotes,
                 photo: photoUrl,
+                updatedByParentAt: serverTimestamp(),
             };
 
             const updater = program === 'preschool' ? updateChild : updateAfterschoolChild;

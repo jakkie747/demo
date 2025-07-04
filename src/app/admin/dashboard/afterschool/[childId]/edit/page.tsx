@@ -26,6 +26,7 @@ import type { Child } from "@/lib/types";
 import { getAfterschoolChildById, updateAfterschoolChild } from "@/services/afterschoolService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
 import { firebaseConfig } from "@/lib/firebase";
+import { deleteField } from "firebase/firestore";
 
 const childEditFormSchema = z.object({
   name: z.string().min(2, "Name is too short"),
@@ -126,7 +127,7 @@ export default function EditAfterschoolChildPage() {
                 photoUrl = await uploadImage(file, 'children');
             }
 
-            const updateData: Partial<Omit<Child, 'id'>> = {
+            const updateData: Partial<Omit<Child, 'id'>> & { updatedByParentAt?: any } = {
                 name: values.name,
                 dateOfBirth: values.dateOfBirth,
                 gender: values.gender,
@@ -141,6 +142,10 @@ export default function EditAfterschoolChildPage() {
                 additionalNotes: values.additionalNotes,
                 photo: photoUrl,
             };
+
+            if (child.updatedByParentAt) {
+                updateData.updatedByParentAt = deleteField();
+            }
 
             await updateAfterschoolChild(child.id, updateData);
             
