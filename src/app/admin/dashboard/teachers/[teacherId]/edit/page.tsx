@@ -93,23 +93,28 @@ export default function EditTeacherPage() {
         setIsSaving(true);
         setSubmissionError(null);
         try {
-            let photoUrl = teacher.photo;
             const file = values.photo?.[0];
 
-            if (file) {
-                if (teacher.photo && teacher.photo.includes('firebasestorage')) {
-                    await deleteImageFromUrl(teacher.photo);
-                }
-                photoUrl = await uploadImage(file, 'teachers');
-            }
-
-            const updatedData: Partial<Teacher> = {
+            // Start with a base payload that doesn't include the photo
+            const updatedData: Partial<Omit<Teacher, 'id' | 'uid' | 'email'>> = {
                 name: values.name,
                 role: values.role,
                 contactNumber: values.contactNumber,
                 homeAddress: values.homeAddress,
-                photo: photoUrl,
             };
+
+            if (file) {
+                // If a new photo is uploaded, delete the old one (if it exists and is not a placeholder)
+                if (teacher.photo && teacher.photo.includes('firebasestorage')) {
+                    await deleteImageFromUrl(teacher.photo);
+                }
+                // Upload the new photo and add its URL to the payload
+                const photoUrl = await uploadImage(file, 'teachers');
+                updatedData.photo = photoUrl;
+            }
+            // If no new photo is uploaded, the `photo` field is not added to `updatedData`,
+            // and the existing value in Firestore remains unchanged. This prevents the
+            // "undefined" error.
 
             await updateTeacher(teacher.id, updatedData);
             toast({ title: t('teacherUpdated'), description: t('teacherUpdatedDesc', { name: values.name }) });
