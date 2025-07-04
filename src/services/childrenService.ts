@@ -1,4 +1,5 @@
 
+
 import { db } from '@/lib/firebase';
 import { collection, getDocs, addDoc, writeBatch, doc, query, orderBy, updateDoc, deleteDoc, getDoc, where } from 'firebase/firestore';
 import type { Child } from '@/lib/types';
@@ -54,8 +55,8 @@ export const getChildrenByParentEmail = async (email: string): Promise<Child[]> 
             getDocs(afterschoolQuery)
         ]);
 
-        const preschoolChildren = childrenSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Child));
-        const afterschoolChildren = afterschoolSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Child));
+        const preschoolChildren = childrenSnapshot.docs.map(doc => ({ id: doc.id, program: 'preschool', ...doc.data() } as Child));
+        const afterschoolChildren = afterschoolSnapshot.docs.map(doc => ({ id: doc.id, program: 'afterschool', ...doc.data() } as Child));
         
         return [...preschoolChildren, ...afterschoolChildren];
 

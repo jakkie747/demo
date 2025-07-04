@@ -1,4 +1,5 @@
 
+
 import type { TranslationKey } from "@/lib/translations";
 
 export interface Child {
@@ -16,6 +17,7 @@ export interface Child {
   emergencyContactPhone: string;
   previousPreschool: 'yes' | 'no';
   additionalNotes?: string;
+  program?: 'preschool' | 'afterschool';
 }
 
 export interface LinkedChildInfo {

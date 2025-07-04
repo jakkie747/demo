@@ -2,18 +2,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { getChildrenByParentEmail } from "@/services/childrenService";
-import { getReportsByChildId } from "@/services/reportService";
 import type { Child, DailyReport } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from "next/image";
-import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, NotebookPen, AlertTriangle } from "lucide-react";
+import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, NotebookPen, AlertTriangle, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { getReportsByChildId } from "@/services/reportService";
 
 const moodConfig = {
     happy: { icon: Smile, color: "text-green-500", label: "Happy" },
@@ -132,15 +133,23 @@ function ChildSection({ child }: { child: Child }) {
 
   return (
     <div key={child.id} className="space-y-6">
-        <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-                <AvatarImage src={child.photo} alt={child.name} />
-                <AvatarFallback>{child.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight">Daily Reports for {child.name}</h2>
-                <p className="text-muted-foreground">Here are the latest updates from the classroom.</p>
+        <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                    <AvatarImage src={child.photo} alt={child.name} />
+                    <AvatarFallback>{child.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Daily Reports for {child.name}</h2>
+                    <p className="text-muted-foreground">Here are the latest updates from the classroom.</p>
+                </div>
             </div>
+            <Button asChild variant="outline">
+                <Link href={`/parent/dashboard/${child.id}/edit?program=${child.program}`}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Profile
+                </Link>
+            </Button>
         </div>
 
       {isLoadingReports ? (
