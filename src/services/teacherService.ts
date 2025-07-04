@@ -24,7 +24,7 @@ export const addTeacher = async (uid: string, teacherData: Omit<Teacher, 'id' | 
     );
 };
 
-export const updateTeacher = async (teacherId: string, teacherData: Partial<Omit<Teacher, 'id' | 'uid' | 'email' | 'role'>>): Promise<void> => {
+export const updateTeacher = async (teacherId: string, teacherData: Partial<Omit<Teacher, 'id' | 'uid' | 'email'>>): Promise<void> => {
     if (!db) throw new Error("Firebase is not configured.");
     const teacherDocRef = doc(db, 'teachers', teacherId);
     await promiseWithTimeout(

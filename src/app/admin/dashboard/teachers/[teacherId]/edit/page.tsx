@@ -16,6 +16,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,9 +25,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { Teacher } from "@/lib/types";
 import { getTeacherByUid, updateTeacher } from "@/services/teacherService";
 import { uploadImage, deleteImageFromUrl } from "@/services/storageService";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 
 const teacherFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
+  role: z.enum(['admin', 'teacher']),
   contactNumber: z.string().optional(),
   homeAddress: z.string().optional(),
   photo: z.any().optional(),
@@ -38,6 +41,7 @@ export default function EditTeacherPage() {
     const router = useRouter();
     const params = useParams();
     const teacherId = params.teacherId as string;
+    const { user: currentUser } = useAdminAuth();
 
     const [teacher, setTeacher] = useState<Teacher | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,6 +52,7 @@ export default function EditTeacherPage() {
         resolver: zodResolver(teacherFormSchema),
         defaultValues: {
             name: "",
+            role: "teacher",
             contactNumber: "",
             homeAddress: "",
             photo: undefined,
@@ -63,6 +68,7 @@ export default function EditTeacherPage() {
                 setTeacher(teacherData);
                 form.reset({
                     name: teacherData.name,
+                    role: teacherData.role || 'teacher',
                     contactNumber: teacherData.contactNumber || "",
                     homeAddress: teacherData.homeAddress || "",
                     photo: undefined,
@@ -99,6 +105,7 @@ export default function EditTeacherPage() {
 
             const updatedData: Partial<Teacher> = {
                 name: values.name,
+                role: values.role,
                 contactNumber: values.contactNumber,
                 homeAddress: values.homeAddress,
                 photo: photoUrl,
@@ -166,6 +173,26 @@ export default function EditTeacherPage() {
                             <FormField control={form.control} name="name" render={({ field }) => (
                                 <FormItem><FormLabel>{t('teacherName')}</FormLabel><FormControl><Input {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
                             )} />
+                            <FormField control={form.control} name="role" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('role')}</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSaving || teacherId === currentUser?.uid}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a role" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="teacher">Teacher</SelectItem>
+                                            <SelectItem value="admin">Admin</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormDescription>
+                                        {teacherId === currentUser?.uid ? "You cannot change your own role." : "Admins have full permission to manage all app content."}
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                             )} />
                             <FormField control={form.control} name="contactNumber" render={({ field }) => (
                                 <FormItem><FormLabel>{t('contactNumber')}</FormLabel><FormControl><Input {...field} disabled={isSaving} /></FormControl><FormMessage /></FormItem>
                             )} />
