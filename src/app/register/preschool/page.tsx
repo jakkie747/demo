@@ -5,7 +5,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle, HeartPulse, Shield, FileText, Calendar, LockKeyhole, Eye, EyeOff } from "lucide-react";
+import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle, HeartPulse, Shield, FileText, Calendar as CalendarIcon, LockKeyhole, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { format } from "date-fns";
@@ -46,6 +46,7 @@ import { uploadImage } from "@/services/storageService";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -241,7 +242,7 @@ export default function PreschoolRegisterPage() {
                                   ) : (
                                     <span>{t('egDob')}</span>
                                   )}
-                                  <Calendar className="ml-auto h-4 w-4 opacity-50" />
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
