@@ -273,17 +273,19 @@ export default function ManageTeachersPage() {
             <AlertDialogHeader>
                 <AlertDialogTitle>Action Required: Final Deletion Step</AlertDialogTitle>
             </AlertDialogHeader>
-            <div className="space-y-4 text-sm text-muted-foreground">
-                <p>The profile for <strong>{showManualDeleteNotice?.name}</strong> has been removed from the app.</p>
-                <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Important Final Step</AlertTitle>
-                    <AlertDescription>
-                        To permanently remove their login access, you must now delete the user from the Firebase Authentication console.
-                    </AlertDescription>
-                </Alert>
-                <p>User to delete: <strong>{showManualDeleteNotice?.email}</strong></p>
-            </div>
+            <AlertDialogDescription asChild>
+                <div className="space-y-4 text-sm text-muted-foreground">
+                    <span>The profile for <strong>{showManualDeleteNotice?.name}</strong> has been removed from the app.</span>
+                    <Alert variant="destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Important Final Step</AlertTitle>
+                        <AlertDescription>
+                            To permanently remove their login access, you must now delete the user from the Firebase Authentication console.
+                        </AlertDescription>
+                    </Alert>
+                    <span>User to delete: <strong>{showManualDeleteNotice?.email}</strong></span>
+                </div>
+            </AlertDialogDescription>
             <AlertDialogFooter>
                 <AlertDialogCancel>Close</AlertDialogCancel>
                 <AlertDialogAction asChild>
@@ -297,3 +299,4 @@ export default function ManageTeachersPage() {
 
     </div>
   );
+}
