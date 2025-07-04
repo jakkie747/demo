@@ -249,7 +249,7 @@ export default function AfterschoolRegisterPage() {
                             <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                captionLayout="dropdown-buttons"
+                                captionLayout="dropdown"
                                 fromYear={new Date().getFullYear() - 18}
                                 toYear={new Date().getFullYear() - 4}
                                 selected={field.value ? new Date(field.value) : undefined}

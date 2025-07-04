@@ -249,7 +249,7 @@ export default function PreschoolRegisterPage() {
                             <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                captionLayout="dropdown-buttons"
+                                captionLayout="dropdown"
                                 fromYear={new Date().getFullYear() - 7}
                                 toYear={new Date().getFullYear()}
                                 selected={field.value ? new Date(field.value) : undefined}
