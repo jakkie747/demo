@@ -72,7 +72,7 @@ export const translations = {
     egEmergencyContact: 'e.g. Grandma Smith',
     emergencyContactPhone: 'Emergency Contact Phone',
     egEmergencyPhone: '(987) 654-3210',
-    medicalConditions: 'Medical Conditions / Allergies',
+    medicalConditions: 'Medical Conditions / Allergieë',
     medicalConditionsDesc: 'Please list any allergies, medications, or other medical conditions.',
     egMedical: 'e.g. Peanut allergy, uses an inhaler for asthma.',
     otherInfo: 'Other Information',
@@ -129,6 +129,7 @@ export const translations = {
     manageGallery: 'Manage Gallery',
     manageDocuments: 'Manage Documents',
     manageTeachers: 'Manage Teachers',
+    manageParents: 'Manage Parents',
     composeMessage: 'Compose Message',
     aiAssistant: 'AI Assistant',
 
@@ -151,6 +152,7 @@ export const translations = {
     manageGalleryDesc: 'Add or update photos in the public gallery.',
     manageDocumentsDesc: 'Upload and manage shared documents like newsletters.',
     manageTeachersDesc: 'View, edit, and manage teacher profiles.',
+    manageParentsDesc: 'View and edit parent contact information.',
     composeMessageDesc: 'Send a message to all registered parents.',
     aiAssistantDesc: 'Generate creative ideas for classroom activities and stories.',
 
@@ -187,6 +189,17 @@ export const translations = {
     parentDetails: 'Parent Details',
     emergencyContact: 'Emergency Contact',
     medicalNotes: 'Medical Notes',
+
+    // Admin Parents Page
+    allParents: 'All Parents',
+    allParentsDesc: 'A list of all unique parents registered in the system.',
+    parentName: "Parent's Name",
+    linkedChildren: 'Linked Children',
+    editParent: 'Edit Parent',
+    updateParentDetails: 'Update Parent Details',
+    parentUpdated: 'Parent Updated!',
+    parentUpdatedDesc: "The details for {name} have been updated across all their children's profiles.",
+    emailCannotBeChanged: 'Email address cannot be changed as it is linked to the login account.',
 
     // Admin Events Page
     editEvent: 'Edit Event',
@@ -470,6 +483,7 @@ export const translations = {
     manageGallery: 'Bestuur Galery',
     manageDocuments: 'Bestuur Dokumente',
     manageTeachers: 'Bestuur Onderwysers',
+    manageParents: 'Bestuur Ouers',
     composeMessage: 'Stel Boodskap Op',
     aiAssistant: 'KI-assistent',
 
@@ -492,6 +506,7 @@ export const translations = {
     manageGalleryDesc: "Voeg foto's by of dateer die openbare galery op.",
     manageDocumentsDesc: 'Laai en bestuur gedeelde dokumente soos nuusbriewe.',
     manageTeachersDesc: 'Sien, wysig en bestuur onderwyserprofiele.',
+    manageParentsDesc: 'Sien en wysig ouer kontakbesonderhede.',
     composeMessageDesc: "'n Boodskap aan alle geregistreerde ouers te stuur.",
     aiAssistantDesc: 'Genereer kreatiewe idees vir klaskameraktiwiteite en stories.',
 
@@ -528,6 +543,17 @@ export const translations = {
     parentDetails: 'Ouerbesonderhede',
     emergencyContact: 'Noodkontak',
     medicalNotes: 'Mediese Notas',
+
+    // Admin Parents Page
+    allParents: 'Alle Ouers',
+    allParentsDesc: "'n Lys van alle unieke ouers wat in die stelsel geregistreer is.",
+    parentName: "Ouer se Naam",
+    linkedChildren: 'Gekoppelde Kinders',
+    editParent: 'Wysig Ouer',
+    updateParentDetails: 'Dateer Ouerbesonderhede op',
+    parentUpdated: 'Ouer Opgedateer!',
+    parentUpdatedDesc: "Die besonderhede vir {name} is opgedateer oor al hul kinderprofiele.",
+    emailCannotBeChanged: 'E-posadres kan nie verander word nie, aangesien dit aan die aanmeldrekening gekoppel is.',
 
     // Admin Events Page
     editEvent: 'Wysig Geleentheid',

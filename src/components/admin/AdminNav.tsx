@@ -56,6 +56,12 @@ export function AdminNav() {
       roles: ['admin'] // Only visible to admins
     },
     {
+      href: "/admin/dashboard/parents",
+      label: t('manageParents'),
+      icon: Users,
+      roles: ['admin']
+    },
+    {
       href: "/admin/dashboard/notifications",
       label: t('composeMessage'),
       icon: Mail,

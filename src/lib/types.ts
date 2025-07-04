@@ -18,6 +18,13 @@ export interface Child {
   additionalNotes?: string;
 }
 
+export interface Parent {
+  email: string;
+  name: string;
+  phone: string;
+  children: string[];
+}
+
 export interface Event {
   id: string;
   title: string;
