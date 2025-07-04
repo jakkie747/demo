@@ -1,9 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -11,72 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
-import { useLanguage } from "@/context/LanguageContext";
+import { ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
-import { auth, isFirebaseConfigured } from "@/lib/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+
 
 export default function ParentRegisterPage() {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const { t } = useLanguage();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isConfigured] = useState(isFirebaseConfigured());
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (password !== confirmPassword) {
-        setError("Passwords do not match.");
-        return;
-    }
-    
-    setIsLoading(true);
-
-    if (!auth) {
-        setError("Firebase is not configured. Please contact the school.");
-        setIsLoading(false);
-        return;
-    }
-
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      
-      toast({
-        title: "Account Created!",
-        description: "You have been successfully registered and logged in.",
-      });
-      router.push("/parent/dashboard");
-
-    } catch (err: any) {
-       switch (err.code) {
-        case 'auth/email-already-in-use':
-            setError("An account with this email already exists.");
-            break;
-        case 'auth/weak-password':
-            setError("Password is too weak. It should be at least 6 characters.");
-            break;
-        default:
-            setError("An unexpected error occurred. Please try again.");
-            console.error("Registration Error:", err);
-            break;
-       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="flex items-center justify-center min-h-dvh px-4 py-8">
       <div className="w-full max-w-md mx-auto">
@@ -86,73 +25,24 @@ export default function ParentRegisterPage() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="font-headline text-2xl">
-              Create Parent Account
+              Registration Has Moved
             </CardTitle>
             <CardDescription>
-                Register to view your child's daily reports.
+                To make things easier, parent account creation is now part of child registration.
             </CardDescription>
           </CardHeader>
           <CardContent>
-             {!isConfigured && (
-                <Alert variant="destructive" className="mb-4">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>System Unavailable</AlertTitle>
-                    <AlertDescription>
-                        Registration is currently unavailable. Please contact the school for assistance.
-                    </AlertDescription>
-                </Alert>
-            )}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('emailAddress')}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder={t('egEmail')}
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading || !isConfigured}
-                />
-                 <p className="text-xs text-muted-foreground">Important: Use the same email address you provided to the school during your child's main registration.</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">{t('password')}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading || !isConfigured}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isLoading || !isConfigured}
-                />
-              </div>
-              {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-              <div className="text-sm">
-                Already have an account?{' '}
-                <Link href="/parent-login" className="underline">
-                  Login here
+             <Alert variant="default" className="text-left">
+                <AlertTitle>How to Register</AlertTitle>
+                <AlertDescription>
+                    Please click the button below to go to our main registration page. As you fill out your child's details, you'll also create your parent login at the same time.
+                </AlertDescription>
+             </Alert>
+            <Button asChild className="w-full mt-6">
+                <Link href="/register">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Go to Child Registration
                 </Link>
-              </div>
-              <Button
-                type="submit"
-                className="w-full font-semibold"
-                disabled={isLoading || !isConfigured}
-              >
-                {isLoading ? "Registering..." : "Create Account"}
-              </Button>
-            </form>
+            </Button>
           </CardContent>
         </Card>
       </div>

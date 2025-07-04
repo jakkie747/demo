@@ -1,11 +1,13 @@
+
 "use client";
 
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle, HeartPulse, Shield, FileText, Calendar } from "lucide-react";
+import { Baby, Home, User, Mail, Phone, Upload, AlertTriangle, HeartPulse, Shield, FileText, Calendar, LockKeyhole } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +42,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { addAfterschoolChild } from "@/services/afterschoolService";
 import type { Child } from "@/lib/types";
 import { uploadImage } from "@/services/storageService";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { auth, isFirebaseConfigured } from "@/lib/firebase";
 
 const formSchema = z.object({
   childName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
@@ -55,12 +57,18 @@ const formSchema = z.object({
   parentPhone: z.string().min(10, "Please enter a valid phone number"),
   address: z.string().min(10, "Please enter a valid address"),
 
+  password: z.string().min(6, "Password must be at least 6 characters."),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters."),
+
   emergencyContactName: z.string().min(2, "Name is too short").max(50, "Name is too long"),
   emergencyContactPhone: z.string().min(10, "Please enter a valid phone number"),
   
   medicalConditions: z.string().optional(),
   previousPreschool: z.enum(["yes", "no"]),
   additionalNotes: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 
@@ -82,6 +90,8 @@ export default function AfterschoolRegisterPage() {
       parentEmail: "",
       parentPhone: "",
       childPhoto: undefined,
+      password: "",
+      confirmPassword: "",
       emergencyContactName: "",
       emergencyContactPhone: "",
       medicalConditions: "",
@@ -91,7 +101,7 @@ export default function AfterschoolRegisterPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmissionError(null);
-    if (!isConfigured) {
+    if (!isConfigured || !auth) {
       setSubmissionError({
         title: "Registration System Unavailable",
         description: "The registration system is currently offline. Please contact the school directly to register.",
@@ -100,14 +110,19 @@ export default function AfterschoolRegisterPage() {
     }
 
     setIsSubmitting(true);
-    const file = values.childPhoto?.[0];
-    let photoUrl = "https://placehold.co/100x100.png";
 
     try {
+      // 1. Create Auth user
+      await createUserWithEmailAndPassword(auth, values.parentEmail, values.password);
+
+      // 2. Upload photo if it exists
+      const file = values.childPhoto?.[0];
+      let photoUrl = "https://placehold.co/100x100.png";
       if (file) {
-        photoUrl = await uploadImage(file, 'children'); // Storing in the same folder is fine
+        photoUrl = await uploadImage(file, 'children');
       }
 
+      // 3. Create Child document in Firestore
       const newChildData: Omit<Child, "id"> = {
         name: values.childName,
         dateOfBirth: values.dateOfBirth,
@@ -126,19 +141,27 @@ export default function AfterschoolRegisterPage() {
 
       await addAfterschoolChild(newChildData);
 
+      // 4. Toast and Redirect
       toast({
         title: t('regSuccessTitle'),
-        description: t('regSuccessDesc', { childName: values.childName }),
+        description: t('regAndLoginSuccessDesc'),
       });
-      form.reset();
-      router.push('/');
+      // User is automatically logged in by Firebase after account creation.
+      router.push('/parent/dashboard');
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Afterschool Registration Error:", error);
-        setSubmissionError({
-            title: "Registration Failed",
-            description: "An unexpected error occurred while submitting your registration. This might be a temporary network issue. Please check your connection and try again in a few moments. If the problem persists, please contact the school directly for assistance.",
-        });
+         if (error.code === 'auth/email-already-in-use') {
+             setSubmissionError({
+                title: "Email Already Registered",
+                description: "An account with this email address already exists. Please log in instead or use a different email.",
+            });
+        } else {
+            setSubmissionError({
+                title: "Registration Failed",
+                description: "An unexpected error occurred. This might be a temporary network issue. Please check your connection and try again. If the problem persists, please contact the school.",
+            });
+        }
     } finally {
       setIsSubmitting(false);
     }
@@ -342,6 +365,43 @@ export default function AfterschoolRegisterPage() {
                 />
               </div>
 
+               {/* Create Parent Account */}
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-xl font-headline text-accent/80 flex items-center gap-2">
+                    <LockKeyhole /> {t('createParentAccountTitle')}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{t('createParentAccountDesc')}</p>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <FormField
+                          control={form.control}
+                          name="password"
+                          render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>{t('password')}</FormLabel>
+                              <FormControl>
+                                  <Input type="password" {...field} disabled={isSubmitting} />
+                              </FormControl>
+                              <FormDescription>{t('passwordDesc')}</FormDescription>
+                              <FormMessage />
+                          </FormItem>
+                          )}
+                      />
+                      <FormField
+                          control={form.control}
+                          name="confirmPassword"
+                          render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>{t('confirmPassword')}</FormLabel>
+                              <FormControl>
+                                  <Input type="password" {...field} disabled={isSubmitting} />
+                              </FormControl>
+                              <FormMessage />
+                          </FormItem>
+                          )}
+                      />
+                   </div>
+                </div>
+
                {/* Emergency & Medical Information */}
                <div className="space-y-4 pt-4">
                  <h3 className="text-xl font-headline text-accent/80 flex items-center gap-2">
@@ -465,10 +525,7 @@ export default function AfterschoolRegisterPage() {
                     />
               </div>
 
-              <Button type="submit" size="lg" className="w-full font-semibold" disabled={isSubmitting || !isConfigured}>
-                 {isSubmitting ? "Submitting..." : t('submitRegistration')}
-              </Button>
-               {submissionError && (
+              {submissionError && (
                 <Alert variant="destructive" className="mt-6">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertTitle>{submissionError.title}</AlertTitle>
@@ -477,6 +534,9 @@ export default function AfterschoolRegisterPage() {
                   </AlertDescription>
                 </Alert>
               )}
+              <Button type="submit" size="lg" className="w-full font-semibold" disabled={isSubmitting || !isConfigured}>
+                 {isSubmitting ? "Submitting..." : t('submitRegistration')}
+              </Button>
             </form>
           </Form>
         </CardContent>

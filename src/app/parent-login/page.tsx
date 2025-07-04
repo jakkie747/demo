@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -85,12 +85,20 @@ export default function ParentLoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {!isConfigured && (
+            {!isConfigured ? (
                 <Alert variant="destructive" className="mb-4">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>System Unavailable</AlertTitle>
                     <AlertDescription>
                         Login is currently unavailable. Please contact the school for assistance.
+                    </AlertDescription>
+                </Alert>
+            ) : (
+                 <Alert className="mb-4">
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>New User?</AlertTitle>
+                    <AlertDescription>
+                        Your parent account is created automatically when you <Link href="/register" className="font-semibold underline">register your child</Link>.
                     </AlertDescription>
                 </Alert>
             )}
@@ -119,12 +127,6 @@ export default function ParentLoginPage() {
                 />
               </div>
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-              <div className="text-sm">
-                Don't have an account?{' '}
-                <Link href="/parent-register" className="underline">
-                  Register here
-                </Link>
-              </div>
               <Button
                 type="submit"
                 className="w-full font-semibold"
