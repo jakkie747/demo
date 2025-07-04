@@ -31,6 +31,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -78,7 +84,7 @@ export default function DashboardPage() {
     fetchData();
   }, [isConfigured, toast, authLoading, fetchData]);
 
-  const handleExportCSV = () => {
+  const handleExport = (format: 'csv' | 'tsv') => {
     if (children.length === 0) {
       toast({ variant: "destructive", title: "No Data", description: "There are no children to export." });
       return;
@@ -90,44 +96,50 @@ export default function DashboardPage() {
       "emergencyContactPhone", "previousPreschool", "additionalNotes"
     ];
     
-    const escapeCSV = (value: string | undefined | null) => {
+    const delimiter = format === 'csv' ? ',' : '\t';
+    const mimeType = format === 'csv' ? 'text/csv;charset=utf-8;' : 'text/tab-separated-values;charset=utf-8;';
+    const fileExtension = format;
+    
+    const escapeField = (value: string | undefined | null) => {
         if (value === null || value === undefined) return '';
         let str = String(value);
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        if (format === 'csv' && (str.includes(',') || str.includes('"') || str.includes('\n'))) {
             return `"${str.replace(/"/g, '""')}"`;
         }
-        return str;
+        return str.replace(/\n|\r/g, ' ');
     };
 
     const rows = children.map(child => 
-        headers.map(header => escapeCSV(child[header as keyof Child])).join(',')
+        headers.map(header => escapeField(child[header as keyof Child])).join(delimiter)
     );
 
-    const csvContent = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const fileContent = [headers.join(delimiter), ...rows].join('\n');
+    const blob = new Blob([fileContent], { type: mimeType });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", "children-export.csv");
+    link.setAttribute("download", `children-export.${fileExtension}`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const headers = "name,dateOfBirth,gender,address,parent,parentEmail,parentPhone,medicalConditions,emergencyContactName,emergencyContactPhone,previousPreschool,additionalNotes";
+  const headersForImport = "name,dateOfBirth,gender,address,parent,parentEmail,parentPhone,medicalConditions,emergencyContactName,emergencyContactPhone,previousPreschool,additionalNotes";
 
   const handleCopyHeaders = () => {
-    navigator.clipboard.writeText(headers);
-    toast({ title: "Copied!", description: "CSV headers copied to clipboard." });
+    navigator.clipboard.writeText(headersForImport);
+    toast({ title: "Copied!", description: "CSV/TSV headers copied to clipboard." });
   };
   
-  const handleImportCSV = async () => {
+  const handleImport = async () => {
     if (!importFile) {
         toast({ variant: "destructive", title: t('noFileSelected') });
         return;
     }
     setIsImporting(true);
+
+    const isTsv = importFile.name.endsWith('.tsv') || importFile.type === 'text/tab-separated-values';
 
     const parseCsvRow = (row: string): string[] => {
       const result: string[] = [];
@@ -136,11 +148,10 @@ export default function DashboardPage() {
       for (let i = 0; i < row.length; i++) {
         const char = row[i];
         const nextChar = row[i + 1];
-
         if (char === '"') {
           if (inQuotes && nextChar === '"') {
-            field += '"'; // This is an escaped quote
-            i++; // Skip the next quote
+            field += '"';
+            i++;
           } else {
             inQuotes = !inQuotes;
           }
@@ -155,6 +166,10 @@ export default function DashboardPage() {
       return result;
     };
 
+    const parseRow = (row: string): string[] => {
+      return isTsv ? row.split('\t') : parseCsvRow(row);
+    };
+
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -162,14 +177,14 @@ export default function DashboardPage() {
             const text = e.target?.result as string;
             const lines = text.split('\n').filter(line => line.trim() !== '');
             if (lines.length < 2) {
-                throw new Error("CSV file must have a header row and at least one data row.");
+                throw new Error("File must have a header row and at least one data row.");
             }
             
-            const header = parseCsvRow(lines[0].trim().replace(/\r/g, ''));
+            const header = parseRow(lines[0].trim().replace(/\r/g, ''));
             const dataRows = lines.slice(1);
 
             const newChildren: Omit<Child, 'id'>[] = dataRows.map(rowStr => {
-                const values = parseCsvRow(rowStr.trim().replace(/\r/g, ''));
+                const values = parseRow(rowStr.trim().replace(/\r/g, ''));
                 const childObject: any = {};
                 header.forEach((h, i) => {
                     childObject[h.trim()] = values[i] || '';
@@ -385,24 +400,24 @@ export default function DashboardPage() {
                 <CardContent className="flex flex-wrap gap-2">
                     <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
                         <DialogTrigger asChild>
-                            <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />{t('importChildren')}</Button>
+                            <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />Import Data</Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                            <DialogTitle>{t('importFromCSV')}</DialogTitle>
+                            <DialogTitle>Import from CSV / TSV</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">{t('importCSVDesc')}</p>
+                            <p className="text-sm text-muted-foreground">Select a CSV or TSV file to import. The file must have headers matching the child profile fields.</p>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
-                                    <p className="text-sm font-semibold text-foreground">Required CSV Header:</p>
+                                    <p className="text-sm font-semibold text-foreground">Required CSV/TSV Header:</p>
                                     <Button variant="ghost" size="sm" onClick={handleCopyHeaders} className="h-7">
                                         <Copy className="mr-2 h-3 w-3" />
                                         Copy
                                     </Button>
                                 </div>
                                 <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md break-all block">
-                                    {headers}
+                                    {headersForImport}
                                 </code>
                             </div>
                             <Alert variant="default" className="text-sm">
@@ -415,11 +430,11 @@ export default function DashboardPage() {
                             </Alert>
                         </div>
                         <div className="grid w-full items-center gap-1.5 mt-4">
-                            <Label htmlFor="csv-file">{t('selectFile')}</Label>
-                            <Input id="csv-file" type="file" accept=".csv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
+                            <Label htmlFor="import-file">Select File</Label>
+                            <Input id="import-file" type="file" accept=".csv,.tsv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
                         </div>
                         <DialogFooter className="sm:justify-start mt-4">
-                            <Button onClick={handleImportCSV} disabled={!importFile || isImporting}>
+                            <Button onClick={handleImport} disabled={!importFile || isImporting}>
                                 {isImporting ? "Importing..." : t('confirmImport')}
                             </Button>
                             <DialogClose asChild>
@@ -430,7 +445,15 @@ export default function DashboardPage() {
                         </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Button onClick={handleExportCSV} variant="outline" disabled={isLoading}><FileDown className="mr-2 h-4 w-4" />{t('exportChildren')}</Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                         <Button onClick={() => handleExport('csv')} variant="outline" disabled={isLoading}><FileDown className="mr-2 h-4 w-4" />Export Data</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleExport('csv')}>Export as CSV</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleExport('tsv')}>Export as TSV</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                 </CardContent>
             </Card>
           </div>
@@ -439,3 +462,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
