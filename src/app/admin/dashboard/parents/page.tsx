@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from 'next/link';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -193,12 +194,25 @@ export default function ManageParentsPage() {
                       <TableCell className="font-medium">{parent.name}</TableCell>
                       <TableCell>{parent.phone}</TableCell>
                       <TableCell>{parent.email}</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <div className="flex flex-wrap gap-1">
-                          {parent.children.map(childName => (
-                            <Badge key={childName} variant="secondary">{childName}</Badge>
-                          ))}
-                        </div>
+                      <TableCell className="hidden align-top md:table-cell">
+                          <div className="flex flex-col items-start gap-2">
+                            {parent.children.map(child => (
+                              <div key={child.id} className="flex items-center justify-start gap-2">
+                                <Badge variant="secondary" className="font-normal">{child.name}</Badge>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button asChild variant="ghost" size="icon" className="h-6 w-6">
+                                      <Link href={`/admin/dashboard/${child.program === 'preschool' ? 'children' : 'afterschool'}/${child.id}/edit`}>
+                                        <Edit className="h-3.5 w-3.5" />
+                                        <span className="sr-only">Edit {child.name}'s Profile</span>
+                                      </Link>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent><p>Edit {child.name}'s Profile</p></TooltipContent>
+                                </Tooltip>
+                              </div>
+                            ))}
+                          </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <Tooltip>

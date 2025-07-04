@@ -1,7 +1,7 @@
 
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, writeBatch } from 'firebase/firestore';
-import type { Child, Parent } from '@/lib/types';
+import type { Child, Parent, LinkedChildInfo } from '@/lib/types';
 import { promiseWithTimeout } from '@/lib/utils';
 
 const TIMEOUT_DURATION = 20000; // 20 seconds for potentially large queries
@@ -17,26 +17,36 @@ export const getParents = async (): Promise<Parent[]> => {
             getDocs(afterschoolCollectionRef)
         ]);
 
-        const allChildrenDocs = [...childrenSnapshot.docs, ...afterschoolSnapshot.docs];
         const parentsMap = new Map<string, Parent>();
 
-        allChildrenDocs.forEach(doc => {
-            const child = doc.data() as Omit<Child, 'id'>;
+        const processChildDoc = (doc: any, program: 'preschool' | 'afterschool') => {
+            const child = { id: doc.id, ...doc.data() } as Child;
             if (!child.parentEmail) return;
+
+            const linkedChildInfo: LinkedChildInfo = { id: child.id, name: child.name, program };
 
             if (parentsMap.has(child.parentEmail)) {
                 const parent = parentsMap.get(child.parentEmail)!;
-                parent.children.push(child.name);
+                // Add child if not already listed
+                if (!parent.children.some(c => c.id === child.id)) {
+                  parent.children.push(linkedChildInfo);
+                }
+                // Update parent details with most recent info
+                parent.name = child.parent;
+                parent.phone = child.parentPhone;
             } else {
                 parentsMap.set(child.parentEmail, {
                     email: child.parentEmail,
                     name: child.parent,
                     phone: child.parentPhone,
-                    children: [child.name],
+                    children: [linkedChildInfo],
                 });
             }
-        });
+        };
 
+        childrenSnapshot.docs.forEach(doc => processChildDoc(doc, 'preschool'));
+        afterschoolSnapshot.docs.forEach(doc => processChildDoc(doc, 'afterschool'));
+        
         const parents = Array.from(parentsMap.values());
         return parents.sort((a, b) => a.name.localeCompare(b.name));
 

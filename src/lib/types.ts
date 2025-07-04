@@ -18,11 +18,17 @@ export interface Child {
   additionalNotes?: string;
 }
 
+export interface LinkedChildInfo {
+  id: string;
+  name: string;
+  program: 'preschool' | 'afterschool';
+}
+
 export interface Parent {
   email: string;
   name: string;
   phone: string;
-  children: string[];
+  children: LinkedChildInfo[];
 }
 
 export interface Event {
