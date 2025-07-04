@@ -85,7 +85,7 @@ export const translations = {
     egNotes: 'e.g. Loves dinosaurs, is shy at first.',
     submitRegistration: 'Register Child & Create Account',
     regSuccessTitle: 'Registration Submitted!',
-    regSuccessDesc: 'Thank you for registering {childName}. We will be in touch shortly.',
+    regSuccessDesc: 'Thank you for registering {childName}. You will be redirected to the home page shortly.',
     regAndLoginSuccessDesc: "Thank you! Your account has been created and you're now logged in.",
 
     // Events Page
@@ -123,7 +123,7 @@ export const translations = {
     
     // AdminNav
     dashboard: 'Dashboard',
-    childrenProfiles: 'Children Profiles',
+    preschoolChildrenNav: 'Preschool Children',
     afterschoolChildren: 'Afterschool Children',
     manageEvents: 'Manage Events',
     manageGallery: 'Manage Gallery',
@@ -140,9 +140,12 @@ export const translations = {
     createNewEvent: 'Create New Event',
     newEvent: 'New Event',
     quickLinks: 'Quick Links',
-    viewAllChildren: 'View All Children',
-    viewAllChildrenDesc: 'See and manage all registered child profiles.',
-    manageChildren: 'Manage Children',
+    viewAllChildren: 'View Preschool Children',
+    viewAllChildrenDesc: 'See and manage all registered preschool child profiles.',
+    manageChildren: 'Manage Preschool',
+    viewAllAfterschoolChildren: 'View Afterschool Children',
+    viewAllAfterschoolChildrenDesc: 'See and manage all registered afterschool child profiles.',
+    manageAfterschoolChildren: 'Manage Afterschool',
     manageEventsCard: 'Manage Events',
     manageEventsDesc: 'Create new events or edit existing ones.',
     manageGalleryDesc: 'Add or update photos in the public gallery.',
@@ -152,7 +155,8 @@ export const translations = {
     aiAssistantDesc: 'Generate creative ideas for classroom activities and stories.',
 
     // Admin Children Page
-    registeredChildrenTitle: 'Registered Children',
+    preschoolChildrenDesc: 'All children registered for the standard daytime program.',
+    afterschoolChildrenDesc: 'All children registered for the afterschool care program.',
     photo: 'Photo',
     profileNo: 'Profile No.',
     childsName: "Child's Name",
@@ -422,7 +426,7 @@ export const translations = {
     egNotes: 'bv. Lief vir dinosourusse, is aanvanklik skaam.',
     submitRegistration: 'Registreer Kind & Skep Rekening',
     regSuccessTitle: 'Registrasie Ingedien!',
-    regSuccessDesc: 'Dankie dat jy {childName} geregistreer het. Ons sal binnekort in aanraking wees.',
+    regSuccessDesc: 'Dankie dat jy {childName} geregistreer het. Jy sal binnekort na die tuisblad herlei word.',
     regAndLoginSuccessDesc: 'Dankie! Jou rekening is geskep en jy is nou aangemeld.',
 
     // Events Page
@@ -460,7 +464,7 @@ export const translations = {
 
     // AdminNav
     dashboard: 'Kontroleskerm',
-    childrenProfiles: 'Kinderprofiele',
+    preschoolChildrenNav: 'Kleuterskool Kinders',
     afterschoolChildren: 'Naskool Kinders',
     manageEvents: 'Bestuur Geleenthede',
     manageGallery: 'Bestuur Galery',
@@ -477,9 +481,12 @@ export const translations = {
     createNewEvent: 'Skep Nuwe Geleentheid',
     newEvent: 'Nuwe Geleentheid',
     quickLinks: 'Vinnige Skakels',
-    viewAllChildren: 'Sien Alle Kinders',
-    viewAllChildrenDesc: 'Sien en bestuur alle geregistreerde kinderprofiele.',
-    manageChildren: 'Bestuur Kinders',
+    viewAllChildren: 'Sien Kleuterskool Kinders',
+    viewAllChildrenDesc: 'Sien en bestuur alle geregistreerde kleuterskool kinderprofiele.',
+    manageChildren: 'Bestuur Kleuterskool',
+    viewAllAfterschoolChildren: 'Sien Naskool Kinders',
+    viewAllAfterschoolChildrenDesc: 'Sien en bestuur alle geregistreerde naskool kinderprofiele.',
+    manageAfterschoolChildren: 'Bestuur Naskool',
     manageEventsCard: 'Bestuur Geleenthede',
     manageEventsDesc: 'Skep nuwe geleenthede of wysig bestaandes.',
     manageGalleryDesc: "Voeg foto's by of dateer die openbare galery op.",
@@ -489,7 +496,8 @@ export const translations = {
     aiAssistantDesc: 'Genereer kreatiewe idees vir klaskameraktiwiteite en stories.',
 
     // Admin Children Page
-    registeredChildrenTitle: 'Geregistreerde Kinders',
+    preschoolChildrenDesc: 'Alle kinders wat vir die standaard dagprogram geregistreer is.',
+    afterschoolChildrenDesc: 'Alle kinders wat vir die naskoolversorgingsprogram geregistreer is.',
     photo: 'Foto',
     profileNo: 'Profielnr.',
     childsName: "Kind se Naam",

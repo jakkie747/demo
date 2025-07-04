@@ -21,7 +21,7 @@ export function AdminNav() {
     { href: "/admin/dashboard", label: t('dashboard'), icon: LayoutDashboard, roles: ['admin', 'teacher'] },
     {
       href: "/admin/dashboard/children",
-      label: t('childrenProfiles'),
+      label: t('preschoolChildrenNav'),
       icon: Users,
       roles: ['admin', 'teacher']
     },

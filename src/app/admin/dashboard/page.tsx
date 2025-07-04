@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Lightbulb, Mail, Briefcase, FileUp, FileDown, Copy } from "lucide-react";
+import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Lightbulb, Mail, Briefcase, FileUp, FileDown, Copy, LampDesk } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getChildren, addMultipleChildren } from "@/services/childrenService";
@@ -301,7 +301,7 @@ export default function DashboardPage() {
 
       <div>
         <h3 className="text-2xl font-semibold mb-4">{t("quickLinks")}</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <Card>
             <CardHeader>
               <CardTitle>{t("viewAllChildren")}</CardTitle>
@@ -311,6 +311,19 @@ export default function DashboardPage() {
               <Button asChild variant="secondary">
                 <Link href="/admin/dashboard/children">
                   {t("manageChildren")}
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("viewAllAfterschoolChildren")}</CardTitle>
+              <CardDescription>{t("viewAllAfterschoolChildrenDesc")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild variant="secondary">
+                <Link href="/admin/dashboard/afterschool">
+                  {t("manageAfterschoolChildren")}
                 </Link>
               </Button>
             </CardContent>
@@ -391,72 +404,70 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
           
-          <div>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Import / Export</CardTitle>
-                    <CardDescription>Bulk import or export children's data.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
-                    <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />Import Data</Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Import from CSV / TSV</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">Select a CSV or TSV file to import. The file must have headers matching the child profile fields.</p>
-                            <div>
-                                <div className="flex justify-between items-center mb-1">
-                                    <p className="text-sm font-semibold text-foreground">Required CSV/TSV Header:</p>
-                                    <Button variant="ghost" size="sm" onClick={handleCopyHeaders} className="h-7">
-                                        <Copy className="mr-2 h-3 w-3" />
-                                        Copy
-                                    </Button>
-                                </div>
-                                <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md break-all block">
-                                    {headersForImport}
-                                </code>
-                            </div>
-                            <Alert variant="default" className="text-sm">
-                                <AlertTriangle className="h-4 w-4" />
-                                <AlertTitle>Field Values</AlertTitle>
-                                <AlertDescription>
-                                    The <code className="text-xs bg-muted p-1 rounded-sm">gender</code> column must be one of <code className="text-xs bg-muted p-1 rounded-sm">male</code>, <code className="text-xs bg-muted p-1 rounded-sm">female</code>, or <code className="text-xs bg-muted p-1 rounded-sm">other</code>.<br/>
-                                    The <code className="text-xs bg-muted p-1 rounded-sm">previousPreschool</code> column must be <code className="text-xs bg-muted p-1 rounded-sm">yes</code> or <code className="text-xs bg-muted p-1 rounded-sm">no</code>.
-                                </AlertDescription>
-                            </Alert>
-                        </div>
-                        <div className="grid w-full items-center gap-1.5 mt-4">
-                            <Label htmlFor="import-file">Select File</Label>
-                            <Input id="import-file" type="file" accept=".csv,.tsv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
-                        </div>
-                        <DialogFooter className="sm:justify-start mt-4">
-                            <Button onClick={handleImport} disabled={!importFile || isImporting}>
-                                {isImporting ? "Importing..." : t('confirmImport')}
-                            </Button>
-                            <DialogClose asChild>
-                                <Button type="button" variant="secondary">
-                                Close
+          <Card>
+            <CardHeader>
+                <CardTitle>Import / Export</CardTitle>
+                <CardDescription>Bulk import or export children's data.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+                <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline"><FileUp className="mr-2 h-4 w-4" />Import Data</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Import from CSV / TSV</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <p className="text-sm text-muted-foreground">Select a CSV or TSV file to import. The file must have headers matching the child profile fields.</p>
+                        <div>
+                            <div className="flex justify-between items-center mb-1">
+                                <p className="text-sm font-semibold text-foreground">Required CSV/TSV Header:</p>
+                                <Button variant="ghost" size="sm" onClick={handleCopyHeaders} className="h-7">
+                                    <Copy className="mr-2 h-3 w-3" />
+                                    Copy
                                 </Button>
-                            </DialogClose>
-                        </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                         <Button variant="outline" disabled={isLoading}><FileDown className="mr-2 h-4 w-4" />Export Data</Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => handleExport('csv')}>Export as CSV</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleExport('tsv')}>Export as TSV</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                </CardContent>
-            </Card>
-          </div>
+                            </div>
+                            <code className="text-xs text-muted-foreground bg-muted p-2 rounded-md break-all block">
+                                {headersForImport}
+                            </code>
+                        </div>
+                        <Alert variant="default" className="text-sm">
+                            <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Field Values</AlertTitle>
+                            <AlertDescription>
+                                The <code className="text-xs bg-muted p-1 rounded-sm">gender</code> column must be one of <code className="text-xs bg-muted p-1 rounded-sm">male</code>, <code className="text-xs bg-muted p-1 rounded-sm">female</code>, or <code className="text-xs bg-muted p-1 rounded-sm">other</code>.<br/>
+                                The <code className="text-xs bg-muted p-1 rounded-sm">previousPreschool</code> column must be <code className="text-xs bg-muted p-1 rounded-sm">yes</code> or <code className="text-xs bg-muted p-1 rounded-sm">no</code>.
+                            </AlertDescription>
+                        </Alert>
+                    </div>
+                    <div className="grid w-full items-center gap-1.5 mt-4">
+                        <Label htmlFor="import-file">Select File</Label>
+                        <Input id="import-file" type="file" accept=".csv,.tsv" onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)} />
+                    </div>
+                    <DialogFooter className="sm:justify-start mt-4">
+                        <Button onClick={handleImport} disabled={!importFile || isImporting}>
+                            {isImporting ? "Importing..." : t('confirmImport')}
+                        </Button>
+                        <DialogClose asChild>
+                            <Button type="button" variant="secondary">
+                            Close
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                     <Button variant="outline" disabled={isLoading}><FileDown className="mr-2 h-4 w-4" />Export Data</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleExport('csv')}>Export as CSV</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExport('tsv')}>Export as TSV</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
