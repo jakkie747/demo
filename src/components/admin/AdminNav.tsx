@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarDays, GalleryHorizontal, Briefcase, Mail, Settings, Lightbulb, FileText } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, GalleryHorizontal, Briefcase, Mail, Settings, Lightbulb, FileText, LampDesk } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -23,6 +23,12 @@ export function AdminNav() {
       href: "/admin/dashboard/children",
       label: t('childrenProfiles'),
       icon: Users,
+      roles: ['admin', 'teacher']
+    },
+    {
+      href: "/admin/dashboard/afterschool",
+      label: t('afterschoolChildren'),
+      icon: LampDesk,
       roles: ['admin', 'teacher']
     },
     {
@@ -76,7 +82,7 @@ export function AdminNav() {
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               asChild
-              isActive={pathname === item.href}
+              isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
               tooltip={item.label}
             >
               <Link href={item.href}>

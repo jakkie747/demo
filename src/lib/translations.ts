@@ -36,6 +36,12 @@ export const translations = {
     // Register Page
     registerTitle: 'Register Your Child',
     registerSub: "Fill out the form below to enroll your child at Blinkogies. We can't wait to meet them!",
+    registerSelectionSub: 'Please select which program you would like to register for.',
+    preschoolRegistration: 'Preschool Registration',
+    preschoolRegistrationDesc: 'For our standard daytime program for ages 1-5. Full-day care, meals, and learning activities included.',
+    afterschoolRegistration: 'Afterschool Registration',
+    afterschoolRegistrationDesc: 'For school-aged children needing care after the regular school day. Includes homework help and activities.',
+    afterschoolRegisterSub: "Fill out the form below to enroll your child in our Afterschool program.",
     childInfo: "Child's Information",
     fullName: 'Full Name',
     egJaneDoe: 'e.g. Jane Doe',
@@ -112,6 +118,7 @@ export const translations = {
     // AdminNav
     dashboard: 'Dashboard',
     childrenProfiles: 'Children Profiles',
+    afterschoolChildren: 'Afterschool Children',
     manageEvents: 'Manage Events',
     manageGallery: 'Manage Gallery',
     manageDocuments: 'Manage Documents',
@@ -360,6 +367,12 @@ export const translations = {
     // Register Page
     registerTitle: 'Registreer Jou Kind',
     registerSub: 'Vul die vorm hieronder in om jou kind by Blinkogies in te skryf. Ons kan nie wag om hulle te ontmoet nie!',
+    registerSelectionSub: 'Kies asseblief vir watter program u wil registreer.',
+    preschoolRegistration: 'Kleuterskool Registrasie',
+    preschoolRegistrationDesc: 'Vir ons standaard dagprogram vir ouderdomme 1-5. Voldagversorging, maaltye en leeraktiwiteite ingesluit.',
+    afterschoolRegistration: 'Naskool Registrasie',
+    afterschoolRegistrationDesc: 'Vir skoolgaande kinders wat sorg na die gewone skooldag benodig. Sluit huiswerkhulp en aktiwiteite in.',
+    afterschoolRegisterSub: "Voltooi die vorm hieronder om jou kind vir ons Naskool-program in te skryf.",
     childInfo: "Kind se Inligting",
     fullName: 'Volle Naam',
     egJaneDoe: 'bv. Jane Doe',
@@ -436,6 +449,7 @@ export const translations = {
     // AdminNav
     dashboard: 'Kontroleskerm',
     childrenProfiles: 'Kinderprofiele',
+    afterschoolChildren: 'Naskool Kinders',
     manageEvents: 'Bestuur Geleenthede',
     manageGallery: 'Bestuur Galery',
     manageDocuments: 'Bestuur Dokumente',
