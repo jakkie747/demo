@@ -67,6 +67,10 @@ export default function InvoicingPage() {
 
   const form = useForm<InvoiceFormData>({
     resolver: zodResolver(invoiceFormSchema),
+    defaultValues: {
+      childId: "",
+      description: "",
+    },
   });
 
   const fetchInitialData = useCallback(async () => {
@@ -180,7 +184,14 @@ export default function InvoicingPage() {
                     <FormItem>
                       <FormLabel>Amount (R)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="e.g. 1500.00" {...field} disabled={isSaving} />
+                        <Input 
+                          type="number" 
+                          step="0.01" 
+                          placeholder="e.g. 1500.00" 
+                          {...field} 
+                          value={field.value || ''}
+                          disabled={isSaving} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
