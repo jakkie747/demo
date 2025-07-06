@@ -71,7 +71,8 @@ function InvoiceSection({ childId }: { childId: string }) {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to create payment link.');
+            const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred while creating the payment link.' }));
+            throw new Error(errorData.error || 'Failed to create payment link.');
         }
 
         const { url } = await response.json();
@@ -85,6 +86,7 @@ function InvoiceSection({ childId }: { childId: string }) {
         setPaymentInProgress(null);
     }
   };
+
 
   if (isLoading) {
     return (
