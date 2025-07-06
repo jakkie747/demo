@@ -57,6 +57,10 @@ export default function ManageParentsPage() {
   
   const form = useForm<z.infer<typeof parentFormSchema>>({
     resolver: zodResolver(parentFormSchema),
+    defaultValues: {
+      name: "",
+      phone: "",
+    },
   });
 
   const fetchParents = useCallback(async () => {
