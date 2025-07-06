@@ -86,3 +86,16 @@ export interface DailyReport {
   photoUrl?: string;
   createdAt: any; // Firestore timestamp
 }
+
+export interface Invoice {
+  id: string;
+  childId: string;
+  parentId: string; // parent email
+  childName: string;
+  description: string;
+  amount: number; // in cents
+  status: 'unpaid' | 'paid' | 'pending' | 'cancelled';
+  invoiceNumber: string;
+  createdAt: any; // Firestore timestamp
+  paidAt?: any; // Firestore timestamp
+}

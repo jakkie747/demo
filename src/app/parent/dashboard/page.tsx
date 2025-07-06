@@ -5,16 +5,27 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { getChildrenByParentEmail } from "@/services/childrenService";
-import type { Child, DailyReport } from "@/lib/types";
+import { getInvoicesByChild } from "@/services/invoiceService";
+import type { Child, DailyReport, Invoice } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from "next/image";
-import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, NotebookPen, AlertTriangle, Edit } from "lucide-react";
+import { Smile, Meh, Frown, Zap, Bed, Utensils, ToyBrick, NotebookPen, AlertTriangle, Edit, ReceiptText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { getReportsByChildId } from "@/services/reportService";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 
 const moodConfig = {
     happy: { icon: Smile, color: "text-green-500", label: "Happy" },
@@ -23,6 +34,115 @@ const moodConfig = {
     energetic: { icon: Zap, color: "text-yellow-500", label: "Energetic" },
     tired: { icon: Bed, color: "text-purple-500", label: "Tired" },
 };
+
+function InvoiceSection({ childId }: { childId: string }) {
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [paymentInProgress, setPaymentInProgress] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const fetchedInvoices = await getInvoicesByChild(childId);
+        setInvoices(fetchedInvoices);
+      } catch (error) {
+        console.error("Failed to fetch invoices", error);
+        toast({ variant: "destructive", title: "Could not fetch invoices." });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchInvoices();
+  }, [childId, toast]);
+  
+  const handlePayNow = async (invoice: Invoice) => {
+    setPaymentInProgress(invoice.id);
+    try {
+        const response = await fetch('/api/stitch/create-payment-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: invoice.amount,
+                email: invoice.parentId,
+                description: invoice.description,
+                externalReference: invoice.id // Use invoice ID to track payment
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to create payment link.');
+        }
+
+        const { url } = await response.json();
+        window.location.href = url; // Redirect parent to Stitch payment page
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Payment Error",
+            description: (error as Error).message || "Could not initiate payment. Please try again.",
+        });
+        setPaymentInProgress(null);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader><Skeleton className="h-6 w-1/2" /></CardHeader>
+        <CardContent><Skeleton className="h-24 w-full" /></CardContent>
+      </Card>
+    );
+  }
+
+  if (invoices.length === 0) {
+    return null; // Don't show the card if there are no invoices
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2"><ReceiptText /> Invoices</CardTitle>
+        <CardDescription>Your outstanding and paid invoices for this child.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {invoices.map(invoice => (
+                    <TableRow key={invoice.id}>
+                        <TableCell className="font-medium">{invoice.description}</TableCell>
+                        <TableCell>R{(invoice.amount / 100).toFixed(2)}</TableCell>
+                        <TableCell>
+                            <Badge variant={invoice.status === 'paid' ? 'default' : 'secondary'}>
+                                {invoice.status}
+                            </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                            {invoice.status === 'unpaid' && (
+                                <Button
+                                    onClick={() => handlePayNow(invoice)}
+                                    disabled={paymentInProgress === invoice.id}
+                                >
+                                    {paymentInProgress === invoice.id ? "Processing..." : "Pay Now"}
+                                </Button>
+                            )}
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  )
+}
 
 function DailyReportCard({ report }: { report: DailyReport }) {
     const { icon: MoodIcon, color, label } = moodConfig[report.mood];
@@ -140,8 +260,8 @@ function ChildSection({ child }: { child: Child }) {
                     <AvatarFallback>{child.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Daily Reports for {child.name}</h2>
-                    <p className="text-muted-foreground">Here are the latest updates from the classroom.</p>
+                    <h2 className="text-3xl font-bold tracking-tight">Updates for {child.name}</h2>
+                    <p className="text-muted-foreground capitalize">{child.program} Program</p>
                 </div>
             </div>
             <Button asChild variant="outline">
@@ -151,6 +271,8 @@ function ChildSection({ child }: { child: Child }) {
                 </Link>
             </Button>
         </div>
+
+      <InvoiceSection childId={child.id} />
 
       {isLoadingReports ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -165,8 +287,11 @@ function ChildSection({ child }: { child: Child }) {
           <AlertDescription>There are no daily reports available for {child.name} at the moment. Please check back later.</AlertDescription>
         </Alert>
       ) : (
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-            {reports.map(report => <DailyReportCard key={report.id} report={report} />)}
+        <div className="space-y-4">
+             <h3 className="text-2xl font-semibold">Daily Reports</h3>
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+                {reports.map(report => <DailyReportCard key={report.id} report={report} />)}
+            </div>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarDays, GalleryHorizontal, Briefcase, Mail, Settings, Lightbulb, FileText, LampDesk } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, GalleryHorizontal, Briefcase, Mail, Settings, Lightbulb, FileText, LampDesk, ReceiptText } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -30,6 +30,12 @@ export function AdminNav() {
       label: t('afterschoolChildren'),
       icon: LampDesk,
       roles: ['admin', 'teacher']
+    },
+     {
+      href: "/admin/dashboard/invoicing",
+      label: "Invoicing",
+      icon: ReceiptText,
+      roles: ['admin']
     },
     {
       href: "/admin/dashboard/events",
