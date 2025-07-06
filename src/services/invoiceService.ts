@@ -1,3 +1,4 @@
+
 import { db } from '@/lib/firebase';
 import { collection, getDocs, addDoc, doc, updateDoc, serverTimestamp, query, orderBy, where } from 'firebase/firestore';
 import type { Invoice } from '@/lib/types';
@@ -27,10 +28,21 @@ export const getInvoicesByChild = async (childId: string): Promise<Invoice[]> =>
     if (!db) return [];
      try {
         const invoicesCollectionRef = collection(db, COLLECTION_NAME);
-        const q = query(invoicesCollectionRef, where("childId", "==", childId), orderBy("createdAt", "desc"));
+        // Removed the 'orderBy' clause to prevent the need for a composite index.
+        const q = query(invoicesCollectionRef, where("childId", "==", childId));
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Invoice));
+        
+        const invoices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Invoice));
+
+        // Sorting is now done on the client-side.
+        return invoices.sort((a, b) => {
+            const dateA = a.createdAt?.toDate() || new Date(0);
+            const dateB = b.createdAt?.toDate() || new Date(0);
+            return dateB.getTime() - dateA.getTime();
+        });
+
     } catch (error: any) {
+        // This error is now less likely to occur for this specific query, but is kept for safety.
         if ((error as any).code === 'failed-precondition') {
             const message = (error as Error).message;
             throw new Error(`A database index is required. Please check the browser console (F12) for a link to create it. Raw error: ${message}`);
