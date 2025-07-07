@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/context/LanguageContext";
+import AppWithSplashScreen from "@/components/AppWithSplashScreen";
 
 export const metadata: Metadata = {
   title: "Blinkogies App",
@@ -39,12 +40,14 @@ export default function RootLayout({
       </head>
       <body className={cn("min-h-screen font-body antialiased")}>
         <LanguageProvider>
-          <div className="flex min-h-dvh flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
+          <AppWithSplashScreen>
+            <div className="flex min-h-dvh flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <Toaster />
+          </AppWithSplashScreen>
         </LanguageProvider>
       </body>
     </html>
