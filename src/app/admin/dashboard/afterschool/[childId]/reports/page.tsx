@@ -175,7 +175,10 @@ export default function ManageAfterschoolReportsPage() {
       // Destructure `photo` from values to prevent it from being sent to Firestore
       const { photo, ...reportContent } = values;
 
-      const reportData = { ...reportContent, photoUrl, childId };
+      const reportData: any = { ...reportContent, childId };
+      if (photoUrl) {
+        reportData.photoUrl = photoUrl;
+      }
       
       if (editingReport) {
         await updateReport(editingReport.id, reportData);
