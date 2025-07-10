@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Lightbulb, Mail, Briefcase, FileUp, FileDown, Copy, LampDesk } from "lucide-react";
+import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Mail, Briefcase, FileUp, FileDown, Copy, LampDesk } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getChildren, addMultipleChildren } from "@/services/childrenService";
@@ -390,17 +390,6 @@ export default function DashboardPage() {
                   {t("composeMessage")}
                 </Link>
               </Button>
-            </CardContent>
-          </Card>
-           <Card>
-            <CardHeader>
-                <CardTitle>{t("aiAssistant")}</CardTitle>
-                <CardDescription>{t("aiAssistantDesc")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Button asChild variant="secondary">
-                    <Link href="/admin/dashboard/ai-assistant">{t("aiAssistant")}</Link>
-                </Button>
             </CardContent>
           </Card>
           
