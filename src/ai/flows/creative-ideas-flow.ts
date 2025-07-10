@@ -59,7 +59,7 @@ const creativeIdeasFlow = ai.defineFlow(
     inputSchema: CreativeIdeaInputSchema,
     outputSchema: CreativeIdeaOutputSchema,
   },
-  async (input) => {
+  async (input: CreativeIdeaInput) => {
     const { output } = await prompt(input);
     return output!;
   }
