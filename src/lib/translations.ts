@@ -312,7 +312,6 @@ export const translations = {
     saveChanges: 'Save Changes',
 
     // Admin Settings Page
-    settings: 'Settings',
     changePassword: 'Change Password',
     changePasswordDesc: 'Update your login password here. You will be logged out after a successful change.',
     currentPassword: 'Current Password',
@@ -653,7 +652,6 @@ export const translations = {
     saveChanges: 'Stoor Veranderinge',
 
     // Admin Settings Page
-    settings: 'Instellings',
     changePassword: 'Verander Wagwoord',
     changePasswordDesc: 'Dateer jou aanmeldwagwoord hier op. Jy sal uitgeteken word na \'n suksesvolle verandering.',
     currentPassword: 'Huidige Wagwoord',
