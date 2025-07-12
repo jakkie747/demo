@@ -1,5 +1,8 @@
 'use server';
 
+import { config } from 'dotenv';
+config();
+
 import { generateActivityIdeas, GenerateActivityIdeasInput } from "@/ai/flows/generate-activity-ideas";
 import { generateLessonPlan, GenerateLessonPlanInput } from "@/ai/flows/generate-lesson-plan";
 import { generateStoryStarters } from "@/ai/flows/generate-story-starters";
@@ -9,7 +12,7 @@ export async function generateStoryStartersAction() {
     const result = await generateStoryStarters({ count: 5 });
     return result.storyStarters;
   } catch (error) {
-    console.error(error);
+    console.error("Error in generateStoryStartersAction:", error);
     return { error: 'Failed to generate story starters.' };
   }
 }
@@ -22,7 +25,7 @@ export async function generateActivityIdeasAction(input: GenerateActivityIdeasIn
     const result = await generateActivityIdeas(input);
     return result.activityIdeas;
   } catch (error) {
-    console.error(error);
+    console.error("Error in generateActivityIdeasAction:", error);
     return { error: 'Failed to generate activity ideas.' };
   }
 }
@@ -36,7 +39,7 @@ export async function generateLessonPlanAction(input: GenerateLessonPlanInput) {
     return result;
   } catch (error)
   {
-    console.error(error);
+    console.error("Error in generateLessonPlanAction:", error);
     return { error: 'Failed to generate lesson plan.' };
   }
 }
