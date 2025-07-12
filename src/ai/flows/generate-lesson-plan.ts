@@ -4,7 +4,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const GenerateLessonPlanInputSchema = z.object({
   topic: z
@@ -56,7 +56,7 @@ const generateLessonPlanFlow = ai.defineFlow(
     inputSchema: GenerateLessonPlanInputSchema,
     outputSchema: GenerateLessonPlanOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await prompt(input);
     return output!;
   }
