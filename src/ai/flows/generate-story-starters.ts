@@ -34,11 +34,11 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateStoryStartersOutputSchema},
   prompt: `You are a helpful AI assistant that generates story starters for preschool teachers.
 
-  Generate a list of exactly {{count}} unique and age-appropriate story starters that can be used as writing prompts for preschool children. Focus on themes that are engaging, imaginative, and relevant to young children's experiences.
+  Generate a list of exactly {{{count}}} unique and age-appropriate story starters that can be used as writing prompts for preschool children. Focus on themes that are engaging, imaginative, and relevant to young children's experiences.
 
   The story starters should encourage creativity and critical thinking.
 
-  Format the output as a valid JSON object with a single key called "storyStarters". The value of this key should be a JSON array containing exactly {{count}} story starters.`,
+  Format the output as a valid JSON object with a single key called "storyStarters". The value of this key should be a JSON array containing exactly {{{count}}} story starters.`,
 });
 
 const generateStoryStartersFlow = ai.defineFlow(
