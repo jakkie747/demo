@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarDays, GalleryHorizontal, Briefcase, Mail, Settings, FileText, LampDesk, ReceiptText } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, GalleryHorizontal, Briefcase, Mail, Settings, FileText, LampDesk, ReceiptText, Sparkles } from "lucide-react";
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -53,6 +53,12 @@ export function AdminNav() {
         href: "/admin/dashboard/documents",
         label: t('manageDocuments'),
         icon: FileText,
+        roles: ['admin', 'teacher']
+    },
+     {
+        href: "/admin/dashboard/ai-assistant",
+        label: t('aiAssistant'),
+        icon: Sparkles,
         roles: ['admin', 'teacher']
     },
     {
