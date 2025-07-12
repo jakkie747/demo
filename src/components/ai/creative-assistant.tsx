@@ -21,7 +21,6 @@ const activityFormSchema = z.object({
 
 const lessonPlanFormSchema = z.object({
   topic: z.string().min(2, { message: "Topic is required." }),
-  ageGroup: z.string().min(2, { message: "Age group is required." }),
   duration: z.string().min(2, { message: "Duration is required." }),
 });
 
@@ -43,7 +42,7 @@ export function CreativeAssistant() {
 
   const lessonPlanForm = useForm<z.infer<typeof lessonPlanFormSchema>>({
     resolver: zodResolver(lessonPlanFormSchema),
-    defaultValues: { topic: "", ageGroup: "", duration: "" },
+    defaultValues: { topic: "", duration: "" },
   });
 
   const handleGenerateStoryStarters = async () => {
@@ -198,19 +197,6 @@ export function CreativeAssistant() {
                       <FormLabel>{t('lessonPlanTopic')}</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., The Solar System" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={lessonPlanForm.control}
-                  name="ageGroup"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('lessonPlanAgeGroup')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 4-5 year olds" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

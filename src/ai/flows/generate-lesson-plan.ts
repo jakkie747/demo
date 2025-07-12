@@ -11,9 +11,6 @@ const GenerateLessonPlanInputSchema = z.object({
   topic: z
     .string()
     .describe('The main theme or subject of the lesson plan. For example: "The Solar System", "Community Helpers", "Spring".'),
-  ageGroup: z
-    .string()
-    .describe('The target age group for the lesson. For example: "2-3 year olds", "4-5 year olds".'),
   duration: z
     .string()
     .describe('The estimated duration of the lesson. For example: "30 minutes", "1 hour".'),
@@ -40,12 +37,11 @@ const prompt = ai.definePrompt({
   name: 'generateLessonPlanPrompt',
   input: {schema: GenerateLessonPlanInputSchema},
   output: {schema: GenerateLessonPlanOutputSchema},
-  prompt: `You are an expert early childhood educator with over 20 years of experience creating engaging and effective lesson plans for preschoolers.
+  prompt: `You are an expert early childhood educator with over 20 years of experience creating engaging and effective lesson plans for preschoolers (ages 3-5).
 
-You will generate a complete, age-appropriate lesson plan based on the provided topic, age group, and duration. The lesson plan should be creative, hands-on, and foster a love of learning.
+You will generate a complete, age-appropriate lesson plan based on the provided topic and duration. The lesson plan should be creative, hands-on, and foster a love of learning.
 
 Topic: {{{topic}}}
-Age Group: {{{ageGroup}}}
 Duration: {{{duration}}}
 
 Structure the output as a JSON object with the specified fields.`,

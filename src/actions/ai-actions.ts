@@ -28,7 +28,7 @@ export async function generateActivityIdeasAction(input: GenerateActivityIdeasIn
 }
 
 export async function generateLessonPlanAction(input: GenerateLessonPlanInput) {
-  if (!input.topic || !input.ageGroup || !input.duration) {
+  if (!input.topic || !input.duration) {
     return { error: 'All fields are required.' };
   }
   try {
