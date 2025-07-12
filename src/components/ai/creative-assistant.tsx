@@ -19,31 +19,31 @@ const activityFormSchema = z.object({
   topic: z.string().min(2, { message: "Topic must be at least 2 characters." }),
 });
 
-const lessonPlanFormSchema = z.object({
-  topic: z.string().min(2, { message: "Topic is required." }),
-  duration: z.string().min(2, { message: "Duration is required." }),
-});
+// const lessonPlanFormSchema = z.object({
+//   topic: z.string().min(2, { message: "Topic is required." }),
+//   duration: z.string().min(2, { message: "Duration is required." }),
+// });
 
 
 export function CreativeAssistant() {
   const { t } = useLanguage();
   const [storyStarters, setStoryStarters] = useState<string[]>([]);
   const [activityIdeas, setActivityIdeas] = useState<string[]>([]);
-  const [lessonPlan, setLessonPlan] = useState<GenerateLessonPlanOutput | null>(null);
+  // const [lessonPlan, setLessonPlan] = useState<GenerateLessonPlanOutput | null>(null);
   const [currentTopic, setCurrentTopic] = useState('');
   const [isStoryLoading, setIsStoryLoading] = useState(false);
   const [isActivityLoading, setIsActivityLoading] = useState(false);
-  const [isLessonPlanLoading, setIsLessonPlanLoading] = useState(false);
+  // const [isLessonPlanLoading, setIsLessonPlanLoading] = useState(false);
 
   const activityForm = useForm<z.infer<typeof activityFormSchema>>({
     resolver: zodResolver(activityFormSchema),
     defaultValues: { topic: "" },
   });
 
-  const lessonPlanForm = useForm<z.infer<typeof lessonPlanFormSchema>>({
-    resolver: zodResolver(lessonPlanFormSchema),
-    defaultValues: { topic: "", duration: "" },
-  });
+  // const lessonPlanForm = useForm<z.infer<typeof lessonPlanFormSchema>>({
+  //   resolver: zodResolver(lessonPlanFormSchema),
+  //   defaultValues: { topic: "", duration: "" },
+  // });
 
   const handleGenerateStoryStarters = async () => {
     setIsStoryLoading(true);
@@ -71,17 +71,17 @@ export function CreativeAssistant() {
     activityForm.reset();
   };
   
-  const handleGenerateLessonPlan = async (values: z.infer<typeof lessonPlanFormSchema>) => {
-    setIsLessonPlanLoading(true);
-    setLessonPlan(null);
-    const result = await generateLessonPlanAction(values);
-     if (result && 'title' in result) {
-      setLessonPlan(result);
-    } else {
-      console.error(result.error);
-    }
-    setIsLessonPlanLoading(false);
-  };
+  // const handleGenerateLessonPlan = async (values: z.infer<typeof lessonPlanFormSchema>) => {
+  //   setIsLessonPlanLoading(true);
+  //   setLessonPlan(null);
+  //   const result = await generateLessonPlanAction(values);
+  //    if (result && 'title' in result) {
+  //     setLessonPlan(result);
+  //   } else {
+  //     console.error(result.error);
+  //   }
+  //   setIsLessonPlanLoading(false);
+  // };
 
   return (
     <div className="space-y-8">
@@ -177,16 +177,20 @@ export function CreativeAssistant() {
           </Card>
         </div>
 
-        {/* Lesson Plan Generator */}
-        <Card className="lg:col-span-1">
+        {/* Lesson Plan Generator - Temporarily Disabled */}
+        <Card className="lg:col-span-1 opacity-50">
            <CardHeader>
              <CardTitle className="flex items-center gap-2 font-headline text-xl">
                 <BookCheck className="text-primary"/>
                 {t('lessonPlanGenerator')}
               </CardTitle>
-              <CardDescription>{t('lessonPlanGeneratorDescription')}</CardDescription>
+              <CardDescription>{t('lessonPlanGeneratorDescription')} (Temporarily Unavailable)</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+             <div className="p-4 text-center text-muted-foreground border-2 border-dashed rounded-lg">
+                This feature is currently being worked on. Please check back soon!
+            </div>
+            {/* 
             <Form {...lessonPlanForm}>
               <form onSubmit={lessonPlanForm.handleSubmit(handleGenerateLessonPlan)} className="space-y-4">
                  <FormField
@@ -293,6 +297,7 @@ export function CreativeAssistant() {
                 </Card>
               </div>
             )}
+             */}
           </CardContent>
         </Card>
       </div>
