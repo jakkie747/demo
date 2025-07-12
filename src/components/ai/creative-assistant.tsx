@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -13,7 +12,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { generateActivityIdeasAction, generateStoryStartersAction, generateLessonPlanAction } from '@/actions/ai-actions';
 import { Loader2, Wand2, Sparkles, BookCheck, ClipboardList, Telescope, Microscope, Lightbulb, GraduationCap } from 'lucide-react';
 import { type GenerateLessonPlanOutput } from '@/ai/flows/generate-lesson-plan';
-import { Separator } from '../ui/separator';
+import { Separator } from '@/components/ui/separator';
 import { Skeleton } from "@/components/ui/skeleton";
 
 const activityFormSchema = z.object({
@@ -279,7 +278,7 @@ export function CreativeAssistant() {
                 <Card className="bg-muted/30">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg font-headline"><Telescope /> {t('lessonPlanProcedure')}</CardTitle>
-                  </Header>
+                  </CardHeader>
                   <CardContent>
                     <ol className="list-decimal space-y-2 pl-5">
                        {lessonPlan.procedure.map((item, i) => <li key={i}>{item}</li>)}
