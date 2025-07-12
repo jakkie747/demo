@@ -44,7 +44,7 @@ You will generate a complete, age-appropriate lesson plan based on the provided 
 Topic: {{{topic}}}
 Duration: {{{duration}}}
 
-Structure the output as a JSON object with the specified fields.`,
+IMPORTANT: Structure the output as a valid JSON object that conforms to the specified output schema.`,
 });
 
 const generateLessonPlanFlow = ai.defineFlow(
