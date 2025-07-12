@@ -131,7 +131,7 @@ export const translations = {
     manageTeachers: 'Manage Teachers',
     manageParents: 'Manage Parents',
     composeMessage: 'Compose Message',
-    aiAssistant: 'AI Assistant',
+    settings: 'Settings',
 
     // Admin Dashboard Page
     registeredChildren: 'Registered Children',
@@ -154,7 +154,6 @@ export const translations = {
     manageTeachersDesc: 'View, edit, and manage teacher profiles.',
     manageParentsDesc: 'View and edit parent contact information.',
     composeMessageDesc: 'Send a message to all registered parents.',
-    aiAssistantDesc: 'Generate creative ideas for classroom activities and stories.',
 
     // Admin Children Page
     preschoolChildrenDesc: 'All children registered for the standard daytime program.',
@@ -192,7 +191,7 @@ export const translations = {
 
     // Admin Parents Page
     allParents: 'All Parents',
-    allParentsDesc: 'A list of all unique parents registered in the system.',
+    allParentsDesc: "'n Lys van alle unieke ouers wat in die stelsel geregistreer is.",
     parentName: "Parent's Name",
     linkedChildren: 'Linked Children',
     editParent: 'Edit Parent',
@@ -328,29 +327,6 @@ export const translations = {
     changePasswordErrorGeneric: 'An unexpected error occurred. Please try again.',
     error: 'Error',
     
-    // AI Assistant Page
-    aiAssistantTitle: 'AI Creative Assistant',
-    aiAssistantSub: 'Feeling stuck? Let our AI assistant help you with fresh ideas for the classroom!',
-    storyStarters: 'Story Starters',
-    activityIdeas: 'Activity Ideas',
-    generateStoryStarters: 'Generate Story Starters',
-    generateActivityIdeas: 'Generate Activity Ideas',
-    storyStartersDesc: 'Get unique and engaging opening lines for your next story time.',
-    activityIdeasDesc: 'Find inspiration for new, fun, and educational classroom activities.',
-    generating: 'Generating...',
-    yourNewIdeas: 'Here are some new ideas!',
-    enterTopic: 'Enter a topic... e.g., Dinosaurs',
-    lessonPlanGenerator: 'Lesson Plan Generator',
-    lessonPlanGeneratorDescription: 'Create a detailed lesson plan for any topic in minutes.',
-    lessonPlanTopic: 'Topic',
-    lessonPlanDuration: 'Duration',
-    generateLessonPlan: 'Generate Lesson Plan',
-    lessonPlanObjectives: 'Learning Objectives',
-    lessonPlanMaterials: 'Materials',
-    lessonPlanProcedure: 'Procedure',
-    lessonPlanAssessment: 'Assessment',
-    lessonPlanExtension: 'Extension Ideas',
-
     // PWA Install Sheet
     installInstructionsTitle: 'Install App',
     installInstructionsDesc: 'For easy access, add this app to your home screen.',
@@ -496,7 +472,7 @@ export const translations = {
     manageTeachers: 'Bestuur Onderwysers',
     manageParents: 'Bestuur Ouers',
     composeMessage: 'Stel Boodskap Op',
-    aiAssistant: 'KI-assistent',
+    settings: 'Instellings',
 
     // Admin Dashboard Page
     registeredChildren: 'Geregistreerde Kinders',
@@ -519,7 +495,6 @@ export const translations = {
     manageTeachersDesc: 'Sien, wysig en bestuur onderwyserprofiele.',
     manageParentsDesc: 'Sien en wysig ouer kontakbesonderhede.',
     composeMessageDesc: "'n Boodskap aan alle geregistreerde ouers te stuur.",
-    aiAssistantDesc: 'Genereer kreatiewe idees vir klaskameraktiwiteite en stories.',
 
     // Admin Children Page
     preschoolChildrenDesc: 'Alle kinders wat vir die standaard dagprogram geregistreer is.',
@@ -693,29 +668,6 @@ export const translations = {
     changePasswordErrorGeneric: '\'n Onverwagte fout het voorgekom. Probeer asseblief weer.',
     error: 'Fout',
     
-    // AI Assistant Page
-    aiAssistantTitle: 'KI Kreatiewe Assistent',
-    aiAssistantSub: 'Voel jy vas? Laat ons KI-assistent jou help met vars idees vir die klaskamer!',
-    storyStarters: 'Storie-beginpunte',
-    activityIdeas: 'Aktiwiteitsidees',
-    generateStoryStarters: 'Genereer Storie-beginpunte',
-    generateActivityIdeas: 'Genereer Aktiwiteitsidees',
-    storyStartersDesc: 'Kry unieke en boeiende openingsinne vir jou volgende storietyd.',
-    activityIdeasDesc: 'Vind inspirasie vir nuwe, prettige en opvoedkundige klaskameraktiwiteite.',
-    generating: 'Besig om te genereer...',
-    yourNewIdeas: 'Hier is \'n paar nuwe idees!',
-    enterTopic: "Voer 'n onderwerp in... bv., Dinosourusse",
-    lessonPlanGenerator: 'Lesplan Generator',
-    lessonPlanGeneratorDescription: "Skep 'n gedetailleerde lesplan vir enige onderwerp binne minute.",
-    lessonPlanTopic: 'Onderwerp',
-    lessonPlanDuration: 'Tydsduur',
-    generateLessonPlan: 'Genereer Lesplan',
-    lessonPlanObjectives: 'Leerdoelwitte',
-    lessonPlanMaterials: 'Materiale',
-    lessonPlanProcedure: 'Prosedure',
-    lessonPlanAssessment: 'Assessering',
-    lessonPlanExtension: 'Uitbreidingsidees',
-
     // PWA Install Sheet
     installInstructionsTitle: 'Installeer Toepassing',
     installInstructionsDesc: 'Vir maklike toegang, voeg hierdie toepassing by jou tuisskerm.',

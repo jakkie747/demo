@@ -55,12 +55,6 @@ export function AdminNav() {
         icon: FileText,
         roles: ['admin', 'teacher']
     },
-     {
-        href: "/admin/dashboard/ai-assistant",
-        label: t('aiAssistant'),
-        icon: Sparkles,
-        roles: ['admin', 'teacher']
-    },
     {
       href: "/admin/dashboard/teachers",
       label: t('manageTeachers'),
