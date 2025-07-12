@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -25,7 +24,6 @@ const lessonPlanFormSchema = z.object({
   ageGroup: z.string().min(2, { message: "Age group is required." }),
   duration: z.string().min(2, { message: "Duration is required." }),
 });
-
 
 export function CreativeAssistant() {
   const { t } = useLanguage();
@@ -95,13 +93,13 @@ export function CreativeAssistant() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                   <Wand2 className="text-primary"/>
-                  {t('generateStoryStarters')}
+                  {t.generateStoryStarters}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Button onClick={handleGenerateStoryStarters} disabled={isStoryLoading} className="w-full">
                 {isStoryLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                {t('generateStoryStarters')}
+                {t.generateStoryStarters}
               </Button>
               {isStoryLoading && (
                    <div className="space-y-2 pt-4">
@@ -112,7 +110,7 @@ export function CreativeAssistant() {
               )}
               {storyStarters.length > 0 && (
                 <div className="pt-4">
-                  <h3 className="font-bold mb-2 font-headline text-lg">{t('storyStarters')}</h3>
+                  <h3 className="font-bold mb-2 font-headline text-lg">{t.storyStarters}</h3>
                   <ul className="space-y-2">
                     {storyStarters.map((starter, index) => (
                       <li key={index} className="p-3 border rounded-lg bg-background flex items-start gap-3">
@@ -131,7 +129,7 @@ export function CreativeAssistant() {
             <CardHeader>
                <CardTitle className="flex items-center gap-2">
                   <Wand2 className="text-primary"/>
-                  {t('generateActivityIdeas')}
+                  {t.generateActivityIdeas}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -143,7 +141,7 @@ export function CreativeAssistant() {
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormControl>
-                          <Input placeholder={t('enterTopic')} {...field} />
+                          <Input placeholder={t.enterTopic} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -164,7 +162,7 @@ export function CreativeAssistant() {
               )}
               {activityIdeas.length > 0 && (
                 <div className="pt-4">
-                  <h3 className="font-bold mb-2 font-headline text-lg">{t('activityIdeas')}: <span className="text-primary">{currentTopic}</span></h3>
+                  <h3 className="font-bold mb-2 font-headline text-lg">{t.activityIdeas}: <span className="text-primary">{currentTopic}</span></h3>
                   <ul className="space-y-2">
                     {activityIdeas.map((idea, index) => (
                       <li key={index} className="p-3 border rounded-lg bg-background flex items-start gap-3">
@@ -184,9 +182,9 @@ export function CreativeAssistant() {
            <CardHeader>
              <CardTitle className="flex items-center gap-2 font-headline text-xl">
                 <BookCheck className="text-primary"/>
-                {t('lessonPlanGenerator')}
+                {t.lessonPlanGenerator}
               </CardTitle>
-              <CardDescription>{t('lessonPlanGeneratorDescription')}</CardDescription>
+              <CardDescription>{t.lessonPlanGeneratorDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Form {...lessonPlanForm}>
@@ -196,7 +194,7 @@ export function CreativeAssistant() {
                   name="topic"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('lessonPlanTopic')}</FormLabel>
+                      <FormLabel>{t.lessonPlanTopic}</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., The Solar System" {...field} />
                       </FormControl>
@@ -209,7 +207,7 @@ export function CreativeAssistant() {
                   name="ageGroup"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('lessonPlanAgeGroup')}</FormLabel>
+                      <FormLabel>{t.lessonPlanAgeGroup}</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 4-5 year olds" {...field} />
                       </FormControl>
@@ -222,7 +220,7 @@ export function CreativeAssistant() {
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('lessonPlanDuration')}</FormLabel>
+                      <FormLabel>{t.lessonPlanDuration}</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., 45 minutes" {...field} />
                       </FormControl>
@@ -232,7 +230,7 @@ export function CreativeAssistant() {
                 />
                 <Button type="submit" disabled={isLessonPlanLoading} className="w-full">
                    {isLessonPlanLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                   {t('generateLessonPlan')}
+                   {t.generateLessonPlan}
                 </Button>
               </form>
             </Form>
@@ -256,7 +254,7 @@ export function CreativeAssistant() {
 
                 <Card className="bg-muted/30">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><GraduationCap /> {t('lessonPlanObjectives')}</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><GraduationCap /> {t.lessonPlanObjectives}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="list-disc space-y-1 pl-5">
@@ -267,7 +265,7 @@ export function CreativeAssistant() {
 
                 <Card className="bg-muted/30">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><ClipboardList /> {t('lessonPlanMaterials')}</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><ClipboardList /> {t.lessonPlanMaterials}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="list-disc space-y-1 pl-5">
@@ -278,7 +276,7 @@ export function CreativeAssistant() {
                 
                 <Card className="bg-muted/30">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><Telescope /> {t('lessonPlanProcedure')}</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><Telescope /> {t.lessonPlanProcedure}</CardTitle>
                   </Header>
                   <CardContent>
                     <ol className="list-decimal space-y-2 pl-5">
@@ -289,7 +287,7 @@ export function CreativeAssistant() {
 
                  <Card className="bg-muted/30">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><Microscope /> {t('lessonPlanAssessment')}</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><Microscope /> {t.lessonPlanAssessment}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p>{lessonPlan.assessment}</p>
@@ -298,7 +296,7 @@ export function CreativeAssistant() {
 
                  <Card className="bg-muted/30">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><Lightbulb /> {t('lessonPlanExtension')}</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-lg font-headline"><Lightbulb /> {t.lessonPlanExtension}</CardTitle>
                   </CardHeader>
                   <CardContent>
                      <ul className="list-disc space-y-1 pl-5">
