@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that generates story starters for preschool teachers.
@@ -33,7 +34,7 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateStoryStartersOutputSchema},
   prompt: `You are a helpful AI assistant that generates story starters for preschool teachers.
 
-  Generate a list of unique and age-appropriate story starters that can be used as writing prompts for preschool children. Focus on themes that are engaging, imaginative, and relevant to young children's experiences. The user wants {{count}} examples.
+  Generate a list of unique and age-appropriate story starters that can be used as writing prompts for preschool children. Focus on themes that are engaging, imaginative, and relevant to young children's experiences. The user wants {{{count}}} examples.
 
   The story starters should encourage creativity and critical thinking.
 
