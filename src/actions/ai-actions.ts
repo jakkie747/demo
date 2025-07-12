@@ -1,4 +1,6 @@
+
 'use server';
+import '@/ai/dev';
 
 import { generateActivityIdeas, GenerateActivityIdeasInput } from "@/ai/flows/generate-activity-ideas";
 import { generateLessonPlan, GenerateLessonPlanInput } from "@/ai/flows/generate-lesson-plan";
