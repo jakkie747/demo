@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { getChildrenByParentEmail } from "@/services/childrenService";
-import { getInvoicesByChild } from "@/services/invoiceService";
 import type { Child, DailyReport, Invoice } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -25,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getInvoicesByChild } from "@/services/invoiceService";
 
 
 const moodConfig = {
@@ -387,3 +387,5 @@ export default function ParentDashboardPage() {
     </div>
   );
 }
+
+    
