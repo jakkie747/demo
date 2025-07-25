@@ -1,7 +1,8 @@
 
+
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { getChildrenByParentEmail } from "@/services/childrenService";
@@ -206,20 +207,21 @@ function ChildSection({ child }: { child: Child }) {
   const [isLoadingReports, setIsLoadingReports] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const fetchedReports = await getReportsByChildId(child.id);
-        setReports(fetchedReports);
-      } catch (error) {
-        console.error(`Failed to fetch reports for ${child.name}`, error);
-        setFetchError((error as Error).message);
-      } finally {
-        setIsLoadingReports(false);
-      }
-    };
-    fetchReports();
+  const fetchReports = useCallback(async () => {
+    try {
+      const fetchedReports = await getReportsByChildId(child.id);
+      setReports(fetchedReports);
+    } catch (error) {
+      console.error(`Failed to fetch reports for ${child.name}`, error);
+      setFetchError((error as Error).message);
+    } finally {
+      setIsLoadingReports(false);
+    }
   }, [child.id, child.name]);
+
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
 
   const renderError = () => {
     if (!fetchError) return null;
@@ -307,24 +309,29 @@ export default function ParentDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchChildrenData = async () => {
-      if (user?.email) {
-        try {
-          const fetchedChildren = await getChildrenByParentEmail(user.email);
-          setChildren(fetchedChildren);
-        } catch (err) {
-          console.error("Error fetching child data:", err);
-          setError((err as Error).message);
-        } finally {
-          setIsLoading(false);
-        }
+  const fetchChildrenData = useCallback(async () => {
+    if (user?.email) {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const fetchedChildren = await getChildrenByParentEmail(user.email);
+        setChildren(fetchedChildren);
+      } catch (err) {
+        console.error("Error fetching child data:", err);
+        setError((err as Error).message);
+      } finally {
+        setIsLoading(false);
       }
-    };
-    if (user) {
-        fetchChildrenData();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+        fetchChildrenData();
+    } else {
+        setIsLoading(false);
+    }
+  }, [user, fetchChildrenData]);
 
   if (isLoading) {
     return (
@@ -387,5 +394,7 @@ export default function ParentDashboardPage() {
     </div>
   );
 }
+
+    
 
     

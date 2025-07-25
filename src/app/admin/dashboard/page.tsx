@@ -10,10 +10,11 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Mail, Briefcase, FileUp, FileDown, Copy, LampDesk } from "lucide-react";
+import { Users, Calendar, PlusCircle, AlertTriangle, FileText, GalleryHorizontal, Mail, Briefcase, FileUp, FileDown, Copy, LampDesk, ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { getChildren, addMultipleChildren } from "@/services/childrenService";
+import { getAfterschoolChildren } from "@/services/afterschoolService";
 import { getEvents } from "@/services/eventsService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -44,7 +45,8 @@ import { Label } from "@/components/ui/label";
 export default function DashboardPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [children, setChildren] = useState<Child[]>([]);
+  const [preschoolChildren, setPreschoolChildren] = useState<Child[]>([]);
+  const [afterschoolChildren, setAfterschoolChildren] = useState<Child[]>([]);
   const [eventsCount, setEventsCount] = useState(0);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isConfigured] = useState(isFirebaseConfigured());
@@ -58,15 +60,18 @@ export default function DashboardPage() {
   const fetchData = useCallback(async () => {
     setIsLoadingData(true);
     try {
-      const [childrenData, events] = await Promise.all([
+      const [preschoolData, afterschoolData, events] = await Promise.all([
         getChildren(),
+        getAfterschoolChildren(),
         getEvents(),
       ]);
-      setChildren(childrenData);
+      setPreschoolChildren(preschoolData);
+      setAfterschoolChildren(afterschoolData)
       setEventsCount(events.length);
     } catch (error) {
       toast({ variant: "destructive", title: "Error", description: "Could not fetch dashboard data." });
-      setChildren([]);
+      setPreschoolChildren([]);
+      setAfterschoolChildren([]);
       setEventsCount(0);
     } finally {
       setIsLoadingData(false);
@@ -85,7 +90,8 @@ export default function DashboardPage() {
   }, [isConfigured, toast, authLoading, fetchData]);
 
   const handleExport = (format: 'csv' | 'tsv') => {
-    if (children.length === 0) {
+    const allChildren = [...preschoolChildren, ...afterschoolChildren];
+    if (allChildren.length === 0) {
       toast({ variant: "destructive", title: "No Data", description: "There are no children to export." });
       return;
     }
@@ -109,7 +115,7 @@ export default function DashboardPage() {
         return str.replace(/\n|\r/g, ' ');
     };
 
-    const rows = children.map(child => 
+    const rows = allChildren.map(child => 
         headers.map(header => escapeField(child[header as keyof Child])).join(delimiter)
     );
 
@@ -229,6 +235,7 @@ export default function DashboardPage() {
 
 
   const isLoading = authLoading || isLoadingData;
+  const totalChildren = preschoolChildren.length + afterschoolChildren.length;
 
   if (!isConfigured) {
     return (
@@ -259,10 +266,10 @@ export default function DashboardPage() {
             {isLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <div className="text-2xl font-bold">{children.length}</div>
+              <div className="text-2xl font-bold">{totalChildren}</div>
             )}
             <p className="text-xs text-muted-foreground">
-              {/* This can be made dynamic later */}
+              {preschoolChildren.length} Preschool, {afterschoolChildren.length} Afterschool
             </p>
           </CardContent>
         </Card>
@@ -328,6 +335,22 @@ export default function DashboardPage() {
               </Button>
             </CardContent>
           </Card>
+           {userRole === 'admin' && (
+            <Card>
+                <CardHeader>
+                  <CardTitle>Invoicing</CardTitle>
+                  <CardDescription>Create and manage parent invoices.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="secondary">
+                    <Link href="/admin/dashboard/invoicing">
+                      <ReceiptText className="mr-2 h-4 w-4" />
+                      Manage Invoices
+                    </Link>
+                  </Button>
+                </CardContent>
+            </Card>
+           )}
           <Card>
             <CardHeader>
               <CardTitle>{t("manageEventsCard")}</CardTitle>
@@ -462,3 +485,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    

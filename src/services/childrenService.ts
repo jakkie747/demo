@@ -50,10 +50,14 @@ export const getChildrenByParentEmail = async (email: string): Promise<Child[]> 
         const childrenQuery = query(childrenCollectionRef, where("parentEmail", "==", email));
         const afterschoolQuery = query(afterschoolCollectionRef, where("parentEmail", "==", email));
         
-        const [childrenSnapshot, afterschoolSnapshot] = await Promise.all([
-            getDocs(childrenQuery),
-            getDocs(afterschoolQuery)
-        ]);
+        const [childrenSnapshot, afterschoolSnapshot] = await promiseWithTimeout(
+            Promise.all([
+                getDocs(childrenQuery),
+                getDocs(afterschoolQuery)
+            ]),
+            TIMEOUT_DURATION,
+            new Error("Fetching children by parent email timed out. Check Firestore indexes.")
+        );
 
         const preschoolChildren = childrenSnapshot.docs.map(doc => ({ id: doc.id, program: 'preschool', ...doc.data() } as Child));
         const afterschoolChildren = afterschoolSnapshot.docs.map(doc => ({ id: doc.id, program: 'afterschool', ...doc.data() } as Child));
@@ -64,7 +68,7 @@ export const getChildrenByParentEmail = async (email: string): Promise<Child[]> 
          if ((error as any).code === 'failed-precondition') {
             const message = (error as Error).message;
             console.error("Firebase Error: The following error message contains a link to create the required Firestore index. Please click the link to resolve the issue:", error);
-            throw new Error(`A database index is required to query children by parent email. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh the page. Raw error: ${message}`);
+            throw new Error(`A database index is required to query children by parent email. Please open the browser console (F12) to find a link to create the required Firestore index, then refresh this page. Raw error: ${message}`);
         }
         console.error("Error fetching children by parent email:", error);
         throw new Error("Could not fetch children for the logged in parent.");
@@ -133,3 +137,5 @@ export const deleteChild = async (childId: string): Promise<void> => {
         new Error(`Deleting child ${childId} timed out.`)
     );
 };
+
+    
