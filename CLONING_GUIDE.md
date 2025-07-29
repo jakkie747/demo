@@ -1,20 +1,32 @@
 
 # How to Clone This App for a New School: A Step-by-Step Guide
 
-This guide provides detailed instructions on how to create a complete, independent copy of this application for a new school. It covers everything from getting the source code to creating a new backend in Firebase and customizing the branding. Follow these steps carefully to ensure a successful setup.
+This guide provides detailed instructions on how to create a complete, independent copy of this application for a new school. It covers everything from setting up a new project in Firebase Studio to customizing the branding. Follow these steps carefully to ensure a successful setup.
 
 ---
-## **Part 1: Get a Copy of the Project Code**
+## **Part 1: Set Up Your New Project in Firebase Studio**
 
-Before you can connect the app to a new school's backend, you need a complete copy of the source code from this working project.
+Before you can customize the app, you need to create a new workspace in Firebase Studio and bring the code from this working project into it.
 
-1.  **Download the Source Code:**
-    *   The easiest way is to download the entire project as a ZIP file. Look for a "Download" or "Clone" button in your code editor or project hosting platform.
-    *   Once downloaded, unzip the file to a new folder on your computer. This folder (e.g., `sunnyside-preschool-app-code`) will be your new project's workspace.
+1.  **Download the Source Code from This Project:**
+    *   In your current, working Firebase Studio project (the one you are cloning *from*), you need to download all the code.
+    *   In the file explorer on the left, right-click on the top-level folder (e.g., `blinkogies-app`).
+    *   Select **"Download"** from the context menu. This will download the entire project as a ZIP file to your computer.
+    *   Find the downloaded ZIP file and **unzip it** into a folder on your computer. You will use this folder as the source to copy from.
 
-2.  **Open the New Project:**
-    *   Open your code editor (like VS Code) and choose "Open Folder".
-    *   Navigate to the folder you just unzipped and open it. You should now see all the files and folders from the original project.
+2.  **Create a New, Blank Project in Firebase Studio:**
+    *   Go to your main Firebase Studio dashboard where you see all your projects.
+    *   Click the **"Create New Project"** button.
+    *   When prompted to choose a template, select a **blank Next.js starter template**. Give your new project a name related to the new school (e.g., "SunnySide-Preschool").
+    *   This will create a new, empty workspace for you.
+
+3.  **Copy the Code into Your New Project:**
+    *   This is a manual but critical step. You need to make the file structure of your new, blank project match the downloaded project.
+    *   In your new Firebase Studio project, delete any boilerplate files in the `src` folder that you don't need.
+    *   Now, go through the unzipped folder on your computer. For each file and folder, you will **recreate it** in your new Firebase Studio project.
+    *   **To create a file:** Right-click in the file explorer in Firebase Studio, select "New File", and give it the correct name (e.g., `tailwind.config.ts`). Then, open the corresponding file on your computer, copy its entire content, and paste it into the new file in Firebase Studio.
+    *   **To create a folder:** Right-click, select "New Folder", and give it the correct name (e.g., `src/services`).
+    *   **Important:** You must copy the content of all key files, including `package.json`, `tailwind.config.ts`, and everything inside the `src` directory (like `app`, `components`, `lib`, `services`, etc.).
 
 ---
 
