@@ -152,6 +152,15 @@ Now you can change the app's appearance for the new school.
 
 ## **Part 6: Deployment**
 
-Once all the changes are made, you are ready to deploy the new app. The deployment process will be the same as for this app, but it will now be connected to your new Firebase project, creating a completely separate and independent application for the new school.
+Once all the changes are made, you are ready to deploy the new app. In Firebase Studio, this process is simple.
 
-You've now successfully cloned the application!
+1.  **Locate the Publish Button:**
+    *   In the top right corner of the Firebase Studio editor, you will see a blue **"Publish"** button.
+
+2.  **Click Publish:**
+    *   Click this button to begin the deployment process. Firebase Studio will automatically build your application, connect it to the Firebase services you configured, and deploy it to Firebase Hosting.
+
+3.  **Wait for Deployment:**
+    *   The process may take a few minutes. Once it's complete, you will be given a public URL where you can view your new, live application.
+
+You've now successfully cloned and deployed the application! It is now a completely separate and independent app connected to your new Firebase project.
