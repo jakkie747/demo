@@ -4,7 +4,13 @@
 This guide provides detailed instructions on how to create a complete, independent copy of this application for a new school. It covers everything from setting up a new project in Firebase Studio to customizing the branding. Follow these steps carefully to ensure a successful setup.
 
 ---
-## **Part 1: Set Up Your New Project in Firebase Studio**
+
+There are two primary methods to get the code into a new project:
+1.  **Manual Copy (Beginner-Friendly):** This involves downloading the code and manually recreating it in a new, blank project. It's straightforward and doesn't require any external tools.
+2.  **Using GitHub (Recommended):** This is the professional standard. It involves pushing your code to a GitHub repository and then importing it into a new Firebase Studio project. This is better for version control and long-term management.
+
+---
+## **Part 1: Set Up Your New Project in Firebase Studio (Manual Method)**
 
 Before you can customize the app, you need to create a new workspace in Firebase Studio and bring the code from this working project into it.
 
@@ -27,6 +33,37 @@ Before you can customize the app, you need to create a new workspace in Firebase
     *   **To create a file:** Right-click in the file explorer in Firebase Studio, select "New File", and give it the correct name (e.g., `tailwind.config.ts`). Then, open the corresponding file on your computer, copy its entire content, and paste it into the new file in Firebase Studio.
     *   **To create a folder:** Right-click, select "New Folder", and give it the correct name (e.g., `src/services`).
     *   **Important:** You must copy the content of all key files, including `package.json`, `tailwind.config.ts`, and everything inside the `src` directory (like `app`, `components`, `lib`, `services`, etc.).
+
+---
+
+## **Part 1 (Alternative): Using GitHub (Recommended Method)**
+
+This method uses GitHub to store your base application code, making it easy to create new copies.
+
+1.  **Push the Current App to a New GitHub Repository:**
+    *   **Go to GitHub:** Create a new repository on [GitHub.com](https://github.com/). It's highly recommended to make this a **private** repository, as your code contains configuration files. Name it something like `preschool-app-template`.
+    *   **Open the Terminal in Firebase Studio:** In your current, working Firebase Studio project, open the terminal at the bottom of the editor.
+    *   **Initialize Git:** Run the following commands one by one in the terminal:
+        ```bash
+        git init
+        git add .
+        git commit -m "Initial commit of the base application"
+        ```
+    *   **Connect to GitHub:** Copy the commands from your new GitHub repository page under the "...or push an existing repository from the command line" section. It will look something like this (use the URL from your own repository):
+        ```bash
+        git remote add origin https://github.com/your-username/preschool-app-template.git
+        git branch -M main
+        git push -u origin main
+        ```
+    *   Your working app's code is now safely stored on GitHub.
+
+2.  **Create a New Project in Firebase Studio from GitHub:**
+    *   Go to your main Firebase Studio dashboard.
+    *   Click **"Create New Project"**.
+    *   Instead of choosing a template, look for the option to **"Import from GitHub"**.
+    *   You will be prompted to connect your GitHub account to Firebase Studio. Follow the authorization steps.
+    *   Once connected, select the `preschool-app-template` repository you just created.
+    *   Firebase Studio will now clone this repository and create a new workspace with all your code already inside it.
 
 ---
 
@@ -81,7 +118,7 @@ Now, you'll tell your copied code to use the new Firebase project you just creat
     *   You will now see a `firebaseConfig` object on the screen. **Do not close this page.** It contains the unique keys for your new project.
 
 2.  **Update the Code:**
-    *   In your code editor, open the file: `src/lib/firebase.ts`.
+    *   In your new Firebase Studio project, open the file: `src/lib/firebase.ts`.
     *   Carefully copy each key and value from the `firebaseConfig` object in your browser (e.g., `apiKey`, `authDomain`, etc.) and paste it into the corresponding placeholder in the `src/lib/firebase.ts` file.
     *   **Important:** After pasting your credentials, your `firebaseConfig` object in the code should look something like this, but with your own unique values:
         ```javascript
