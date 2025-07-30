@@ -21,13 +21,12 @@ import { getFunctions, type Functions } from "firebase/functions";
 //    the placeholder values like "PASTE_YOUR_API_KEY_HERE".
 // =================================================================================
 export const firebaseConfig = {
-  apiKey: "AIzaSyBge7Syi7vZW6ENlbsXhAb1EcU7s8FFwOk",
-  authDomain: "fir-project-329cd.firebaseapp.com",
-  projectId: "fir-project-329cd",
-  storageBucket: "fir-project-329cd.firebasestorage.app",
-  messagingSenderId: "491407915555",
-  appId: "1:491407915555:web:dcf366dcd28b02b1e2cf96",
-  measurementId: "G-3H7JE2SJFH"
+  apiKey: "AIzaSyCvngLWjuvzkTr3frPzYLjUYhhAjYnchBA",
+  authDomain: "easyspark-demo-98cee.firebaseapp.com",
+  projectId: "easyspark-demo-98cee",
+  storageBucket: "easyspark-demo-98cee.firebasestorage.app",
+  messagingSenderId: "408119497197",
+  appId: "1:408119497197:web:f9da557f4f87fed0d497e4"
 };
 
 
