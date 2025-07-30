@@ -4,6 +4,16 @@
 This guide provides detailed instructions on how to create a complete, independent copy of this application for a new school. It covers everything from setting up a new project in Firebase Studio to customizing the branding. Follow these steps carefully to ensure a successful setup.
 
 ---
+## **Core Concept: Separating the App and the Backend**
+
+Before you begin, it's crucial to understand that for every new school, you will have **two** separate pieces:
+
+1.  **The App Code (in Firebase Studio):** This is the visible part of the application—the user interface, pages, and logic. When you clone this project, you are copying this code.
+2.  **The Firebase Project (in the Firebase Console):** This is the invisible backend that provides essential services like the database (Firestore), user logins (Authentication), and file uploads (Storage).
+
+**Crucially, every new school *must* have its own separate Firebase Project.** You cannot have multiple schools sharing the same database. The final step of this guide is to connect your copied App Code to your new, dedicated Firebase Project.
+
+---
 
 There are two primary methods to get the code into a new project:
 1.  **Manual Copy (Beginner-Friendly):** This involves downloading the code and manually recreating it in a new, blank project. It's straightforward and doesn't require any external tools.
