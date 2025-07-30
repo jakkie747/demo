@@ -1,62 +1,83 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper function to check if a user is an authenticated admin
+    
+    // Helper functions
+    function isParent() {
+      return request.auth != null && exists(/databases/$(database)/documents/parents/$(request.auth.token.email));
+    }
+    
     function isAdmin() {
       return request.auth != null && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.role == 'admin';
     }
     
-    // Helper function to check if a user is authenticated
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    // Children collection can be read by admins, and created by anyone (public registration form).
-    // Updates and deletes are restricted to admins.
-    match /children/{childId} {
-      allow read: if isAdmin();
-      allow create: if true;
-      allow update, delete: if isAdmin();
+    function isTeacher() {
+       return request.auth != null && exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
     }
     
-    // Events, Activities (Gallery), and Documents can be read by anyone.
-    // Only admins can create, update, or delete them.
+    function isOwner(resourceId) {
+        return request.auth.uid == resourceId;
+    }
+
+    // PUBLIC: Events, Gallery (Activities), Documents can be read by anyone.
     match /events/{eventId} {
       allow read: if true;
       allow write: if isAdmin();
     }
     
     match /activities/{activityId} {
-        allow read: if true;
-        allow write: if isAdmin();
+      allow read: if true;
+      allow write: if isTeacher();
     }
     
     match /documents/{documentId} {
-        allow read: if true;
-        allow write: if isAdmin();
-    }
-
-    // Teachers collection can only be read and written to by admins.
-    // This prevents non-admin users from seeing or modifying teacher data.
-    match /teachers/{teacherId} {
-        allow read, write: if isAdmin();
-    }
-
-    // Daily reports can only be read by the child's parent or an admin.
-    // They can only be created, updated, or deleted by an admin.
-    match /daily_reports/{reportId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.childId in get(/databases/$(database)/documents/children?where("parentEmail", "==", request.auth.token.email)).docs.map(doc => doc.id));
+      allow read: if true;
       allow write: if isAdmin();
     }
 
-    // FCM tokens for push notifications can be written by anyone,
-    // but should not be readable to prevent leaking tokens.
-    match /fcmTokens/{token} {
-      allow read: if false;
-      allow write: if true;
+    // CHILDREN: Anyone can create (register). Only admins can read/update.
+    // Parents can only update specific fields on their own child's profile.
+    match /children/{childId} {
+      allow create: if true; // Public registration
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin() || 
+                      (request.auth.token.email == resource.data.parentEmail &&
+                       !('parentEmail' in request.resource.data) &&
+                       !('parent' in request.resource.data));
+    }
+    
+    // AFTERSCHOOL CHILDREN: Same rules as preschool children.
+    match /afterschoolChildren/{childId} {
+        allow create: if true; // Public registration
+        allow read, delete: if isAdmin();
+        allow update: if isAdmin() || 
+                        (request.auth.token.email == resource.data.parentEmail &&
+                         !('parentEmail' in request.resource.data) &&
+                         !('parent' in request.resource.data));
+    }
+
+    // DAILY REPORTS: Only teachers/admins can create/write.
+    // Parents can only read reports for their own children.
+    match /daily_reports/{reportId} {
+      allow read: if isTeacher() || 
+                    (request.auth != null && request.auth.token.email == get(/databases/$(database)/documents/children/$(resource.data.childId)).data.parentEmail) ||
+                    (request.auth != null && request.auth.token.email == get(/databases/$(database)/documents/afterschoolChildren/$(resource.data.childId)).data.parentEmail);
+      allow create, update, delete: if isTeacher();
+    }
+    
+    // TEACHERS: Only admins can manage teacher profiles. Teachers can read their own profile.
+    match /teachers/{teacherId} {
+      allow read: if isTeacher();
+      allow create, update: if isAdmin();
+      // Deletion is handled in the app to trigger a manual auth delete.
+      allow delete: if isAdmin();
+    }
+
+    // INVOICES: Admins can create/read all. Parents can only read their own.
+    match /invoices/{invoiceId} {
+        allow create, read, update: if isAdmin();
+        allow read: if request.auth.token.email == resource.data.parentId;
     }
   }
 }
