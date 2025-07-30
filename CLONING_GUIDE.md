@@ -67,6 +67,46 @@ This method uses GitHub to store your base application code, making it easy to c
 
 ---
 
+## **Troubleshooting GitHub Push Errors**
+
+If you encounter errors when running `git push`, here are solutions to common problems.
+
+### **Error: `remote origin already exists`**
+
+*   **What it means:** You have already run the `git remote add origin ...` command in this project.
+*   **Solution:** This is not a critical error. You can safely ignore it and proceed with the next command (`git branch -M main`).
+
+### **Error: `Permission denied` or `fatal: unable to access ... The requested URL returned error: 403`**
+
+*   **What it means:** This is a **permissions error**. The GitHub account logged into your computer is different from the account that owns the repository you're trying to push to. For example, your computer is authenticated as user `jacwil747`, but the repository is owned by `jakkie747`.
+*   **Solution:** You need to update the saved Git credentials on your computer. On Windows, this is done through the Credential Manager.
+
+**Step-by-Step Fix (Windows):**
+
+1.  **Open Credential Manager:**
+    *   Click the **Start Menu** and type "Credential Manager".
+    *   Select it from the search results.
+
+2.  **Go to Windows Credentials:**
+    *   In the Credential Manager window, click on the **"Windows Credentials"** tab.
+
+3.  **Find the GitHub Credential:**
+    *   Look through the list under "Generic Credentials" for an entry that looks like `git:https://github.com`.
+
+4.  **Remove the Old Credential:**
+    *   Click on the GitHub credential to expand it.
+    *   Click the **"Remove"** link at the bottom. Confirm that you want to remove it.
+
+5.  **Try Pushing Again:**
+    *   Go back to the terminal in Firebase Studio.
+    *   Run the `git push -u origin main` command again.
+    *   This time, Git should prompt you to log in. A new window from GitHub will appear.
+    *   **Crucially, log in with the correct GitHub account**—the one that owns the repository (e.g., `jakkie747`).
+
+After logging in with the correct account, your `git push` command should succeed.
+
+---
+
 ## **Part 2: Create a New Firebase Project**
 
 Every new school needs its own separate, secure backend. This is the most important part of the process.
@@ -213,5 +253,3 @@ Once all the changes are made, you are ready to deploy the new app. In Firebase 
     *   The process may take a few minutes. Once it's complete, you will be given a public URL where you can view your new, live application.
 
 You've now successfully cloned and deployed the application! It is now a completely separate and independent app connected to your new Firebase project.
-
-    
