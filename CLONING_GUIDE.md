@@ -43,13 +43,13 @@ This method uses GitHub to store your base application code, making it easy to c
 1.  **Push the Current App to a New GitHub Repository:**
     *   **Go to GitHub:** Create a new repository on [GitHub.com](https://github.com/). It's highly recommended to make this a **private** repository, as your code contains configuration files. Name it something like `preschool-app-template`.
     *   **Open the Terminal in Firebase Studio:** In your current, working Firebase Studio project, open the terminal at the bottom of the editor.
-    *   **Initialize Git:** Run the following commands one by one in the terminal:
+    *   **Initialize Git and Commit:** Run the following commands one by one in the terminal. This prepares your project and creates the first commit, which is essential.
         ```bash
         git init
         git add .
         git commit -m "Initial commit of the base application"
         ```
-    *   **Connect to GitHub:** Copy the commands from your new GitHub repository page under the "...or push an existing repository from the command line" section. It will look something like this (use the URL from your own repository):
+    *   **Connect to GitHub and Push:** Now, copy the commands from your new GitHub repository page under the "...or push an existing repository from the command line" section. It will look something like this (use the URL from your own repository). These commands link your local project to GitHub and send the files up.
         ```bash
         git remote add origin https://github.com/your-username/preschool-app-template.git
         git branch -M main
