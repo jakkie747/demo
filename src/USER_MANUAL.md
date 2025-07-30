@@ -1,5 +1,5 @@
 
-# Blinkogies App - User Manual...
+# Blinkogies App - User Manual........
 
 Welcome to the Blinkogies App! This application is designed to be a central place for all communication between the school and our families. This guide will walk you through all the features available to you.
 
