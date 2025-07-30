@@ -213,3 +213,5 @@ Once all the changes are made, you are ready to deploy the new app. In Firebase 
     *   The process may take a few minutes. Once it's complete, you will be given a public URL where you can view your new, live application.
 
 You've now successfully cloned and deployed the application! It is now a completely separate and independent app connected to your new Firebase project.
+
+    
